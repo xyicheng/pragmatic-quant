@@ -39,7 +39,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Basic\EnumerableUtils.cs" />
+    <Compile Include="Math\Function\BasicRRFunction.cs" />
+    <Compile Include="Math\Function\Interpolation.cs" />
     <Compile Include="Math\RRFunction.cs" />
+    <Compile Include="Basic\StepSearcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
