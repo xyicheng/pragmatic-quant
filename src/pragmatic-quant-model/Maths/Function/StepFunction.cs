@@ -27,4 +27,5 @@ namespace pragmatic_quant_model.Maths.Function
             return values[System.Math.Min(leftIndex, abscissae.Length - 1)];
         }
     }
+
 }

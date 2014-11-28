@@ -16,6 +16,7 @@ namespace pragmatic_quant_model.Maths.Function
         }
     }
 
+
     public class ExpRRFunction : RRFunction
     {
         #region private fields

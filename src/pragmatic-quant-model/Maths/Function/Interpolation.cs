@@ -39,6 +39,7 @@ namespace pragmatic_quant_model.Maths.Function
         }
     }
     
+
     public class CubicSplineInterpolation : RRFunction
     {
         #region private fields
