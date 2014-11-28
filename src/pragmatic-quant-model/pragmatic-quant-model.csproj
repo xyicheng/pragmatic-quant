@@ -39,10 +39,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Basic\DoubleUtils.cs" />
     <Compile Include="Basic\EnumerableUtils.cs" />
-    <Compile Include="Math\Function\BasicRRFunction.cs" />
-    <Compile Include="Math\Function\Interpolation.cs" />
-    <Compile Include="Math\RRFunction.cs" />
+    <Compile Include="Maths\Function\BasicRRFunction.cs" />
+    <Compile Include="Maths\Function\Interpolation.cs" />
+    <Compile Include="Maths\Function\StepFunction.cs" />
+    <Compile Include="Maths\RRFunction.cs" />
     <Compile Include="Basic\StepSearcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
