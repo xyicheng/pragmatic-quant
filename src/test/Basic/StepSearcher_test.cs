@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using pragmatic_quant_model.Basic;
 
 namespace test.Basic
@@ -9,18 +10,26 @@ namespace test.Basic
         [TestMethod]
         public void TestLocateLeftIndex()
         {
-            var stepSearcher = new StepSearcher(new[] {0.0, 0.5, 0.7, 1.0, 10.0});
+            var abs = new[] {0.0, 0.5, 0.7, 1.0, 10.0};
+            var stepSearcher = new StepSearcher(abs);
 
-            Assert.AreEqual(stepSearcher.LocateLeftIndex(0.0), 0);
-            Assert.AreEqual(stepSearcher.LocateLeftIndex(0.5), 1);
-            Assert.AreEqual(stepSearcher.LocateLeftIndex(0.7), 2);
-            Assert.AreEqual(stepSearcher.LocateLeftIndex(1.0), 3);
-            Assert.AreEqual(stepSearcher.LocateLeftIndex(10.0), 4);
+            foreach (var i in Enumerable.Range(0, abs.Length))
+            {
+                Assert.AreEqual(stepSearcher.LocateLeftIndex(abs[i]), i);
+                if (i < abs.Length - 1)
+                {
+                    double midPoint = 0.5 * (abs[i] + abs[i + 1]);
+                    Assert.AreEqual(stepSearcher.LocateLeftIndex(midPoint), i);
 
-            Assert.AreEqual(stepSearcher.LocateLeftIndex(-0.1), -1);
-            Assert.AreEqual(stepSearcher.LocateLeftIndex(0.25), 0);
-            Assert.AreEqual(stepSearcher.LocateLeftIndex(1.01), 3);
-            Assert.AreEqual(stepSearcher.LocateLeftIndex(11.0), 4);
+                    double nextPointMinus = abs[i] + (1.0 - 10.0 * DoubleUtils.Epsilon) * (abs[i + 1] - abs[i]);
+                    Assert.AreEqual(stepSearcher.LocateLeftIndex(nextPointMinus), i);
+                }
+            }
+            
+            Assert.AreEqual(stepSearcher.LocateLeftIndex(abs[0] - 0.00000001), -1);
+            Assert.AreEqual(stepSearcher.LocateLeftIndex(abs[abs.Length - 1] + 0.00000001), abs.Length - 1);
+            Assert.AreEqual(stepSearcher.LocateLeftIndex(double.NegativeInfinity), -1);
+            Assert.AreEqual(stepSearcher.LocateLeftIndex(double.PositiveInfinity), abs.Length - 1);
         }
     }
 }
