@@ -44,6 +44,7 @@
     <Compile Include="Maths\Function\BasicRRFunction.cs" />
     <Compile Include="Maths\Function\Interpolation.cs" />
     <Compile Include="Maths\Function\StepFunction.cs" />
+    <Compile Include="Maths\Gauss.cs" />
     <Compile Include="Maths\RRFunction.cs" />
     <Compile Include="Basic\StepSearcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
