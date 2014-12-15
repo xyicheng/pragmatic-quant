@@ -52,7 +52,9 @@
   <ItemGroup>
     <Compile Include="Basic\DoubleUtils_test.cs" />
     <Compile Include="Basic\StepSearcher_test.cs" />
+    <Compile Include="Maths\Function\LinearInterpolation_test.cs" />
     <Compile Include="Maths\Function\StepFunction.cs" />
+    <Compile Include="Maths\Cholesky_test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

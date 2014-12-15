@@ -20,7 +20,6 @@ namespace pragmatic_quant_model.Maths.Function
             this.rightExtrapolationSlope = rightExtrapolationSlope;
             stepSearcher = new StepSearcher(abscissae);
         }
-
         public override double Eval(double x)
         {
             int leftIndex = stepSearcher.LocateLeftIndex(x);
@@ -44,39 +43,39 @@ namespace pragmatic_quant_model.Maths.Function
         #region private fields
         private readonly StepSearcher stepSearcher;
         private readonly double[] abscissae;
-        private readonly double[] yy;
-        private readonly double[] y2;
+        private readonly double[] values;
+        private readonly double[] secondDerivatives;
         #endregion
-        public CubicSplineInterpolation(double[] xv, double[] values, double yp1, double ypn)
+        public CubicSplineInterpolation(double[] abscissae, double[] values, double leftDerivative, double rightDerivative)
         {
-            abscissae = xv;
-            yy = values;
-            stepSearcher = new StepSearcher(xv);
-            y2 = new double[values.Length];
+            this.abscissae = abscissae;
+            this.values = values;
+            stepSearcher = new StepSearcher(abscissae);
+            secondDerivatives = new double[values.Length];
 
-            var u = new double[xv.Length];
-            if (double.IsNaN(yp1))
+            var u = new double[abscissae.Length];
+            if (double.IsNaN(leftDerivative))
             {//Natural Spline
-                y2[0] = 0.0;
+                secondDerivatives[0] = 0.0;
             }
             else
             {
-                y2[0] = -0.5;
-                u[0] = (3.0 / (xv[1] - xv[0])) * ((values[1] - values[0]) / (xv[1] - xv[0]) - yp1);
+                secondDerivatives[0] = -0.5;
+                u[0] = (3.0 / (abscissae[1] - abscissae[0])) * ((values[1] - values[0]) / (abscissae[1] - abscissae[0]) - leftDerivative);
             }
 
-            for (int i = 1; i < xv.Length - 1; i++)
+            for (int i = 1; i < abscissae.Length - 1; i++)
             {
-                double sig = (xv[i] - xv[i - 1]) / (xv[i + 1] - xv[i - 1]);
-                double p = sig * y2[i - 1] + 2.0;
-                y2[i] = (sig - 1.0) / p;
-                u[i] = (values[i + 1] - values[i]) / (xv[i + 1] - xv[i]) - (values[i] - values[i - 1]) / (xv[i] - xv[i - 1]);
-                u[i] = (6.0 * u[i] / (xv[i + 1] - xv[i - 1]) - sig * u[i - 1]) / p;
+                double sig = (abscissae[i] - abscissae[i - 1]) / (abscissae[i + 1] - abscissae[i - 1]);
+                double p = sig * secondDerivatives[i - 1] + 2.0;
+                secondDerivatives[i] = (sig - 1.0) / p;
+                u[i] = (values[i + 1] - values[i]) / (abscissae[i + 1] - abscissae[i]) - (values[i] - values[i - 1]) / (abscissae[i] - abscissae[i - 1]);
+                u[i] = (6.0 * u[i] / (abscissae[i + 1] - abscissae[i - 1]) - sig * u[i - 1]) / p;
             }
 
             int n = values.Length;
             double qn, un;
-            if (double.IsNaN(ypn))
+            if (double.IsNaN(rightDerivative))
             {//Natural Spline
                 qn = 0.0;
                 un = 0.0;
@@ -84,28 +83,28 @@ namespace pragmatic_quant_model.Maths.Function
             else
             {
                 qn = 0.5;
-                un = (3.0 / (xv[n - 1] - xv[n - 1])) * (ypn - (values[n - 1] - values[n - 2]) / (xv[n - 1] - xv[n - 2]));
+                un = (3.0 / (abscissae[n - 1] - abscissae[n - 1])) * (rightDerivative - (values[n - 1] - values[n - 2]) / (abscissae[n - 1] - abscissae[n - 2]));
             }
-            y2[n - 1] = (un - qn * u[n - 2]) / (qn * y2[n - 2] + 1.0);
+            secondDerivatives[n - 1] = (un - qn * u[n - 2]) / (qn * secondDerivatives[n - 2] + 1.0);
             for (int k = n - 2; k >= 0; k--)
             {
-                y2[k] = y2[k] * y2[k + 1] + u[k];
+                secondDerivatives[k] = secondDerivatives[k] * secondDerivatives[k + 1] + u[k];
             }
         }
         public override double Eval(double x)
         {
-            int klo = stepSearcher.LocateLeftIndex(x);
-            int khi = klo + 1;
-            if (klo <= -1 || klo >= abscissae.Length - 1)
+            int leftIndex = stepSearcher.LocateLeftIndex(x);
+            int rightIndex = leftIndex + 1;
+            if (leftIndex <= -1 || rightIndex >= abscissae.Length)
                 throw new Exception("Extrapolation not allowed");
 
-            double h = abscissae[khi] - abscissae[klo];
+            double h = abscissae[rightIndex] - abscissae[leftIndex];
             if (DoubleUtils.EqualZero(h))
                 throw new Exception("Bad input to routine spline");
-            double a = (abscissae[khi] - x) / h;
-            double b = (x - abscissae[klo]) / h;
-            double y = a * yy[klo] + b * yy[khi]
-                       + ((a * a * a - a) * y2[klo] + (b * b * b - b) * y2[khi]) * (h * h) / 6.0;
+            double w1 = (abscissae[rightIndex] - x) / h;
+            double w2 = (x - abscissae[leftIndex]) / h;
+            double y = w1 * values[leftIndex] + w2 * values[rightIndex]
+                       + ((w1 * w1 * w1 - w1) * secondDerivatives[leftIndex] + (w2 * w2 * w2 - w2) * secondDerivatives[rightIndex]) * (h * h) / 6.0;
             return y;
         }
     }
