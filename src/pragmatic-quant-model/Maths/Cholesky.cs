@@ -9,8 +9,9 @@ namespace pragmatic_quant_model.Maths
         /// Return lower triangular matrix L s.t. A=L*transpose(L)
         /// </summary>
         /// <param name="a"></param>
+        /// <param name="negativeTolerance"></param>
         /// <returns></returns>
-        public static double[,] Decomposition(double[,] a)
+        public static double[,] Decomposition(double[,] a, double negativeTolerance)
         {
             int n = a.GetLength(0);
             if (n != a.GetLength(1))
@@ -25,7 +26,7 @@ namespace pragmatic_quant_model.Maths
                     for (int k = i - 1; k >= 0; k--) sum -= el[i, k] * el[j, k];
                     if (i == j)
                     {
-                        if (sum < -DoubleUtils.Epsilon * Math.Abs(el[i, i]))
+                        if (sum < -negativeTolerance * Math.Abs(el[i, i]))
                             throw new Exception("Cholesky failed !");
                         if (sum <= 0.0)
                         {
@@ -47,6 +48,14 @@ namespace pragmatic_quant_model.Maths
 
             return el;
         }
-
+        /// <summary>
+        /// Return lower triangular matrix L s.t. A=L*transpose(L)
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        public static double[,] Decomposition(double[,] a)
+        {
+            return Decomposition(a, DoubleUtils.Epsilon);
+        }
     }
 }

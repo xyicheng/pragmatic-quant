@@ -4,6 +4,7 @@ namespace pragmatic_quant_model.Basic
 {
     public interface ITimeMeasure
     {
+        DateTime RefDate { get; }
         double this[DateTime date] { get; }
         double[] this[DateTime[] dates] { get; }
     }
@@ -22,6 +23,13 @@ namespace pragmatic_quant_model.Basic
             return new TimeMeasure(refDate);
         }
 
+        public DateTime RefDate
+        {
+            get
+            {
+                return refDate;
+            }
+        }
         public double this[DateTime date]
         {
             get

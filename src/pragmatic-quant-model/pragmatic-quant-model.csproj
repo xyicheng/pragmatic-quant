@@ -42,6 +42,8 @@
     <Compile Include="Basic\DoubleUtils.cs" />
     <Compile Include="Basic\EnumerableUtils.cs" />
     <Compile Include="Basic\TimeMeasure.cs" />
+    <Compile Include="Market\AssetId.cs" />
+    <Compile Include="Market\AssetMarket.cs" />
     <Compile Include="Market\Currency.cs" />
     <Compile Include="Market\DiscountProvider.cs" />
     <Compile Include="Market\FinancingCurveId.cs" />
