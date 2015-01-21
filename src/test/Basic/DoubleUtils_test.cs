@@ -5,7 +5,7 @@ using pragmatic_quant_model.Basic;
 namespace test.Basic
 {
     [TestClass]
-    public class DoubleUtils_test
+    public class DoubleUtils_Test
     {
         [TestMethod]
         public void TestEqualZero()

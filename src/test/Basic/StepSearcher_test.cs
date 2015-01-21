@@ -5,7 +5,7 @@ using pragmatic_quant_model.Basic;
 namespace test.Basic
 {
     [TestClass]
-    public class StepSearcher_test
+    public class StepSearcher_Test
     {
         [TestMethod]
         public void TestLocateLeftIndex()

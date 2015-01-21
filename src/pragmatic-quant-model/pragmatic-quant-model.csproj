@@ -41,17 +41,21 @@
   <ItemGroup>
     <Compile Include="Basic\DoubleUtils.cs" />
     <Compile Include="Basic\EnumerableUtils.cs" />
+    <Compile Include="Basic\GridUtils.cs" />
+    <Compile Include="Basic\MathConsts.cs" />
     <Compile Include="Basic\TimeMeasure.cs" />
     <Compile Include="Market\AssetId.cs" />
     <Compile Include="Market\AssetMarket.cs" />
     <Compile Include="Market\Currency.cs" />
     <Compile Include="Market\DiscountProvider.cs" />
     <Compile Include="Market\FinancingCurveId.cs" />
+    <Compile Include="Maths\BlackOption.cs" />
     <Compile Include="Maths\Cholesky.cs" />
+    <Compile Include="Maths\ErrorFunctions.cs" />
     <Compile Include="Maths\Function\BasicRRFunction.cs" />
     <Compile Include="Maths\Function\Interpolation.cs" />
     <Compile Include="Maths\Function\StepFunction.cs" />
-    <Compile Include="Maths\Gauss.cs" />
+    <Compile Include="Maths\NormalDistribution.cs" />
     <Compile Include="Maths\MatrixUtils.cs" />
     <Compile Include="Maths\RRFunction.cs" />
     <Compile Include="Basic\StepSearcher.cs" />

@@ -6,7 +6,7 @@ using pragmatic_quant_model.Maths;
 namespace test.Maths
 {
     [TestClass]
-    public class Cholesky_test
+    public class Cholesky_Test
     {
         #region private methods
         private static  void TestDecomposition(double[,] a, double precision)
@@ -27,7 +27,7 @@ namespace test.Maths
         [TestMethod]
         public void TestDecomposition1()
         {
-            var rho = 0.5;
+            const double rho = 0.5;
             var a = new[,]
             {
                 {1.0, rho, rho, rho},
@@ -41,7 +41,7 @@ namespace test.Maths
         [TestMethod]
         public void TestDecomposition2()
         {
-            var rho = 0.99;
+            const double rho = 0.99;
             var a = new[,]
             {
                 {1.0, rho, rho, rho},
@@ -55,7 +55,7 @@ namespace test.Maths
         [TestMethod]
         public void TestDecomposition3()
         {
-            var rho = 0.5;
+            const double rho = 0.5;
             var a = new[,]
             {
                 {1.0, rho, rho, rho},
@@ -69,7 +69,7 @@ namespace test.Maths
         [TestMethod]
         public void TestDecomposition4()
         {
-            var rho = 0.5;
+            const double rho = 0.5;
             var a = new[,]
             {
                 {1.0, 1.0, rho, rho},

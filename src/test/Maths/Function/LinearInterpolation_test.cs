@@ -5,7 +5,7 @@ using pragmatic_quant_model.Maths.Function;
 namespace test.Maths.Function
 {
     [TestClass]
-    public class LinearInterpolation_test
+    public class LinearInterpolation_Test
     {
         [TestMethod]
         public void TestEval()
@@ -36,7 +36,7 @@ namespace test.Maths.Function
     }
 
     [TestClass]
-    public class CubicSplineInterpolation_test
+    public class CubicSplineInterpolation_Test
     {
         [TestMethod]
         public void TestEval()

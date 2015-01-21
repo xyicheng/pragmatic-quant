@@ -19,11 +19,15 @@ namespace pragmatic_quant_model.Basic
         }
         #endregion
         public static readonly double Epsilon = GetMachineEpsilon();
+        public static readonly double Sqrt_Epsilon = Math.Sqrt(Epsilon);
+        public static readonly double FourthRoot_Epsilon = Math.Sqrt(Sqrt_Epsilon);
+        public static readonly double EighthRoot_Epsilon = Math.Sqrt(FourthRoot_Epsilon);
+        public static readonly double SixteenthRoot_Epsilon = Math.Sqrt(EighthRoot_Epsilon);
+        
         public static bool MachineEquality(double x, double y)
         {
             return Math.Abs(x - y) <= Math.Max(Math.Abs(x), Math.Abs(y)) * Epsilon;
         }
-
         public static bool EqualZero(double x)
         {
             // ReSharper disable once CompareOfFloatsByEqualityOperator

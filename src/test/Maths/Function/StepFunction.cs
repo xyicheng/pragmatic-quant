@@ -6,7 +6,7 @@ using pragmatic_quant_model.Maths.Function;
 namespace test.Maths.Function
 {
     [TestClass]
-    public class StepFunction_test
+    public class StepFunction_Test
     {
         [TestMethod]
         public void TestEval()
