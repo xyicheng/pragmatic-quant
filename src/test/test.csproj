@@ -57,6 +57,7 @@
     <Compile Include="Maths\Function\StepFunction.cs" />
     <Compile Include="Maths\Cholesky_test.cs" />
     <Compile Include="Maths\NormalDistribution_test.cs" />
+    <Compile Include="Maths\BlackOption_Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

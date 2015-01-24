@@ -3,8 +3,14 @@ namespace pragmatic_quant_model.Basic
 {
     public static class MathConsts
     {
+        public const double TwoPi = 6.283185307179586476925286766559005768394338798750;
+        public const double PiOverSix = 0.523598775598298873077107230546583814032861566563;
         public const double SqrtTwoPi = 2.506628274631000502415765284811045253006986740610;
         public const double InvSqrtTwoPi = 0.3989422804014326779399460599343818684758586311649;
+
+        public const double SqrtThree = 1.732050807568877293527446341505872366942805253810;
         public const double InvSqrt2 = 0.7071067811865475244008443621048490392848359376887;
+        public const double SqrtOneOverThree = 0.577350269189625764509148780501957455647601751270;
+        
     }
 }

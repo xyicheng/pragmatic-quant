@@ -1,5 +1,5 @@
-﻿// ORIGINAL SOURCE CODE
-// This source code resides at www.jaeckel.org/LetsBeRational.7z .
+﻿// ORIGINAL SOURCE CODE :
+// source code resides at www.jaeckel.org/LetsBeRational.7z .
 //
 // ======================================================================================
 // Copyright © 2013-2014 Peter Jäckel.

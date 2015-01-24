@@ -49,7 +49,7 @@
     <Compile Include="Market\Currency.cs" />
     <Compile Include="Market\DiscountProvider.cs" />
     <Compile Include="Market\FinancingCurveId.cs" />
-    <Compile Include="Maths\BlackOption.cs" />
+    <Compile Include="Maths\BlackScholesOption.cs" />
     <Compile Include="Maths\Cholesky.cs" />
     <Compile Include="Maths\ErrorFunctions.cs" />
     <Compile Include="Maths\Function\BasicRRFunction.cs" />
@@ -57,6 +57,7 @@
     <Compile Include="Maths\Function\StepFunction.cs" />
     <Compile Include="Maths\NormalDistribution.cs" />
     <Compile Include="Maths\MatrixUtils.cs" />
+    <Compile Include="Maths\RationalCubic.cs" />
     <Compile Include="Maths\RRFunction.cs" />
     <Compile Include="Basic\StepSearcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
