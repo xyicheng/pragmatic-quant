@@ -36,7 +36,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BagServices.cs" />
     <Compile Include="VanillaOption.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

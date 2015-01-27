@@ -34,6 +34,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BagServices.cs" />
     <Compile Include="Basic\Assertions.cs" />
     <Compile Include="Basic\DoubleConverter.cs" />
     <Compile Include="Basic\DoubleUtils.cs" />

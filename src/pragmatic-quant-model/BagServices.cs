@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Structure;
 
-namespace pragmatic_quant_com
+namespace pragmatic_quant_model
 {
     public class BagServices
     {
@@ -12,13 +12,9 @@ namespace pragmatic_quant_com
         {
             return new Exception("Missing parameter : " + name + " !");
         }
-        private static Exception MissingValue(string name)
+        private static string MissingValueMsg(string name)
         {
-            return new Exception("Missing parameter value for " + name + " !");
-        }
-        private static Exception MissingOrOutsideValue(string name)
-        {
-            return new Exception("Parameter value for " + name + " is outside bag or missing !");
+            return "Missing parameter value for " + name + " !";
         }
         private static bool IsEmptyCell(object cellValue)
         {
@@ -75,20 +71,24 @@ namespace pragmatic_quant_com
             return Has(bag, name, out row, out col);
         }
 
+        public static T ProcessScalar<T>(object[,] bag, int row, int col, Func<object, T> valueMap, string missingException)
+        {
+            if (col >= bag.GetUpperBound(1))
+                throw new Exception(missingException);
+
+            var scalar = bag[row, col + 1];
+
+            if (IsEmptyCell(scalar))
+                throw new Exception(missingException);
+
+            return valueMap(scalar);
+        }
         public static T ProcessScalar<T>(object[,] bag, string name, Func<object, T> valueMap)
         {
             int row, col;
             if (Has(bag, name, out row, out col))
             {
-                if (col >= bag.GetUpperBound(1))
-                    throw MissingOrOutsideValue(name);
-
-                var scalar = bag[row, col + 1];
-
-                if (IsEmptyCell(scalar))
-                    throw MissingValue(name);
-
-                return valueMap(scalar);
+                return ProcessScalar(bag, row, col, valueMap, MissingValueMsg(name));
             }
             throw MissingParameter(name);
         }
@@ -105,26 +105,30 @@ namespace pragmatic_quant_com
             return ProcessScalar(bag, name, DateOrDurationValueConverter(name));
         }
 
+        public static T[] ProcessVector<T>(object[,] bag, int baseRow, int baseCol, Func<object, T> valueMap, string missingException)
+        {
+            if (baseRow >= bag.GetUpperBound(0))
+                throw new Exception(missingException);
+
+            var values = new List<T>();
+            for (int row = baseRow; row <= bag.GetUpperBound(0); ++row)
+            {
+                var value = bag[row, baseCol];
+                if (IsEmptyCell(value)) break;
+                values.Add(valueMap(value));
+            }
+
+            if (values.Count == 0)
+                throw new Exception(missingException);
+
+            return values.ToArray();
+        }
         public static T[] ProcessVector<T>(object[,] bag, string name, Func<object, T> valueMap)
         {
             int row, col;
             if (Has(bag, name, out row, out col))
             {
-                if (row >= bag.GetUpperBound(0))
-                    throw MissingOrOutsideValue(name);
-
-                var values = new List<T>();
-                for (row = row + 1; row <= bag.GetUpperBound(0); ++row)
-                {
-                    var value = bag[row, col];
-                    if (IsEmptyCell(value)) break;
-                    values.Add(valueMap(value));
-                }
-
-                if (values.Count == 0)
-                    throw MissingValue(name);
-
-                return values.ToArray();
+                return ProcessVector(bag, row + 1, col, valueMap, MissingValueMsg(name));
             }
             throw MissingParameter(name);
         }
@@ -139,6 +143,56 @@ namespace pragmatic_quant_com
         public static DateOrDuration[] ProcessVectorDateOrDuration(object[,] bag, string name)
         {
             return ProcessVector(bag, name, DateOrDurationValueConverter(name));
+        }
+
+        public static T[,] ProcessMatrix<T>(object[,] bag, int baseRow, int baseCol, Func<object, T> valueMap, string missingException)
+        {
+            if (baseRow >= bag.GetUpperBound(0))
+                throw new Exception(missingException);
+
+            int nbRows = 0, nbCols = 0;
+            
+            for (int row = baseRow; row <= bag.GetUpperBound(0); row++)
+            {
+                var value = bag[row, baseCol];
+                if (IsEmptyCell(value)) break;
+                nbRows++;
+            }
+            if (nbRows == 0)
+                throw new Exception(missingException);
+            for (int col = baseCol; col <= bag.GetUpperBound(1); col++)
+            {
+                var value = bag[baseRow, col];
+                if (IsEmptyCell(value)) break;
+                nbCols++;
+            }
+
+            var result = new T[nbRows, nbCols];
+            for (int i = 0; i < nbRows; i++)
+            {
+                for (int j = 0; j < nbCols; j++)
+                {
+                    result[i, j] = valueMap(bag[baseRow + i, baseCol + j]);
+                }
+            }
+            return result;
+        }
+        public static T[,] ProcessMatrix<T>(object[,] bag, string name, Func<object, T> valueMap)
+        {
+            int row, col;
+            if (Has(bag, name, out row, out col))
+            {
+                return ProcessMatrix(bag, row + 1, col, valueMap, MissingValueMsg(name));
+            }
+            throw MissingParameter(name);
+        }
+        public static double[,] ProcessMatrixDouble(object[,] bag, string name)
+        {
+            return ProcessMatrix(bag, name, DoubleValueConverter(name));
+        }
+        public static string[,] ProcessMatrixString(object[,] bag, string name)
+        {
+            return ProcessMatrix(bag, name, o => o.ToString());
         }
     } 
 }

@@ -59,6 +59,8 @@
     <Compile Include="Maths\BlackOption_Test.cs" />
     <Compile Include="Maths\BachelierOption_Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="BagServices_Test.cs" />
+    <Compile Include="UnitTestUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\pragmatic-quant-model\pragmatic-quant-model.csproj">
