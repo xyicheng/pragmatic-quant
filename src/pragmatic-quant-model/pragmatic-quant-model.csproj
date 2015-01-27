@@ -35,10 +35,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Basic\Assertions.cs" />
+    <Compile Include="Basic\DoubleConverter.cs" />
     <Compile Include="Basic\DoubleUtils.cs" />
     <Compile Include="Basic\EnumerableUtils.cs" />
     <Compile Include="Basic\GridUtils.cs" />
     <Compile Include="Basic\MathConsts.cs" />
+    <Compile Include="Basic\Structure\DateAndDurationConverter.cs" />
     <Compile Include="Basic\Structure\Duration.cs" />
     <Compile Include="Basic\TimeMeasure.cs" />
     <Compile Include="Market\AssetId.cs" />

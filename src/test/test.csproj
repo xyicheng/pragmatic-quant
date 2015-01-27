@@ -50,6 +50,8 @@
     <Compile Include="Basic\DoubleUtils_test.cs" />
     <Compile Include="Basic\GriddUtils_Test.cs" />
     <Compile Include="Basic\StepSearcher_test.cs" />
+    <Compile Include="Basic\Duration_Test.cs" />
+    <Compile Include="Basic\DateOrDurationConverter_Test.cs" />
     <Compile Include="Maths\Function\LinearInterpolation_test.cs" />
     <Compile Include="Maths\Function\StepFunction.cs" />
     <Compile Include="Maths\Cholesky_test.cs" />

@@ -133,9 +133,6 @@ namespace pragmatic_quant_model.Maths
         /// </summary>
         public static double CumulativeInverse(double p)
         {
-            
-
-
             if (p <= 0)
                 return Math.Log(p);
             if (p >= 1)
