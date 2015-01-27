@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pragmatic-quant-model", "pr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{384A1A98-9872-4618-854E-AE1A9442D74C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pragmatic-quant-com", "pragmatic-quant-com\pragmatic-quant-com.csproj", "{4654D410-73C0-473A-9E6F-031104350E7C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{384A1A98-9872-4618-854E-AE1A9442D74C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{384A1A98-9872-4618-854E-AE1A9442D74C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{384A1A98-9872-4618-854E-AE1A9442D74C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4654D410-73C0-473A-9E6F-031104350E7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4654D410-73C0-473A-9E6F-031104350E7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4654D410-73C0-473A-9E6F-031104350E7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4654D410-73C0-473A-9E6F-031104350E7C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

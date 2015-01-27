@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5214E422-5A30-4613-BB5E-CA7C190A0A1F}</ProjectGuid>
+    <ProjectGuid>{4654D410-73C0-473A-9E6F-031104350E7C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>pragmatic_quant_model</RootNamespace>
-    <AssemblyName>pragmatic-quant-model</AssemblyName>
+    <RootNamespace>pragmatic_quant_com</RootNamespace>
+    <AssemblyName>pragmatic-quant-com</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -19,7 +19,8 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>2</WarningLevel>
+    <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,37 +29,22 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Basic\Assertions.cs" />
-    <Compile Include="Basic\DoubleUtils.cs" />
-    <Compile Include="Basic\EnumerableUtils.cs" />
-    <Compile Include="Basic\GridUtils.cs" />
-    <Compile Include="Basic\MathConsts.cs" />
-    <Compile Include="Basic\Structure\Duration.cs" />
-    <Compile Include="Basic\TimeMeasure.cs" />
-    <Compile Include="Market\AssetId.cs" />
-    <Compile Include="Market\AssetMarket.cs" />
-    <Compile Include="Market\Currency.cs" />
-    <Compile Include="Market\DiscountProvider.cs" />
-    <Compile Include="Market\FinancingCurveId.cs" />
-    <Compile Include="Maths\BachelierOption.cs" />
-    <Compile Include="Maths\BlackScholesOption.cs" />
-    <Compile Include="Maths\Cholesky.cs" />
-    <Compile Include="Maths\ErrorFunctions.cs" />
-    <Compile Include="Maths\Function\BasicRRFunction.cs" />
-    <Compile Include="Maths\Function\Interpolation.cs" />
-    <Compile Include="Maths\Function\StepFunction.cs" />
-    <Compile Include="Maths\NormalDistribution.cs" />
-    <Compile Include="Maths\MatrixUtils.cs" />
-    <Compile Include="Maths\RationalCubic.cs" />
-    <Compile Include="Maths\RRFunction.cs" />
-    <Compile Include="Basic\StepSearcher.cs" />
+    <Compile Include="BagServices.cs" />
+    <Compile Include="VanillaOption.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\pragmatic-quant-model\pragmatic-quant-model.csproj">
+      <Project>{5214e422-5a30-4613-bb5e-ca7c190a0a1f}</Project>
+      <Name>pragmatic-quant-model</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

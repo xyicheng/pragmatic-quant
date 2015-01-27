@@ -6,7 +6,7 @@ namespace pragmatic_quant_model.Maths
     public static class BlackScholesOption
     {
         /// <summary>
-        /// Black-Scholes formulae
+        /// Black-Scholes formulae for call and put option
         /// </summary>
         /// <param name="f">forward</param>
         /// <param name="k">strike</param>
@@ -18,7 +18,7 @@ namespace pragmatic_quant_model.Maths
         {
             double intrinsic = Math.Abs(Math.Max((q < 0 ? k - f : f - k), 0.0));
             // Map in-the-money to out-of-the-money
-            if (q * (f - k) > 0)
+            if (q * (f - k) > 0.0)
                 return intrinsic + Price(f, k, sigma, t, -q);
             return Math.Max(intrinsic,
                 (Math.Sqrt(f) * Math.Sqrt(k)) * JaeckelBlackFormula.NormalisedBlack(Math.Log(f / k), sigma * Math.Sqrt(t), q));
@@ -36,15 +36,15 @@ namespace pragmatic_quant_model.Maths
         /// <returns></returns>
         public static double ImpliedVol(double price, double f, double k, double t, double q, int n = 2)
         {
-            double intrinsic = Math.Abs(Math.Max((q < 0 ? k - f : f - k), 0.0));
+            double intrinsic = Math.Abs(Math.Max((q < 0.0 ? k - f : f - k), 0.0));
             if (price < intrinsic)
                 return JaeckelBlackFormula.VolatilityValueToSignalPriceIsBelowIntrinsic;
-            double max_price = (q < 0 ? k : f);
+            double max_price = (q < 0.0 ? k : f);
             if (price >= max_price)
                 return JaeckelBlackFormula.VolatilityValueToSignalPriceIsAboveMaximum;
             double x = Math.Log(f / k);
             // Map in-the-money to out-of-the-money
-            if (q * x > 0)
+            if (q * x > 0.0)
             {
                 price = Math.Abs(Math.Max(price - intrinsic, 0.0));
                 q = -q;
@@ -102,9 +102,9 @@ namespace pragmatic_quant_model.Maths
         ///           Y(z) := Φ(z)/φ(z)
         ///
         /// using an expansion of Y(h+t)-Y(h-t) for small t to twelvth order in t.
-        /// Theoretically accurate to (better than) precision  ε = 2.23E-16  when  h<=0  and  t < τ  with τ := 2·ε^(1/16) ≈ 0.21.
-        /// The main bottleneck for precision is the coefficient a:=1+h·Y(h) when |h|>1 .
-        ///</summary>
+        /// Theoretically accurate to (better than) precision  ε = 2.23E-16  when  h l.t. 0
+        /// and  t l.t. τ  with τ := 2·ε^(1/16) ≈ 0.21.  The main bottleneck for precision is the coefficient a:=1+h·Y(h) when |h|>1 .
+        /// </summary>
         private static double small_t_expansion_of_normalized_black_call(double h, double t)
         {
             // Y(h) := Φ(h)/φ(h) = √(π/2)·erfcx(-h/√2)
@@ -469,7 +469,7 @@ namespace pragmatic_quant_model.Maths
         #region private methods
         private static double householder_factor(double newton, double halley, double hh3)
         {
-            return (1 + 0.5 * halley * newton) / (1 + newton * (halley + hh3 * newton / 6));
+            return (1 + 0.5 * halley * newton) / (1.0 + newton * (halley + hh3 * newton / 6.0));
         }
         private static void compute_f_upper_map_and_first_two_derivatives(double x, double s, out double f, out double fp, out double fpp)
         {
@@ -494,19 +494,19 @@ namespace pragmatic_quant_model.Maths
                 s2 = s * s,
                 Phi = NormalDistribution.Cumulative(-z),
                 phi = NormalDistribution.Cumulative(z);
-            fpp = MathConsts.PiOverSix * y / (s2 * s) * Phi * (8 * MathConsts.SqrtThree * s * ax + (3 * s2 * (s2 - 8) - 8 * x * x) * Phi / phi)
-                  * Math.Exp(2 * y + 0.25 * s2);
+            fpp = MathConsts.PiOverSix * y / (s2 * s) * Phi * (8.0 * MathConsts.SqrtThree * s * ax + (3.0 * s2 * (s2 - 8.0) - 8.0 * x * x) * Phi / phi)
+                  * Math.Exp(2.0 * y + 0.25 * s2);
             if (Math.Abs(s) < Denormalization_Cutoff)
             {
-                fp = 1;
-                f = 0;
+                fp = 1.0;
+                f = 0.0;
             }
             else
             {
                 double Phi2 = Phi * Phi;
                 fp = MathConsts.TwoPi * y * Phi2 * Math.Exp(y + 0.125 * s * s);
                 if (Math.Abs(x) < Denormalization_Cutoff)
-                    f = 0;
+                    f = 0.0;
                 else
                     f = 1.209199576156145233729385505094770488189377498728 * ax * (Phi2 * Phi);
             }
@@ -517,8 +517,7 @@ namespace pragmatic_quant_model.Maths
                 ? 0.0
                 : Math.Abs(x / (MathConsts.SqrtThree *
                                 NormalDistribution.CumulativeInverse(
-                                    Math.Pow(f / (1.209199576156145233729385505094770488189377498728 * Math.Abs(x)),
-                                        1.0 / 3.0))
+                                    Math.Pow(f / (1.209199576156145233729385505094770488189377498728 * Math.Abs(x)), 1.0 / 3.0))
                     ));
         }
         #endregion
@@ -539,18 +538,17 @@ namespace pragmatic_quant_model.Maths
             double q /* q=±1 */, int n)
         {
             // Subtract intrinsic.
-            if (q * x > 0)
+            if (q * x > 0.0)
             {
                 beta = Math.Abs(Math.Max(beta - normalised_intrinsic(x, q), 0.0));
                 q = -q;
             }
             // Map puts to calls
-            if (q < 0)
+            if (q < 0.0)
             {
                 x = -x;
-                q = -q;
             }
-            if (beta <= 0) // For negative or zero prices we return 0.
+            if (beta <= 0.0) // For negative or zero prices we return 0.
                 return 0.0;
             if (beta < Denormalization_Cutoff)
                 // For positive but denormalized (a.k.a. 'subnormal') prices, we return 0 since it would be impossible to converge to full machine accuracy anyway.
@@ -559,9 +557,9 @@ namespace pragmatic_quant_model.Maths
             if (beta >= b_max)
                 return VolatilityValueToSignalPriceIsAboveMaximum;
             int iterations = 0, direction_reversal_count = 0;
-            double f = -double.MaxValue, s = -double.MaxValue, ds = s, ds_previous = 0, s_left = double.Epsilon, s_right = double.MaxValue;
+            double f = -double.MaxValue, s = -double.MaxValue, ds = s, ds_previous = 0.0, s_left = double.Epsilon, s_right = double.MaxValue;
             // The temptation is great to use the optimised form b_c = exp(x/2)/2-exp(-x/2)·Phi(sqrt(-2·x)) but that would require implementing all of the above types of round-off and over/underflow handling for this expression, too.
-            double s_c = Math.Sqrt(Math.Abs(2 * x)), b_c = NormalisedBlackCall(x, s_c), v_c = NormalisedVega(x, s_c);
+            double s_c = Math.Sqrt(Math.Abs(2.0 * x)), b_c = NormalisedBlackCall(x, s_c), v_c = NormalisedVega(x, s_c);
             // Four branches.
             if (beta < b_c)
             {
@@ -632,17 +630,14 @@ namespace pragmatic_quant_model.Maths
                     }
                     return s; //implied_volatility_output(iterations, s);
                 }
-                else
-                {
-                    double v_l = NormalisedVega(x, s_l),
-                        r_lm =
-                            RationalCubic.convex_rational_cubic_control_parameter_to_fit_second_derivative_at_right_side(b_l, b_c, s_l, s_c, 1 / v_l,
-                                1 / v_c, 0.0,
-                                false);
-                    s = RationalCubic.rational_cubic_interpolation(beta, b_l, b_c, s_l, s_c, 1 / v_l, 1 / v_c, r_lm);
-                    s_left = s_l;
-                    s_right = s_c;
-                }
+
+                double v_l = NormalisedVega(x, s_l),
+                    r_lm =
+                        RationalCubic.convex_rational_cubic_control_parameter_to_fit_second_derivative_at_right_side(b_l, b_c, s_l, s_c, 1 / v_l,
+                            1 / v_c, 0.0, false);
+                s = RationalCubic.rational_cubic_interpolation(beta, b_l, b_c, s_l, s_c, 1 / v_l, 1 / v_c, r_lm);
+                s_left = s_l;
+                s_right = s_c;
             }
             else
             {
@@ -669,7 +664,7 @@ namespace pragmatic_quant_model.Maths
                                 d_f_upper_map_h_d_beta, -0.5, d2_f_upper_map_h_d_beta2, true);
                         f = RationalCubic.rational_cubic_interpolation(beta, b_h, b_max, f_upper_map_h, 0.0, d_f_upper_map_h_d_beta, -0.5, r_hh);
                     }
-                    if (f <= 0)
+                    if (f <= 0.0)
                     {
                         double h = b_max - b_h, t = (beta - b_h) / h;
                         f = (f_upper_map_h * (1 - t) + 0.5 * h * t) * (1 - t);
@@ -691,7 +686,6 @@ namespace pragmatic_quant_model.Maths
                         //              hh3    = g'''/g' =   b'''/b' +  g'·(2g'+3b''/b')
                         // and the iteration is
                         //     s_n+1  =  s_n  +  newton · [ 1 + halley·newton/2 ] / [ 1 + newton·( halley + hh3·newton/6 ) ].
-                        //
                         for (; iterations < n && Math.Abs(ds) > DoubleUtils.Epsilon * s; ++iterations)
                         {
                             if (ds * ds_previous < 0)
@@ -703,7 +697,7 @@ namespace pragmatic_quant_model.Maths
                                 s = 0.5 * (s_left + s_right);
                                 if (s_right - s_left <= DoubleUtils.Epsilon * s) break;
                                 direction_reversal_count = 0;
-                                ds = 0;
+                                ds = 0.0;
                             }
                             ds_previous = ds;
                             double b = NormalisedBlackCall(x, s), bp = NormalisedVega(x, s);
@@ -743,13 +737,13 @@ namespace pragmatic_quant_model.Maths
                     s = 0.5 * (s_left + s_right);
                     if (s_right - s_left <= DoubleUtils.Epsilon * s) break;
                     direction_reversal_count = 0;
-                    ds = 0;
+                    ds = 0.0;
                 }
                 ds_previous = ds;
                 double b = NormalisedBlackCall(x, s), bp = NormalisedVega(x, s);
                 if (b > beta && s < s_right) s_right = s;
                 else if (b < beta && s > s_left) s_left = s; // Tighten the bracket if applicable.
-                double newton = (beta - b) / bp, halley = (x * x / (s * s)) / s - s / 4, hh3 = halley * halley - 3 * (x * x / (s * s * s * s)) - 0.25;
+                double newton = (beta - b) / bp, halley = (x * x / (s * s)) / s - s / 4.0, hh3 = halley * halley - 3.0 * (x * x / (s * s * s * s)) - 0.25;
                 s += ds = Math.Max(-0.5 * s, newton * householder_factor(newton, halley, hh3));
             }
             return s; //implied_volatility_output(iterations, s);
