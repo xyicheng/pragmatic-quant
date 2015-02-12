@@ -28,6 +28,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -56,11 +57,15 @@
     <Compile Include="Maths\Function\BasicRRFunction.cs" />
     <Compile Include="Maths\Function\Interpolation.cs" />
     <Compile Include="Maths\Function\StepFunction.cs" />
+    <Compile Include="Maths\mt19937uniformrng.cs" />
     <Compile Include="Maths\NormalDistribution.cs" />
     <Compile Include="Maths\MatrixUtils.cs" />
+    <Compile Include="Maths\primitivepolynomials.cs" />
     <Compile Include="Maths\RationalCubic.cs" />
     <Compile Include="Maths\RRFunction.cs" />
     <Compile Include="Basic\StepSearcher.cs" />
+    <Compile Include="Maths\sobolrsg.cs" />
+    <Compile Include="Maths\sobolrsg2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

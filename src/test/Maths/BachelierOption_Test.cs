@@ -39,5 +39,77 @@ namespace test.Maths
                 }
             }
         }
+
+        [TestMethod]
+        public void ImpliedVol_Test()
+        {
+            const double mat = 0.5;
+            const double vol = 0.070;
+            var moneynesses = GridUtils.RegularGrid(-5.5, 5.5, 10000);
+
+            foreach (double m in moneynesses)
+            {
+                var strike = m * vol * Math.Sqrt(mat);
+                var option = BachelierOption.Price(0.0, strike, vol, mat, m > 0 ? 1 : -1);
+                var impliedVol = BachelierOption.ImpliedVol(option, 0.0, strike, mat, m > 0 ? 1 : -1);
+
+                var errRelative = (impliedVol - vol) / vol;
+                Assert.IsTrue(Math.Abs(errRelative) < 5.5e-12);
+            }
+        }
+
+        [TestMethod]
+        public void ImpliedVol_NearForward_Test()
+        {
+            const double mat = 0.5;
+            const double vol = 0.070;
+            var moneynesses = GridUtils.RegularGrid(-1.0e-6, 1.0e-6, 10000);
+
+            foreach (double m in moneynesses)
+            {
+                var strike = m * vol * Math.Sqrt(mat);
+                var option = BachelierOption.Price(0.0, strike, vol, mat, m > 0 ? 1 : -1);
+                var impliedVol = BachelierOption.ImpliedVol(option, 0.0, strike, mat, m > 0 ? 1 : -1);
+
+                var errRelative = (impliedVol - vol) / vol;
+                Assert.IsTrue(Math.Abs(errRelative) < 5.0e-12);
+            }
+        }
+
+        [TestMethod]
+        public void ImpliedVol_HighRegion_Test()
+        {
+            const double mat = 0.5;
+            const double vol = 0.070;
+            var moneynesses = GridUtils.RegularGrid(5.5, 15.0, 10000);
+
+            foreach (double m in moneynesses)
+            {
+                var strike = m * vol * Math.Sqrt(mat);
+                var option = BachelierOption.Price(0.0, strike, vol, mat, m > 0 ? 1 : -1);
+                var impliedVol = BachelierOption.ImpliedVol(option, 0.0, strike, mat, m > 0 ? 1 : -1);
+
+                var errRelative = (impliedVol - vol) / vol;
+                Assert.IsTrue(Math.Abs(errRelative) < 5.5e-11);
+            }
+        }
+
+        [TestMethod]
+        public void ImpliedVol_VeryHighRegion_Test()
+        {
+            const double mat = 0.5;
+            const double vol = 0.070;
+            var moneynesses = GridUtils.RegularGrid(15.0, 37.0, 10000); 
+
+            foreach (double m in moneynesses)
+            {
+                var strike = m * vol * Math.Sqrt(mat);
+                var option = BachelierOption.Price(0.0, strike, vol, mat, m > 0 ? 1 : -1);
+                var impliedVol = BachelierOption.ImpliedVol(option, 0.0, strike, mat, m > 0 ? 1 : -1);
+
+                var errRelative = (impliedVol - vol) / vol;
+                Assert.IsTrue(Math.Abs(errRelative) < 6.0e-12);
+            }
+        }
     }
 }
