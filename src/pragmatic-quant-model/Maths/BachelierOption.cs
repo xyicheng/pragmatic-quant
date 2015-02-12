@@ -85,9 +85,8 @@ namespace pragmatic_quant_model.Maths
         /// <param name="k"> strike </param>
         /// <param name="t"> maturity </param>
         /// <param name="q"> 1 for call, -1 for put </param>
-        /// <param name="n"> number of householder solver iterations </param>
         /// <returns></returns>
-        public static double ImpliedVol(double price, double f, double k, double t, double q, int n = 2)
+        public static double ImpliedVol(double price, double f, double k, double t, double q)
         {
             double intrinsic = Math.Abs(Math.Max((q < 0.0 ? k - f : f - k), 0.0));
             if (price < intrinsic)
@@ -106,7 +105,7 @@ namespace pragmatic_quant_model.Maths
         /// Bachelier model second order greeks
         /// Gamma : d^2P / df^2
         /// Vega : dP / dsigma
-        /// Vanna : dP^2 / dsigma df
+        /// Vanna : dP^2 / dsigmadf
         /// Vomma : dP^2 / dsigma^2
         /// </summary>
         /// <param name="f">forward</param>
