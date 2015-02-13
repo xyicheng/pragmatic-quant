@@ -164,9 +164,7 @@ namespace pragmatic_quant_model.Maths
                 }
                 return q < 0.0 ? -ret : ret;
             }
-            
 
-            
         }
     }
 }

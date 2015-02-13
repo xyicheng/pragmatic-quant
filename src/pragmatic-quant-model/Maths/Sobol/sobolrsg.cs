@@ -19,7 +19,7 @@
 
 using System;
 
-namespace pragmatic_quant_model.Maths {
+namespace pragmatic_quant_model.Maths.Sobol {
     
     /*! A Gray code counter and bitwise operations are used for very
         fast sequence generation.

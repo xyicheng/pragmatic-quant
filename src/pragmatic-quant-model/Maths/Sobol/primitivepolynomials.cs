@@ -17,7 +17,7 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-namespace pragmatic_quant_model.Maths
+namespace pragmatic_quant_model.Maths.Sobol
 {
 /* this file is a slightly edited version of
  * PrimitivePolynomialsModuloTwoUpToDegree27.h

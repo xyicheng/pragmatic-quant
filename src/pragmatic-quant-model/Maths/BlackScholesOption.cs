@@ -54,6 +54,36 @@ namespace pragmatic_quant_model.Maths
                     price / (Math.Sqrt(f) * Math.Sqrt(k)), x, q, n) /
                 Math.Sqrt(t);
         }
+
+        /// <summary>
+        /// Black model second order greeks
+        /// Gamma : d^2P / df^2
+        /// Vega : dP / dsigma
+        /// Vanna : dP^2 / dsigmadf
+        /// Vomma : dP^2 / dsigma^2
+        /// </summary>
+        /// <param name="f">forward</param>
+        /// <param name="k">strike</param>
+        /// <param name="t">maturity</param>
+        /// <param name="sigma">volatility</param>
+        /// <param name="gamma"> output option gamma</param>
+        /// <param name="vega"> output option vega  </param>
+        /// <param name="vanna"> output option vanna  </param>
+        /// <param name="vomma"> output option vomma  </param>
+        public static void Greeks(double f, double k, double t, double sigma,
+            out double gamma, out double vega, out double vanna, out double vomma)
+        {
+            var timesqrt = Math.Sqrt(t);
+            var stdDev = sigma * timesqrt;
+            var d_plus = Math.Log(f / k) / stdDev + 0.5 * stdDev;
+            var d_minus = d_plus - stdDev;
+
+            var density = MathConsts.InvSqrtTwoPi * Math.Exp(-0.5 * d_plus * d_plus);
+            gamma = density / f / stdDev;
+            vega = timesqrt * f * density;
+            vanna = -d_minus / sigma * density;
+            vomma = d_plus * d_minus / sigma * timesqrt * f * density;
+        }
     }
 
     internal static class JaeckelBlackFormula

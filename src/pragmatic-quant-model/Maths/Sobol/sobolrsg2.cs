@@ -18,7 +18,7 @@
 */
 
 
-namespace pragmatic_quant_model.Maths
+namespace pragmatic_quant_model.Maths.Sobol
 {
 
 #if NOPOLY

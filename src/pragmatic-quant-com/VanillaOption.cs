@@ -13,7 +13,33 @@ namespace pragmatic_quant_com
             {
                 double gamma, vega, vanna, vomma;
                 BachelierOption.Greeks(fwd, strike, maturity, vol,
-                                 out gamma, out vega, out vanna, out vomma);
+                    out gamma, out vega, out vanna, out vomma);
+                switch (request.Trim().ToLower())
+                {
+                    case "gamma":
+                        return gamma;
+                    case "vega":
+                        return vega;
+                    case "vanna":
+                        return vanna;
+                    case "vomma":
+                        return vomma;
+                    default:
+                        throw new Exception("Unknow greek : " + request);
+                }
+            }
+            catch (Exception e)
+            {
+                return "FAILURE: '" + e.Message + "'";
+            }
+        }
+        public object BlackGreek(double fwd, double strike, double maturity, double vol, string request)
+        {
+            try
+            {
+                double gamma, vega, vanna, vomma;
+                BlackScholesOption.Greeks(fwd, strike, maturity, vol,
+                    out gamma, out vega, out vanna, out vomma);
                 switch (request.Trim().ToLower())
                 {
                     case "gamma":

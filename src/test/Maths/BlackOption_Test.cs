@@ -42,7 +42,7 @@ namespace test.Maths
         }
         
         [TestMethod]
-        public void ImpliedVolTest()
+        public void ImpliedVol_MoneynessSample_Test()
         {
             const double mat = 0.5;
             const double vol = 0.253251;
@@ -58,5 +58,23 @@ namespace test.Maths
                 Assert.IsTrue(Math.Abs(errRelative) < 6 * DoubleUtils.Epsilon);
             }
         }
+
+        [TestMethod]
+        public void Implied_VolSample_Test()
+        {
+            const double mat = 1.0;
+            const double strike = 1.50;
+            var vols = GridUtils.RegularGrid(0.015, 2.0, 100);
+
+            foreach (double vol in vols)
+            {
+                var option = BlackScholesOption.Price(1.0, strike, vol, mat, 1);
+                var impliedVol = BlackScholesOption.ImpliedVol(option, 1.0, strike, mat, 1);
+
+                var errRelative = (impliedVol - vol) / vol;
+                Assert.IsTrue(Math.Abs(errRelative) < 6 * DoubleUtils.Epsilon);
+            }
+        }
+
     }
 }
