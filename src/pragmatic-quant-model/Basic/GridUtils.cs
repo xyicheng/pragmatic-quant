@@ -9,7 +9,7 @@ namespace pragmatic_quant_model.Basic
         /// </summary>
         /// <param name="start">first point</param>
         /// <param name="end">last point</param>
-        /// <param name="size">grid size (should be at least 2) </param>
+        /// <param name="size">grid size (should be > 1) </param>
         /// <returns></returns>
         public static double[] RegularGrid(double start, double end, int size)
         {

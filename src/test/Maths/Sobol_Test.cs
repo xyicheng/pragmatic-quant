@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using pragmatic_quant_model.Maths;
@@ -39,6 +40,9 @@ namespace test.Maths
             const int dim = 200;
             var sobol = new SobolRsg(dim, 0, SobolRsg.DirectionIntegers.JoeKuoD5);
 
+            var chrono = new Stopwatch();
+            chrono.Start();    
+
             double[] atmCalls = new double[dim];
             double[] strike1Call = new double[dim];
             double[] strike2Call = new double[dim];
@@ -60,6 +64,9 @@ namespace test.Maths
                 strike1Call[i] /= nbPaths;
                 strike2Call[i] /= nbPaths;
             }
+
+            chrono.Stop();
+            Console.WriteLine("Elapsed " + chrono.Elapsed);
 
             var refAtmCalls = atmCalls.Select(c => BachelierOption.Price(0.0, 0.0, 1.0, 1.0, 1.0)).ToArray();
             var refStrike1Calls = atmCalls.Select(c => BachelierOption.Price(0.0, 1.0, 1.0, 1.0, 1.0)).ToArray();

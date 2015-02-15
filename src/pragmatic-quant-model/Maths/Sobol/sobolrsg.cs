@@ -452,7 +452,8 @@ namespace pragmatic_quant_model.Maths.Sobol {
 
         public ulong[] NextInt32Sequence()
         {
-            if (firstDraw) {
+            if (firstDraw)
+            {
                 // it was precomputed in the constructor
                 firstDraw = false;
                 return integerSequence;
@@ -468,8 +469,13 @@ namespace pragmatic_quant_model.Maths.Sobol {
             ulong n = sequenceCounter;
             // Find rightmost zero bit of n
             int j = 0;
-            while ((n & 1) != 0) { n >>= 1; j++; }
-            for (int k=0; k<dimensionality; k++) {
+            while ((n & 1) != 0)
+            {
+                n >>= 1;
+                j++;
+            }
+            for (int k = 0; k < dimensionality; k++)
+            {
                 // XOR the appropriate direction number into each component of
                 // the integer sequence to obtain a new Sobol integer for that
                 // component

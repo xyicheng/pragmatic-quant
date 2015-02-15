@@ -12,7 +12,7 @@ namespace test.Maths
         private static  void TestDecomposition(double[,] a, double precision)
         {
             var d = Cholesky.Decomposition(a);
-            var test = d.Mult(d.Tranpose());
+            var test = d.Prod(d.Tranpose());
 
             for (int i = 0; i < a.GetLength(0); i++)
             {

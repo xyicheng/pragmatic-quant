@@ -21,6 +21,12 @@ namespace test
         {
             EqualMatrix(a, b, (t1, t2) => t1.Equals(t2));
         }
+        public static void EqualDoubleMatrix(double[,] a, double[,] b, double tolerance, bool relativeTolerance = false)
+        {
+            if (relativeTolerance) EqualMatrix(a, b, (u, v) => (Math.Abs(u / v - 1.0) < tolerance));
+            else EqualMatrix(a, b, (u, v) => (Math.Abs(u - v) < tolerance));
+        }
+
         public static void EqualArrays<T>(T[] a, T[] b, Func<T, T, bool> equality)
         {
             Assert.AreEqual(a.Length, b.Length);

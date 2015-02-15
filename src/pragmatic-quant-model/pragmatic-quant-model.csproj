@@ -52,6 +52,7 @@
     <Compile Include="Market\FinancingCurveId.cs" />
     <Compile Include="Maths\BachelierOption.cs" />
     <Compile Include="Maths\BlackScholesOption.cs" />
+    <Compile Include="Maths\BrownianBridge.cs" />
     <Compile Include="Maths\Cholesky.cs" />
     <Compile Include="Maths\ErrorFunctions.cs" />
     <Compile Include="Maths\Function\BasicRRFunction.cs" />
