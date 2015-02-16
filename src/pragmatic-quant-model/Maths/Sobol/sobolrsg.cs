@@ -142,10 +142,10 @@ namespace pragmatic_quant_model.Maths.Sobol {
 
             integerSequence = new ulong[dimensionality];
 
-            this.directionIntegers = new ulong[dimensionality][];
-            for (int i = 0; i < dimensionality; i++)
-                this.directionIntegers[i] = new ulong[Bits];
-
+            this.directionIntegers = new ulong[Bits][];
+            for (int i = 0; i < Bits; i++)
+                this.directionIntegers[i] = new ulong[dimensionality];
+            
             if (!(dimensionality > 0)) throw new ApplicationException("dimensionality must be greater than 0");
             if (!(dimensionality<=PPMT_MAX_DIM))
                 throw new ApplicationException("dimensionality " + dimensionality + " exceeds the number of available "
@@ -206,7 +206,7 @@ namespace pragmatic_quant_model.Maths.Sobol {
             // degenerate (no free direction integers) first dimension
             int j;
             for (j=0; j<Bits; j++)
-                this.directionIntegers[0][j] = (1UL<<(Bits-j-1));
+                this.directionIntegers[j][0] = (1UL << (Bits - j - 1));
 
             int maxTabulated = 0;
             // dimensions from 2 (k=1) to maxTabulated (k=maxTabulated-1) included
@@ -219,8 +219,8 @@ namespace pragmatic_quant_model.Maths.Sobol {
                     {
                         for (int l = 1; l <= degree[k]; l++)
                         {
-                            this.directionIntegers[k][l - 1] = 1UL;
-                            this.directionIntegers[k][l - 1] <<= (Bits - l);
+                            this.directionIntegers[l - 1][k] = 1UL;
+                            this.directionIntegers[l - 1][k] <<= (Bits - l);
                         }
                     }
                     break;
@@ -233,8 +233,8 @@ namespace pragmatic_quant_model.Maths.Sobol {
                         // 0UL marks coefficients' end for a given dimension
                         while (initializers[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[k][j] = initializers[k - 1][j];
-                            this.directionIntegers[k][j] <<= (Bits - j - 1);
+                            this.directionIntegers[j][k] = initializers[k - 1][j];
+                            this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }
                     }
@@ -248,8 +248,8 @@ namespace pragmatic_quant_model.Maths.Sobol {
                         // 0UL marks coefficients' end for a given dimension
                         while (SLinitializers[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[k][j] = SLinitializers[k - 1][j];
-                            this.directionIntegers[k][j] <<= (Bits - j - 1);
+                            this.directionIntegers[j][k] = SLinitializers[k - 1][j];
+                            this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }
                     }
@@ -263,8 +263,8 @@ namespace pragmatic_quant_model.Maths.Sobol {
                         // 0UL marks coefficients' end for a given dimension
                         while (Linitializers[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[k][j] = Linitializers[k - 1][j];
-                            this.directionIntegers[k][j] <<= (Bits - j - 1);
+                            this.directionIntegers[j][k] = Linitializers[k - 1][j];
+                            this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }
                     }
@@ -278,8 +278,8 @@ namespace pragmatic_quant_model.Maths.Sobol {
                         // 0UL marks coefficients' end for a given dimension
                         while (JoeKuoD5initializers[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[k][j] = JoeKuoD5initializers[k - 1][j];
-                            this.directionIntegers[k][j] <<= (Bits - j - 1);
+                            this.directionIntegers[j][k] = JoeKuoD5initializers[k - 1][j];
+                            this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }
                     }
@@ -293,8 +293,8 @@ namespace pragmatic_quant_model.Maths.Sobol {
                         // 0UL marks coefficients' end for a given dimension
                         while (JoeKuoD6initializers[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[k][j] = JoeKuoD6initializers[k - 1][j];
-                            this.directionIntegers[k][j] <<= (Bits - j - 1);
+                            this.directionIntegers[j][k] = JoeKuoD6initializers[k - 1][j];
+                            this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }
                     }
@@ -308,8 +308,8 @@ namespace pragmatic_quant_model.Maths.Sobol {
                         // 0UL marks coefficients' end for a given dimension
                         while (JoeKuoD7initializers[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[k][j] = JoeKuoD7initializers[k - 1][j];
-                            this.directionIntegers[k][j] <<= (Bits - j - 1);
+                            this.directionIntegers[j][k] = JoeKuoD7initializers[k - 1][j];
+                            this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }
                     }
@@ -324,8 +324,8 @@ namespace pragmatic_quant_model.Maths.Sobol {
                         // 0UL marks coefficients' end for a given dimension
                         while (Kuoinitializers[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[k][j] = Kuoinitializers[k - 1][j];
-                            this.directionIntegers[k][j] <<= (Bits - j - 1);
+                            this.directionIntegers[j][k] = Kuoinitializers[k - 1][j];
+                            this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }
                     }
@@ -340,8 +340,8 @@ namespace pragmatic_quant_model.Maths.Sobol {
                         // 0UL marks coefficients' end for a given dimension
                         while (Kuo2initializers[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[k][j] = Kuo2initializers[k - 1][j];
-                            this.directionIntegers[k][j] <<= (Bits - j - 1);
+                            this.directionIntegers[j][k] = Kuo2initializers[k - 1][j];
+                            this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }
                     }
@@ -356,8 +356,8 @@ namespace pragmatic_quant_model.Maths.Sobol {
                         // 0UL marks coefficients' end for a given dimension
                         while (Kuo3initializers[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[k][j] = Kuo3initializers[k - 1][j];
-                            this.directionIntegers[k][j] <<= (Bits - j - 1);
+                            this.directionIntegers[j][k] = Kuo3initializers[k - 1][j];
+                            this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }
                     }
@@ -378,8 +378,8 @@ namespace pragmatic_quant_model.Maths.Sobol {
                             double u = uniformRng.next();
                             // the direction integer has at most the
                             // rightmost l bits non-zero
-                            this.directionIntegers[k][l - 1] = (ulong) (u * (1UL << l));
-                        } while ((this.directionIntegers[k][l - 1] & 1UL) == 0);
+                            this.directionIntegers[l - 1][k] = (ulong)(u * (1UL << l));
+                        } while ((this.directionIntegers[l - 1][k] & 1UL) == 0);
                         // iterate until the direction integer is odd
                         // that is it has the rightmost bit set
 
@@ -387,7 +387,7 @@ namespace pragmatic_quant_model.Maths.Sobol {
                         // we are guaranteed that the l-th leftmost bit
                         // is set, and only the first l leftmost bit
                         // can be non-zero
-                        this.directionIntegers[k][l - 1] <<= (Bits - l);
+                        this.directionIntegers[l - 1][k] <<= (Bits - l);
                     }
                 }
             }
@@ -398,7 +398,7 @@ namespace pragmatic_quant_model.Maths.Sobol {
                 uint gk = degree[k];
                 for (var l=(int)gk; l<Bits; l++) {
                     // eq. 8.19 "Monte Carlo Methods in Finance" by P. Jдckel
-                    ulong n = (this.directionIntegers[k][(int)(l - gk)] >> (int)gk);
+                    ulong n = (this.directionIntegers[(int)(l - gk)][k] >> (int)gk);
                     // a[k][j] are the coefficients of the monomials in ppmt[k]
                     // The highest order coefficient a[k][0] is not actually
                     // used in the recurrence relation, and the lowest order
@@ -411,19 +411,19 @@ namespace pragmatic_quant_model.Maths.Sobol {
                         // XORed with a selection of (unshifted) direction
                         // integers controlled by which of the a[k][j] are set
                         if ((((ulong)ppmt[k] >> (int)(gk - z - 1)) & 1UL) != 0)
-                            n ^= this.directionIntegers[k][(int)(l-z)];
+                            n ^= this.directionIntegers[(int)(l - z)][k];
                     }
                     // a[k][gk] is always set, so directionIntegers_[k][l-gk]
                     // will always enter
-                    n ^= this.directionIntegers[k][(int)(l-gk)];
-                    this.directionIntegers[k][l]=n;
+                    n ^= this.directionIntegers[(int)(l - gk)][k];
+                    this.directionIntegers[l][k] = n;
                 }
             }
             
             // initialize the Sobol integer/double vectors
             // first draw
             for (k=0; k<this.dimensionality; k++) {
-                integerSequence[k]=this.directionIntegers[k][0];
+                integerSequence[k] = this.directionIntegers[0][k];
             }
         }
 
@@ -433,18 +433,18 @@ namespace pragmatic_quant_model.Maths.Sobol {
         /// <param name="skip"></param>
         public void SkipTo(ulong skip)
         {
-            ulong N = skip + 1;
-            uint ops = (uint) (Math.Log(N) / Ln2) + 1;
+            ulong n = skip + 1;
+            uint ops = (uint) (Math.Log(n) / Ln2) + 1;
 
             // Convert to Gray code
-            ulong G = N ^ (N >> 1);
+            ulong g = n ^ (n >> 1);
             for (int k = 0; k < dimensionality; k++)
             {
                 integerSequence[k] = 0;
                 for (int index = 0; index < ops; index++)
                 {
-                    if ((G >> index & 1) != 0)
-                        integerSequence[k] ^= directionIntegers[k][index];
+                    if ((g >> index & 1) != 0)
+                        integerSequence[k] ^= directionIntegers[index][k];
                 }
             }
             sequenceCounter = skip;
@@ -474,12 +474,13 @@ namespace pragmatic_quant_model.Maths.Sobol {
                 n >>= 1;
                 j++;
             }
+            var j_direction = directionIntegers[j];
             for (int k = 0; k < dimensionality; k++)
             {
                 // XOR the appropriate direction number into each component of
                 // the integer sequence to obtain a new Sobol integer for that
                 // component
-                integerSequence[k] ^= directionIntegers[k][j];
+                integerSequence[k] ^= j_direction[k];
             }
             return integerSequence;
         }
