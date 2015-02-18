@@ -375,7 +375,7 @@ namespace pragmatic_quant_model.Maths.Sobol {
                         do
                         {
                             // u is in (0,1)
-                            double u = uniformRng.next();
+                            double u = uniformRng.Next();
                             // the direction integer has at most the
                             // rightmost l bits non-zero
                             this.directionIntegers[l - 1][k] = (ulong)(u * (1UL << l));

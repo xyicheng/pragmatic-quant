@@ -21,28 +21,55 @@ using System.Collections.Generic;
 
 namespace pragmatic_quant_model.Maths
 {
-    //! Uniform random number generator
-    /*! Mersenne Twister random number generator of period 2**19937-1
-
-        For more details see http://www.math.keio.ac.jp/matumoto/emt.html
-
-        \test the correctness of the returned values is tested by
-              checking them against known good results.
-    */
-    public class MersenneTwisterUniformRng {
-        //typedef Sample<Real> sample_type;
-
-        /*! if the given seed is 0, a random seed will be chosen based on clock() */
+    
+    ///<summary>
+    ///  Mersenne Twister uniform random number generator of period 2**19937-1
+    ///   For more details see http://www.math.keio.ac.jp/matumoto/emt.html
+    ///</summary>
+    public class MersenneTwisterUniformRng
+    {
+        #region const
+        // Period parameters
+        const int N = 624;
+        const int M = 397;
+        // constant vector a
+        const ulong Matrix_A = 0x9908b0dfUL;
+        // most significant w-r bits
+        const ulong Upper_Mask = 0x80000000UL;
+        // least significant r bits
+        const ulong Lower_Mask = 0x7fffffffUL;
+        #endregion
+        #region private fields
+        private List<ulong> mt;
+        private int mti;
+        #endregion
+        #region private methods
+        private void SeedInitialization(ulong seed)
+        {
+            /* initializes mt with a seed */
+            ulong s = seed;
+            mt[0] = s & 0xffffffffUL;
+            for (mti = 1; mti < N; mti++)
+            {
+                mt[mti] = (1812433253UL * (mt[mti - 1] ^ (mt[mti - 1] >> 30)) + (ulong)mti);
+                /* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
+                /* In the previous versions, MSBs of the seed affect   */
+                /* only MSBs of the array mt[].                        */
+                /* 2002/01/09 modified by Makoto Matsumoto             */
+                mt[mti] &= 0xffffffffUL;
+                /* for >32 bit machines */
+            }
+        }
+        #endregion
         public MersenneTwisterUniformRng() : this(0) { }
         public MersenneTwisterUniformRng(ulong seed) {
             mt = new List<ulong>(N);
-            seedInitialization(seed);
+            SeedInitialization(seed);
         }
-
         public MersenneTwisterUniformRng(List<ulong> seeds) {
             mt = new List<ulong>(N);
 
-            seedInitialization(19650218UL);
+            SeedInitialization(19650218UL);
             int i = 1, j = 0, k = (N > seeds.Count ? N : seeds.Count);
             for (; k!=0; k--) {
                 mt[i] = (mt[i] ^ ((mt[i - 1] ^ (mt[i - 1] >> 30)) * 1664525UL)) + seeds[j] + (ulong)j; /* non linear */
@@ -60,33 +87,36 @@ namespace pragmatic_quant_model.Maths
 
             mt[0] = 0x80000000UL; /*MSB is 1; assuring non-zero initial array*/
         }
-
         
-        /*! returns a sample with weight 1.0 containing a random number on (0.0, 1.0)-real-interval  */
-        public double next() {
+        /// <summary>
+        /// Return a sample with weight 1.0 containing a random number on (0.0, 1.0)-real-interval
+        /// </summary>
+        public double Next() {
             // divide by 2^32
-            double result = ((double)nextInt32() + 0.5)/4294967296.0;
+            double result = ((double)NextInt32() + 0.5)/4294967296.0;
             return result;
         }
 
-        //! return  a random number on [0,0xffffffff]-interval
-        public ulong nextInt32() {
+        /// <summary>
+        /// Return  a random number on [0,0xffffffff]-interval
+        /// </summary>
+        public ulong NextInt32() {
             ulong y;
-            ulong[] mag01 = { 0x0UL, MATRIX_A };
+            ulong[] mag01 = { 0x0UL, Matrix_A };
             /* mag01[x] = x * MATRIX_A  for x=0,1 */
 
             if (mti >= N) { /* generate N words at one time */
                 int kk;
 
                 for (kk=0;kk<N-M;kk++) {
-                    y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
+                    y = (mt[kk]&Upper_Mask)|(mt[kk+1]&Lower_Mask);
                     mt[kk] = mt[kk+M] ^ (y >> 1) ^ mag01[y & 0x1UL];
                 }
                 for (;kk<N-1;kk++) {
-                    y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
+                    y = (mt[kk]&Upper_Mask)|(mt[kk+1]&Lower_Mask);
                     mt[kk] = mt[kk+(M-N)] ^ (y >> 1) ^ mag01[y & 0x1UL];
                 }
-                y = (mt[N-1]&UPPER_MASK)|(mt[0]&LOWER_MASK);
+                y = (mt[N-1]&Upper_Mask)|(mt[0]&Lower_Mask);
                 mt[N-1] = mt[M-1] ^ (y >> 1) ^ mag01[y & 0x1UL];
 
                 mti = 0;
@@ -102,34 +132,5 @@ namespace pragmatic_quant_model.Maths
 
             return y;
         }
-
-        private void seedInitialization(ulong seed) {
-            /* initializes mt with a seed */
-            ulong s = seed;
-            mt[0]= s & 0xffffffffUL;
-            for (mti=1; mti<N; mti++) {
-                mt[mti] = (1812433253UL * (mt[mti - 1] ^ (mt[mti - 1] >> 30)) + (ulong)mti);
-                /* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
-                /* In the previous versions, MSBs of the seed affect   */
-                /* only MSBs of the array mt[].                        */
-                /* 2002/01/09 modified by Makoto Matsumoto             */
-                mt[mti] &= 0xffffffffUL;
-                /* for >32 bit machines */
-            }
-        }
-
-        private List<ulong> mt;
-        private int mti;
-
-
-        // Period parameters
-        const int N = 624;
-        const int M = 397;
-        // constant vector a
-        const ulong MATRIX_A = 0x9908b0dfUL;
-        // most significant w-r bits
-        const ulong UPPER_MASK=0x80000000UL;
-        // least significant r bits
-        const ulong LOWER_MASK=0x7fffffffUL;
     }
 }

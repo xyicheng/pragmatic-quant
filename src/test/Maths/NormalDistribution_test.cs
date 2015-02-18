@@ -58,7 +58,7 @@ namespace test.Maths
         }
 
         [TestMethod]
-        public void TestInverseLowerRegion()
+        public void InverseLowerRegion()
         {
             var grid = GridUtils.RegularGrid(-37.0, -2.0, 1000);
             foreach (var x in grid)
@@ -71,7 +71,7 @@ namespace test.Maths
         }
 
         [TestMethod]
-        public void TestInverseCentralRegion()
+        public void InverseCentralRegion()
         {
             var grid = GridUtils.RegularGrid(-2.0, 2.0, 1000);
             foreach (var x in grid)
@@ -84,7 +84,7 @@ namespace test.Maths
         }
 
         [TestMethod]
-        public void TestInverseHigherRegion()
+        public void InverseHigherRegion()
         {
             var grid = GridUtils.RegularGrid(2.0, 6.0, 1000);
             foreach (var x in grid)
@@ -94,6 +94,22 @@ namespace test.Maths
                 var err = Math.Abs((proxy_x - x) / x);
                 Assert.IsTrue(err < 1.0e-8);
             }
+        }
+
+        [TestMethod]
+        public void FastVsPreciseInverse()
+        {
+            var bound = NormalDistribution.CumulativeInverse(1.0e-6);
+            var grid = GridUtils.RegularGrid(bound, -bound, 1000);
+            foreach (var x in grid)
+            {
+                var p = NormalDistribution.Cumulative(x);
+                var precise = NormalDistribution.CumulativeInverse(p);
+                var fast = NormalDistribution.FastCumulativeInverse(p);
+                var errRelative = Math.Abs(fast - precise);
+                Assert.IsTrue(errRelative < 3.0e-9);
+            }
+
         }
     }
 }

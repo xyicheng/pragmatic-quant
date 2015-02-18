@@ -24,7 +24,7 @@ namespace test.Maths
             for (int i = 0; i < nbPaths; ++i)
             {
                 var uniforms = sobol.NextSequence();
-                var gaussians = uniforms.Select(NormalDistribution.CumulativeInverse).ToArray();
+                var gaussians = uniforms.Select(NormalDistribution.FastCumulativeInverse).ToArray();
                 var path = brownian.NextPath(gaussians);
                 for (int j = 0; j < variances.Length; ++j)
                     variances[j] += path[j] * path[j];
@@ -67,7 +67,7 @@ namespace test.Maths
             for (int i = 0; i < nbPaths; ++i)
             {
                 var uniforms = sobol.NextSequence();
-                var gaussians = uniforms.Select(NormalDistribution.CumulativeInverse).ToArray();
+                var gaussians = uniforms.Select(NormalDistribution.FastCumulativeInverse).ToArray();
                 var path = brownian.NextPath(gaussians, brownianDim);
                 for (int j = 0; j < covariances.Length; ++j)
                 {
@@ -90,10 +90,16 @@ namespace test.Maths
         }
         #endregion
         [TestMethod]
-        public void MultiDimPathCovariance()
+        public void MultiDimPathCovariance1()
         {
             var dates = new[] { 0.0, 0.083333333333, 0.25, 0.5, 0.901, 2.0, 3.10184, 4.0, 5.0 };
             MultiDimPathCovariance(dates, 3, 1000000, 2.5e-4);
+        }
+        [TestMethod]
+        public void MultiDimPathCovariance2()
+        {
+            var dates = GridUtils.RegularGrid(1.0, 10.0, 100);
+            MultiDimPathCovariance(dates, 3, 1000000, 6.0e-4);
         }
     }
 }

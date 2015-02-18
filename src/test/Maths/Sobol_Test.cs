@@ -93,7 +93,7 @@ namespace test.Maths
                 var sample = sobol.NextSequence();
                 for (int i = 0; i < dim; i++)
                 {
-                    var gaussian = NormalDistribution.CumulativeInverse(sample[i]);
+                    var gaussian = NormalDistribution.FastCumulativeInverse(sample[i]);
                     atmCalls[i] += Math.Max(0.0, gaussian);
                     strikeCall1[i] += Math.Max(0.0, gaussian - 1.0);
                     strikeCall2[i] += Math.Max(0.0, gaussian - 2.0);
