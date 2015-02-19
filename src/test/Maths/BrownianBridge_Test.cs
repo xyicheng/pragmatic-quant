@@ -62,7 +62,8 @@ namespace test.Maths
 
             var sobol = new SobolRsg(dates.Length * brownianDim, 0, SobolRsg.DirectionIntegers.JoeKuoD5);
             var covariances = new double[dates.Length][,];
-            for (int j = 0; j < dates.Length; ++j) covariances[j] = new double[brownianDim, brownianDim];
+            for (int j = 0; j < dates.Length; ++j) 
+                covariances[j] = new double[brownianDim, brownianDim];
 
             for (int i = 0; i < nbPaths; ++i)
             {

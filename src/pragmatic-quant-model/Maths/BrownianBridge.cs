@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using pragmatic_quant_model.Basic;
@@ -57,28 +58,53 @@ namespace pragmatic_quant_model.Maths
         /// <param name="dates"> Simulation dates, assumed to be sorted and strictly positive </param>
         public static BrownianBridge Create(double[] dates)
         {
+            return Create(dates, Enumerable.Range(0, dates.Length).ToArray());
+        }
+
+        /// <summary>
+        /// Brownian bridge constructor
+        /// </summary>
+        /// <param name="dates"> Simulation dates, assumed to be sorted and strictly positive </param>
+        /// <param name="importantIndexes"> Indexes of Dates that should choose first in brownian bridge construction </param>
+        public static BrownianBridge Create(double[] dates, int[] importantIndexes)
+        {
+            if (importantIndexes.Any(index => index > dates.Length))
+                throw new Exception("BrownianBridge : importantIndexes contain an index higher that dates.Length !");
+            
             if (!EnumerableUtils.IsSorted(dates))
                 throw new Exception("BrownianBridge : dates must be sorted ! ");
-
+            
             if (dates[0] < 0.0)
                 throw new Exception("BrownianBridge : First date must be positive");
 
-            int[] simulationIndex = Enumerable.Range(0, dates.Length).Select(i => int.MinValue).ToArray();
-            double[] simulVariance = Enumerable.Range(0, dates.Length).Select(i => double.NaN).ToArray();
-            int[] leftIndex = Enumerable.Range(0, dates.Length).Select(i => -1).ToArray();
-            int[] rightIndex = Enumerable.Range(0, dates.Length).Select(i => dates.Length).ToArray();
+            int[] simulationIndexes = EnumerableUtils.ConstantArray(int.MinValue, dates.Length);
+            int[] leftIndex = EnumerableUtils.ConstantArray(-1, dates.Length);
+            int[] rightIndex = EnumerableUtils.ConstantArray(dates.Length, dates.Length);
+            double[] simulVariance = EnumerableUtils.ConstantArray(double.NaN, dates.Length);
 
-            double[] dateVariances = dates.Select(d => d).ToArray();
+            double[] dateVariances = EnumerableUtils.Map(dates, d => d);
+            var importantIndexesList = new List<int>(importantIndexes);
+
             for (int k = 0; k < dates.Length; ++k)
             {
-                var maxVariance = dateVariances.Max();
-                var currentIndex = dateVariances.Select((v, i) => new { Var = v, Index = i })
-                                                .Where(v => DoubleUtils.MachineEquality(v.Var, maxVariance))
-                                                .Select(v => v.Index)
-                                                .First();
+                int currentIndex;
+                if (importantIndexes.Count() > 0)
+                {
+                    double maxVariance = importantIndexesList.Select(i => dateVariances[i]).Max();
+                    currentIndex = importantIndexesList.First(i => DoubleUtils.MachineEquality(dateVariances[i], maxVariance));
+                    importantIndexesList.Remove(currentIndex);
+                }
+                else
+                {
+                    double maxVariance =  dateVariances.Max();
+                    currentIndex = dateVariances.Select((v, i) => new {Var = v, Index = i})
+                        .Where(v => DoubleUtils.MachineEquality(v.Var, maxVariance))
+                        .Select(v => v.Index)
+                        .First();
+                }
 
                 var currentVariance = dateVariances[currentIndex];
-                simulationIndex[k] = currentIndex;
+                simulationIndexes[k] = currentIndex;
                 simulVariance[k] = currentVariance;
 
                 int currentLeftIndex = leftIndex[currentIndex];
@@ -100,7 +126,7 @@ namespace pragmatic_quant_model.Maths
                 }
             }
             var simulationStdDevs = simulVariance.Select(Math.Sqrt).ToArray();
-            return new BrownianBridge(dates, simulationIndex, simulationStdDevs, leftIndex, rightIndex);
+            return new BrownianBridge(dates, simulationIndexes, simulationStdDevs, leftIndex, rightIndex);
         }
 
         public double[] NextPath(double[] gaussians)

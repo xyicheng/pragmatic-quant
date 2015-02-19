@@ -16,6 +16,17 @@ namespace pragmatic_quant_model.Basic
                 y = x;
                 return b;
             });
-        } 
+        }
+        public static T[] ConstantArray<T>(T value, int size)
+        {
+            var result = new T[size];
+            for (int i = 0; i < result.Length; ++i)
+                result[i] = value;
+            return result;
+        }
+        public static TOut[] Map<TIn, TOut>(IEnumerable<TIn> list, Func<TIn, TOut> map)
+        {
+            return list.Select(map).ToArray();
+        }
     }
 }

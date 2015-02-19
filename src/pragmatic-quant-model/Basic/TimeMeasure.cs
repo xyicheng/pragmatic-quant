@@ -37,7 +37,7 @@ namespace pragmatic_quant_model.Basic
                 return (date - refDate).TotalDays / 365.0;
             }
         }
-        double[] ITimeMeasure.this[DateTime[] dates]
+        public double[] this[DateTime[] dates]
         {
             get
             {
