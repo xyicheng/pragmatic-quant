@@ -61,6 +61,7 @@
     <Compile Include="Maths\mt19937uniformrng.cs" />
     <Compile Include="Maths\NormalDistribution.cs" />
     <Compile Include="Maths\MatrixUtils.cs" />
+    <Compile Include="Maths\Sobol\JoeKuoDirections.cs" />
     <Compile Include="Maths\Sobol\primitivepolynomials.cs" />
     <Compile Include="Maths\RationalCubic.cs" />
     <Compile Include="Maths\RRFunction.cs" />
