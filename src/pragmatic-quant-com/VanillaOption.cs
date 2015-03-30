@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using ExcelDna.ComInterop;
+using ExcelDna.Integration;
 using pragmatic_quant_model.Maths;
 
 namespace pragmatic_quant_com
 {
     [ComVisible(true)]
+    [ClassInterface(ClassInterfaceType.AutoDispatch)]
+    [ProgId("PragmaticQuant_VanillaOption")]
     public class VanillaOption
     {
         public object BachelierGreek(double fwd, double strike, double maturity, double vol, string request)
@@ -58,6 +62,19 @@ namespace pragmatic_quant_com
             {
                 return "FAILURE: '" + e.Message + "'";
             }
+        }
+    }
+
+    [ComVisible(false)]
+    class PragmaticQuantAddin : IExcelAddIn
+    {
+        public void AutoOpen()
+        {
+            ComServer.DllRegisterServer();
+        }
+        public void AutoClose()
+        {
+            ComServer.DllUnregisterServer();
         }
     }
 }
