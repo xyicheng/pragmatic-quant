@@ -10,7 +10,7 @@ namespace pragmatic_quant_model.Maths
         {
             return Math.Exp(-0.5 * d * d) * (MathConsts.InvSqrtTwoPi - 0.5 * d * ErrorFunctions.Erfcx(MathConsts.InvSqrt2 * d));
         }
-        public static double NormalizedImpliedVol(double x, double price, double q)
+        private static double NormalizedImpliedVol(double x, double price, double q)
         {
             // Subtract intrinsic.
             if (q * x < 0.0)
@@ -113,16 +113,18 @@ namespace pragmatic_quant_model.Maths
         /// <param name="t">maturity</param>
         /// <param name="sigma">volatility</param>
         /// <param name="gamma"> output option gamma</param>
+        /// <param name="theta"> output option theta</param>
         /// <param name="vega"> output option vega  </param>
         /// <param name="vanna"> output option vanna  </param>
         /// <param name="vomma"> output option vomma  </param>
         public static void Greeks(double f, double k, double t, double sigma,
-            out double gamma, out double vega, out double vanna, out double vomma)
+            out double gamma, out double theta, out double vega, out double vanna, out double vomma)
         {
             double sqrtMat = Math.Sqrt(t);
             double dev = (k - f) / sigma;
 
             gamma = MathConsts.InvSqrtTwoPi * Math.Exp(-0.5 * dev * dev / t) / (sigma * sqrtMat);
+            theta = -0.5 * sigma * sigma * gamma;
             vega = sigma * t * gamma;
             vanna = dev * gamma;
             vomma = dev * vanna;

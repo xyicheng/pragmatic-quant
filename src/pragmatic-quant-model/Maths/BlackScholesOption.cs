@@ -58,6 +58,7 @@ namespace pragmatic_quant_model.Maths
         /// <summary>
         /// Black model second order greeks
         /// Gamma : d^2P / df^2
+        /// Theta : -dP / dt
         /// Vega : dP / dsigma
         /// Vanna : dP^2 / dsigmadf
         /// Vomma : dP^2 / dsigma^2
@@ -67,11 +68,12 @@ namespace pragmatic_quant_model.Maths
         /// <param name="t">maturity</param>
         /// <param name="sigma">volatility</param>
         /// <param name="gamma"> output option gamma</param>
+        /// <param name="theta"> output option theta</param>
         /// <param name="vega"> output option vega  </param>
         /// <param name="vanna"> output option vanna  </param>
         /// <param name="vomma"> output option vomma  </param>
         public static void Greeks(double f, double k, double t, double sigma,
-            out double gamma, out double vega, out double vanna, out double vomma)
+            out double gamma, out double theta, out double vega, out double vanna, out double vomma)
         {
             var timesqrt = Math.Sqrt(t);
             var stdDev = sigma * timesqrt;
@@ -80,6 +82,7 @@ namespace pragmatic_quant_model.Maths
 
             var density = MathConsts.InvSqrtTwoPi * Math.Exp(-0.5 * d_plus * d_plus);
             gamma = density / f / stdDev;
+            theta = -0.5 * f * f * sigma * sigma * gamma;
             vega = timesqrt * f * density;
             vanna = -d_minus / sigma * density;
             vomma = d_plus * d_minus / sigma * timesqrt * f * density;
