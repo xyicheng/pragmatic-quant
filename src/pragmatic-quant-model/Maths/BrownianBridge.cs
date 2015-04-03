@@ -170,6 +170,10 @@ namespace pragmatic_quant_model.Maths
             }
             return path;
         }
+        public int GaussianSize(int dimension)
+        {
+            return dates.Length * dimension;
+        }
         public double[] Dates
         {
             get { return dates; }

@@ -49,7 +49,6 @@ namespace pragmatic_quant_model.Maths
         /// </summary>
         /// <param name="result"></param>
         /// <param name="a"></param>
-        /// <param name="b"></param>
         public static void Tranpose(ref double[,] result, double[,] a)
         {
             if (result.GetLength(0) != a.GetLength(1))

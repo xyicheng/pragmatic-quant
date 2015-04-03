@@ -12,11 +12,11 @@ namespace pragmatic_quant_model.Market
         private readonly AssetId asset;
         private readonly ITimeMeasure time;
         private readonly double spot;
-        private readonly DiscountProvider repoCurve;
+        private readonly DiscountCurve repoCurve;
         private readonly DividendDatas dividendDatas;
         #endregion
         public AssetMarket(AssetId asset, DateTime refDate, ITimeMeasure time,
-            double spot, DiscountProvider repoCurve, DividendDatas dividendDatas)
+            double spot, DiscountCurve repoCurve, DividendDatas dividendDatas)
         {
             this.asset = asset;
             this.refDate = refDate;
@@ -44,13 +44,13 @@ namespace pragmatic_quant_model.Market
         {
             get { return dividendDatas; }
         }
-        public DiscountProvider RepoCurve
+        public DiscountCurve RepoCurve
         {
             get { return repoCurve; }
         }
-        public AssetForwardProvider Forward(DiscountProvider cashFinancingCurve)
+        public AssetForwardProvider Forward(DiscountCurve cashFinancingCurve)
         {
-            var assetFinancingCurve = DiscountProvider.Product(repoCurve, cashFinancingCurve);
+            var assetFinancingCurve = DiscountCurve.Product(repoCurve, cashFinancingCurve);
             return new AssetForwardProvider(spot, dividendDatas, assetFinancingCurve, time);
         }
     }
@@ -78,10 +78,10 @@ namespace pragmatic_quant_model.Market
         private readonly double spot;
         private readonly ITimeMeasure time;
         private readonly DividendDatas dividendDatas;
-        private readonly DiscountProvider assetFinancingCurve;
+        private readonly DiscountCurve assetFinancingCurve;
         private readonly RRFunction cumulatedDividendFunc;
         #endregion
-        public AssetForwardProvider(double spot, DividendDatas dividendDatas, DiscountProvider assetFinancingCurve,
+        public AssetForwardProvider(double spot, DividendDatas dividendDatas, DiscountCurve assetFinancingCurve,
             ITimeMeasure time)
         {
             this.spot = spot;

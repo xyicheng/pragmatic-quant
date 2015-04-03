@@ -3,13 +3,13 @@ using pragmatic_quant_model.Basic;
 
 namespace pragmatic_quant_model.Market
 {
-    public abstract class DiscountProvider
+    public abstract class DiscountCurve
     {
         #region protected fields
         protected readonly DateTime refDate;
         #endregion
         #region protected methods
-        protected DiscountProvider(DateTime refDate)
+        protected DiscountCurve(DateTime refDate)
         {
             this.refDate = refDate;
         }
@@ -20,17 +20,17 @@ namespace pragmatic_quant_model.Market
         }
         public abstract double Zc(DateTime d);
 
-        public static DiscountProvider LinearRateInterpol(DateTime[] pillars, double[] zcs, ITimeMeasure time)
+        public static DiscountCurve LinearRateInterpol(DateTime[] pillars, double[] zcs, ITimeMeasure time)
         {
             return new LinearZcRateInterpolation(pillars, zcs, time);
         }
-        public static DiscountProvider Product(DiscountProvider discount1, DiscountProvider discount2)
+        public static DiscountCurve Product(DiscountCurve discount1, DiscountCurve discount2)
         {
             return new ProductDiscount(discount1, discount2);
         }
     }
 
-    public class LinearZcRateInterpolation : DiscountProvider
+    public class LinearZcRateInterpolation : DiscountCurve
     {
         #region private fields
         private readonly ITimeMeasure time;
@@ -71,7 +71,7 @@ namespace pragmatic_quant_model.Market
             if (leftIndex <= -1)
             {
                 throw new Exception(String.Format(
-                    "LinearRateDiscountProvider : not discount for date {0} previous to ref date {1}",
+                    "LinearRateDiscountProvider : discount date {0} previous to ref date {1}",
                     d.ToShortDateString(), refDate.ToShortDateString()));
             }
 
@@ -86,13 +86,13 @@ namespace pragmatic_quant_model.Market
         }
     }
 
-    public class ProductDiscount : DiscountProvider
+    public class ProductDiscount : DiscountCurve
     {
         #region private fields
-        private readonly DiscountProvider discount1;
-        private readonly DiscountProvider discount2;
+        private readonly DiscountCurve discount1;
+        private readonly DiscountCurve discount2;
         #endregion
-        public ProductDiscount(DiscountProvider discount1, DiscountProvider discount2)
+        public ProductDiscount(DiscountCurve discount1, DiscountCurve discount2)
             : base(discount1.RefDate)
         {
             if (discount1.RefDate != discount2.RefDate)
