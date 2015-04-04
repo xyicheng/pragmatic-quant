@@ -76,7 +76,7 @@ namespace pragmatic_quant_model.Basic.Structure
             var asString = o.ToString();
 
             DateTime dateParsing;
-            if (DateTime.TryParse(asString, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out dateParsing))
+            if (DateTime.TryParse(asString, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out dateParsing)) //TODO : check culture
             {
                 result = new DateOrDuration(dateParsing);
                 return true;

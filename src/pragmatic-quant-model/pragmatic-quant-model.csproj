@@ -36,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BagServices.cs" />
+    <Compile Include="Basic\ArrayUtils.cs" />
     <Compile Include="Basic\Assertions.cs" />
     <Compile Include="Basic\DoubleConverter.cs" />
     <Compile Include="Basic\DoubleUtils.cs" />
@@ -43,13 +44,19 @@
     <Compile Include="Basic\GridUtils.cs" />
     <Compile Include="Basic\MathConsts.cs" />
     <Compile Include="Basic\Structure\DateAndDurationConverter.cs" />
+    <Compile Include="Basic\Structure\DateOrDuration.cs" />
     <Compile Include="Basic\Structure\Duration.cs" />
+    <Compile Include="Basic\Structure\LabelledMatrix.cs" />
+    <Compile Include="Basic\Structure\TimeMatrixData.cs" />
     <Compile Include="Basic\TimeMeasure.cs" />
+    <Compile Include="Factories\IFactoryFromBag.cs" />
+    <Compile Include="Factories\RateMarketFactory.cs" />
     <Compile Include="Market\AssetId.cs" />
     <Compile Include="Market\AssetMarket.cs" />
     <Compile Include="Market\Currency.cs" />
     <Compile Include="Market\DiscountCurve.cs" />
     <Compile Include="Market\FinancingCurveId.cs" />
+    <Compile Include="Market\RateMarket.cs" />
     <Compile Include="Maths\BachelierOption.cs" />
     <Compile Include="Maths\BlackScholesOption.cs" />
     <Compile Include="Maths\BrownianBridge.cs" />
@@ -70,6 +77,7 @@
     <Compile Include="Maths\Sobol\sobolrsg2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

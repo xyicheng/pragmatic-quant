@@ -10,12 +10,12 @@ namespace pragmatic_quant_model
         #region private methods
         private static Exception MissingParameter(string name)
         {
-            return new Exception("Missing parameter : " + name + " !");
+            return new Exception(String.Format("Missing parameter : {0} !", name));
         }
         private static string MissingValueMsg(string name)
         {
-            return "Missing parameter value for " + name + " !";
-        }
+            return String.Format("Missing parameter value for {0} !", name);
+        } 
         private static bool IsEmptyCell(object cellValue)
         {
             if (cellValue == null)
@@ -42,7 +42,7 @@ namespace pragmatic_quant_model
             {
                 DateOrDuration result;
                 if (DateAndDurationConverter.TryConvertDateOrDuration(o, out result)) return result;
-                throw new Exception("Parameter value for " + name + " is not a Date or a Duration !");
+                throw new Exception(String.Format("Parameter value for {0} is not a Date or a Duration !", name));
             };
             return converter;
         }
@@ -193,6 +193,39 @@ namespace pragmatic_quant_model
         public static string[,] ProcessMatrixString(object[,] bag, string name)
         {
             return ProcessMatrix(bag, name, o => o.ToString());
+        }
+
+        public static LabelledMatrix<TRow, TCol, TVal> ProcessLabelledMatrix<TRow, TCol, TVal>(object[,] bag, string name, 
+            Func<object, TRow> rowLabelMap,Func<object, TCol> colLabelMap, Func<object, TVal> valueMap)
+        {
+            int row, col;
+            if (Has(bag, name, out row, out col))
+            {
+                var valuesAndDates = ProcessMatrix(bag, row + 1, col, o => o, MissingValueMsg(name));
+
+                var dates = new TRow[valuesAndDates.GetLength(0)];
+                for (int i = 0; i < dates.Length; i++)
+                {
+                    dates[i] = rowLabelMap(valuesAndDates[i, 0]);
+                }
+
+                var values = valuesAndDates
+                    .ExtractSubArray(0, valuesAndDates.GetLength(0), 1, valuesAndDates.GetLength(1) - 1)
+                    .Map(valueMap);
+
+                var labels = bag
+                    .ExtractSubArray(row, 1, col + 1, valuesAndDates.GetLength(1) - 1)
+                    .ExtractRow(0)
+                    .Map(colLabelMap);
+
+                return new LabelledMatrix<TRow, TCol, TVal>(dates, labels, values);
+            }
+            throw MissingParameter(name);
+        }
+        public static TimeMatrixDatas ProcessTimeMatrixDatas(object[,] bag, string name)
+        {
+            var matrix  = ProcessLabelledMatrix(bag, name, DateOrDurationValueConverter(name), o => o.ToString(), DoubleValueConverter(name));
+            return new TimeMatrixDatas(matrix);
         }
     } 
 }

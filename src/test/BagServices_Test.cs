@@ -2,6 +2,7 @@
 using System.Globalization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using pragmatic_quant_model;
+using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Structure;
 
 namespace test
@@ -263,8 +264,7 @@ namespace test
             var myParamArray5 = BagServices.ProcessVectorString(bag5, "MyParam");
             UnitTestUtils.EqualArrays(myParamArray5, new[] { "val1", "val2" });
         }
-
-
+        
         [TestMethod]
         public void TestMatrixString()
         {
@@ -292,6 +292,23 @@ namespace test
             var myParamArray2 = BagServices.ProcessMatrixString(bag2, "MyParam");
             UnitTestUtils.EqualMatrix(myParamArray2, new[,] {{"val11", "val12"}, {"val21", "val22"}});
 
+        }
+
+        [TestMethod]
+        public void TestTimeMatrixDouble()
+        {
+            //Test1
+            var bag1 = new object[,]
+            {
+                {null, null, null},
+                {"", "myparam ", "hello"},
+                {null, "1y", "1.0"},
+                {null, "02/22/1978", "2.0"},
+                {null, "10y", "3.0"}
+            };
+            TimeMatrixDatas timeDatas = BagServices.ProcessTimeMatrixDatas(bag1, "MyParam");
+            var helloDatas = timeDatas.GetCol("hello");
+            UnitTestUtils.EqualDoubleArray(helloDatas, new[] {1.0, 2.0, 3.0}, DoubleUtils.Epsilon);
         }
     }
 }

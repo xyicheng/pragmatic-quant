@@ -17,34 +17,7 @@ namespace pragmatic_quant_model.Basic.Structure
             this.nbunit = nbunit;
         }
         #endregion
-        public override string ToString()
-        {
-            switch (unity)
-            {
-                case BasicDuration.Hour:
-                    return nbunit.ToString(CultureInfo.InvariantCulture) + "H";
-                case BasicDuration.Day:
-                    return nbunit.ToString(CultureInfo.InvariantCulture) + "D";
-                case BasicDuration.Month:
-                    return nbunit.ToString(CultureInfo.InvariantCulture) + "M";
-                case BasicDuration.Year:
-                    return nbunit.ToString(CultureInfo.InvariantCulture) + "Y";
-                default:
-                    throw new Exception("Duration : Should not get there !");
-            }
-        }
-        public override bool Equals(object obj)
-        {
-            var asDur = obj as Duration;
-            if (asDur == null)
-                return false;
-            //Todo : 12m = 1y and 24h = 1d 
-            return (unity == asDur.unity && nbunit == asDur.nbunit);
-        }
-        public override int GetHashCode()
-        {
-            return unity.GetHashCode() ^ nbunit.GetHashCode();
-        }
+        private enum BasicDuration { Hour, Day, Month, Year };
         
         public static readonly Duration Year = new Duration(BasicDuration.Year, 1);
         public static readonly Duration Month = new Duration(BasicDuration.Month, 1);
@@ -120,65 +93,34 @@ namespace pragmatic_quant_model.Basic.Structure
                 return d;
             throw new Exception("Failed to parse duration : " + s);
         }
-
-        private enum BasicDuration { Hour, Day, Month, Year };
-    }
-
-    public class DateOrDuration
-    {
-        #region private fields
-        private readonly Duration duration;
-        private readonly DateTime? date;
-        private readonly bool isDate;
-        #endregion
-        public DateOrDuration(DateTime date)
+        
+        public override string ToString()
         {
-            duration = null;
-            this.date = date;
-            isDate = true;
-        }
-        public DateOrDuration(Duration duration)
-        {
-            this.duration = duration;
-            date = null;
-            isDate = false;
-        }
-
-        public Duration Duration
-        {
-            get
+            switch (unity)
             {
-                return duration;
+                case BasicDuration.Hour:
+                    return nbunit.ToString(CultureInfo.InvariantCulture) + "H";
+                case BasicDuration.Day:
+                    return nbunit.ToString(CultureInfo.InvariantCulture) + "D";
+                case BasicDuration.Month:
+                    return nbunit.ToString(CultureInfo.InvariantCulture) + "M";
+                case BasicDuration.Year:
+                    return nbunit.ToString(CultureInfo.InvariantCulture) + "Y";
+                default:
+                    throw new Exception("Duration : Should not get there !");
             }
         }
-        public DateTime Date
+        public override bool Equals(object obj)
         {
-            get
-            {
-                if (date != null)
-                    return date.Value;
-                throw new Exception("Not a date !");
-            }
+            var asDur = obj as Duration;
+            if (asDur == null)
+                return false;
+            //Todo : 12m = 1y and 24h = 1d 
+            return (unity == asDur.unity && nbunit == asDur.nbunit);
         }
-        public bool IsDuration
+        public override int GetHashCode()
         {
-            get
-            {
-                return !isDate;
-            }
-        }
-        public bool IsDate
-        {
-            get
-            {
-                return isDate;
-            }
-        }
-
-        public DateTime ToDate(DateTime refDate)
-        {
-            if (isDate && date != null) return date.Value;
-            return refDate + duration;
+            return unity.GetHashCode() ^ nbunit.GetHashCode();
         }
     }
 }
