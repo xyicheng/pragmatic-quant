@@ -291,7 +291,6 @@ namespace test
                 };
             var myParamArray2 = BagServices.ProcessMatrixString(bag2, "MyParam");
             UnitTestUtils.EqualMatrix(myParamArray2, new[,] {{"val11", "val12"}, {"val21", "val22"}});
-
         }
 
         [TestMethod]
@@ -300,15 +299,19 @@ namespace test
             //Test1
             var bag1 = new object[,]
             {
-                {null, null, null},
-                {"", "myparam ", "hello"},
-                {null, "1y", "1.0"},
-                {null, "02/22/1978", "2.0"},
-                {null, "10y", "3.0"}
+                {null, null, null, null},
+                {"", "myparam ", "hello", "toto"},
+                {null, "1y", "1.0", 5.0},
+                {null, "02/22/1978", "2.0", "4.0"},
+                {null, "10y", "3.0", 1.0}
             };
+            
             TimeMatrixDatas timeDatas = BagServices.ProcessTimeMatrixDatas(bag1, "MyParam");
             var helloDatas = timeDatas.GetCol("hello");
+            var totoDatas = timeDatas.GetCol("toto");
+            
             UnitTestUtils.EqualDoubleArray(helloDatas, new[] {1.0, 2.0, 3.0}, DoubleUtils.Epsilon);
+            UnitTestUtils.EqualDoubleArray(totoDatas, new[] { 5.0, 4.0, 1.0 }, DoubleUtils.Epsilon);
         }
     }
 }

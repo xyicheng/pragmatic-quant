@@ -23,6 +23,25 @@
         public static readonly Currency Eur = new Currency("EUR");
         public static readonly Currency Usd = new Currency("USD");
         public static readonly Currency Jpy = new Currency("JPY");
+        public static bool TryParse(string desc, out Currency currency)
+        {
+            switch (desc.Trim().ToUpper())
+            {
+                case "EUR":
+                    currency = Eur;
+                    break;
+                case "USD":
+                    currency = Usd;
+                    break;
+                case "JPY":
+                    currency = Jpy;
+                    break;
+                default:
+                    currency = null;
+                    return false;
+            }
+            return true;
+        }
 
         public override bool Equals(object obj)
         {

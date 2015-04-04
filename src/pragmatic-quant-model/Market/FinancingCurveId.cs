@@ -1,4 +1,6 @@
-﻿namespace pragmatic_quant_model.Market
+﻿using System;
+
+namespace pragmatic_quant_model.Market
 {
     public class FinancingCurveId
     {
@@ -26,9 +28,31 @@
         {
             get { return currency; }
         }
+        
         public static FinancingCurveId RiskFree(Currency currency)
         {
             return new FinancingCurveId("RiskFree", currency);
+        }
+        public static bool TryParse(string curveId, out FinancingCurveId result)
+        {
+            result = null;
+
+            var splitted = curveId.Split('.');
+            if (splitted.Length != 2)
+                throw new Exception(string.Format("Not a valid FinancingCurveId : {0}", curveId));
+            
+            Currency currency;
+            if (!Currency.TryParse(splitted[1], out currency))
+                return false;
+            
+            switch (splitted[0].Trim().ToLowerInvariant())
+            {
+                case "riskfree":
+                    result = RiskFree(currency);
+                    return true;
+            }
+
+            return false;
         }
 
         public override bool Equals(object obj)

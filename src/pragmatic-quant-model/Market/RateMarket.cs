@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace pragmatic_quant_model.Market
 {
@@ -11,6 +12,11 @@ namespace pragmatic_quant_model.Market
         public RateMarket(IDictionary<FinancingCurveId, DiscountCurve> discountCurves)
         {
             this.discountCurves = discountCurves;
+
+            var curveDates = discountCurves.Values.Select(c => c.RefDate).ToArray();
+            if (curveDates.Count() != 1)
+                throw new Exception("RateMarket : many curve refDate's !");
+            RefDate = curveDates.First();
         }
         public DiscountCurve DiscountCurve(FinancingCurveId financingId)
         {
@@ -19,5 +25,6 @@ namespace pragmatic_quant_model.Market
                 throw new Exception(string.Format("Missing discount curve : {0}", financingId));
             return curve;
         }
+        public DateTime RefDate { get; private set; }
     }
 }
