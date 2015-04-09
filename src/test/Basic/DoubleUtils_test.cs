@@ -1,13 +1,13 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using pragmatic_quant_model.Basic;
 
 namespace test.Basic
 {
-    [TestClass]
+    [TestFixture]
     public class DoubleUtils_Test
     {
-        [TestMethod]
+        [Test]
         public void TestEqualZero()
         {
             Assert.IsTrue(DoubleUtils.EqualZero(0.0));
@@ -15,7 +15,7 @@ namespace test.Basic
             Assert.IsFalse(DoubleUtils.EqualZero(1.0e-28));
         }
 
-        [TestMethod]
+        [Test]
         public void TestMachineEquality()
         {
             Assert.IsTrue(DoubleUtils.MachineEquality(1.0 + DoubleUtils.Epsilon, 1.0));

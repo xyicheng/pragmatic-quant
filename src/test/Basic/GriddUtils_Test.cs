@@ -1,12 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using pragmatic_quant_model.Basic;
 
 namespace test.Basic
 {
-    [TestClass]
+    [TestFixture]
     public class GriddUtils_Test
     {
-        [TestMethod]
+        [Test]
         public void TestRegularGrid()
         {
             var g = GridUtils.RegularGrid(0.0, 1.0, 4);

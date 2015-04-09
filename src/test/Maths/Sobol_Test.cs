@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Sobol;
 
 namespace test.Maths
 {
-    [TestClass]
+    [TestFixture]
     public class Sobol_Test
     {
-        [TestMethod]
+        [Test]
         public void InitialisationTest()
         {
             var chrono = new Stopwatch();
@@ -49,7 +49,7 @@ namespace test.Maths
             Assert.IsTrue(true);
         }
 
-        [TestMethod]
+        [Test]
         public void Test1()
         {
             const int dim = 10;
@@ -73,7 +73,7 @@ namespace test.Maths
             Assert.IsTrue(Math.Abs((estimatedVolume - trueVolume) / trueVolume) < 1.0e-5);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCallBachelier()
         {
             const int dim = 200;

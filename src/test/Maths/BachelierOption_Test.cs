@@ -1,14 +1,14 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Maths;
 
 namespace test.Maths
 {
-    [TestClass]
+    [TestFixture]
     public class BachelierOption_Test
     {
-        [TestMethod]
+        [Test]
         public void CallNaiveImplemXCheck()
         {
             var maturities = GridUtils.RegularGrid(0.1, 5.0, 100);
@@ -40,7 +40,7 @@ namespace test.Maths
             }
         }
 
-        [TestMethod]
+        [Test]
         public void ImpliedVol_Test()
         {
             const double mat = 0.5;
@@ -58,7 +58,7 @@ namespace test.Maths
             }
         }
 
-        [TestMethod]
+        [Test]
         public void ImpliedVol_NearForward_Test()
         {
             const double mat = 0.5;
@@ -76,7 +76,7 @@ namespace test.Maths
             }
         }
 
-        [TestMethod]
+        [Test]
         public void ImpliedVol_HighRegion_Test()
         {
             const double mat = 0.5;
@@ -94,7 +94,7 @@ namespace test.Maths
             }
         }
 
-        [TestMethod]
+        [Test]
         public void ImpliedVol_VeryHighRegion_Test()
         {
             const double mat = 0.5;

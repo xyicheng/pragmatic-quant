@@ -1,13 +1,13 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using pragmatic_quant_model.Basic.Structure;
 
 namespace test.Basic
 {
-    [TestClass]
+    [TestFixture]
     public class Duration_Test
     {
-        [TestMethod]
+        [Test]
         public void TestParse()
         {
             Assert.AreEqual(Duration.Parse("5y"), Duration.Year * 5);
@@ -39,7 +39,7 @@ namespace test.Basic
             Assert.AreEqual(Duration.Parse("100H"), Duration.Hour * 100);
         }
 
-        [TestMethod]
+        [Test]
         public void TestDateAdd()
         {
             var refDate = new DateTime(1978, 2, 22);

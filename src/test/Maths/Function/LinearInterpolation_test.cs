@@ -1,13 +1,13 @@
 ﻿using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using pragmatic_quant_model.Maths.Function;
 
 namespace test.Maths.Function
 {
-    [TestClass]
+    [TestFixture]
     public class LinearInterpolation_Test
     {
-        [TestMethod]
+        [Test]
         public void TestEval()
         {
             var abs = new[] { 0.0, 0.5, 0.99, 2.5 };
@@ -35,10 +35,10 @@ namespace test.Maths.Function
         }
     }
 
-    [TestClass]
+    [TestFixture]
     public class CubicSplineInterpolation_Test
     {
-        [TestMethod]
+        [Test]
         public void TestEval()
         {
             var abs = new[] {0.0, 0.5, 0.99, 2.5};

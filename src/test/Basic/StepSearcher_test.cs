@@ -1,13 +1,13 @@
 ﻿using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using pragmatic_quant_model.Basic;
 
 namespace test.Basic
 {
-    [TestClass]
+    [TestFixture]
     public class StepSearcher_Test
     {
-        [TestMethod]
+        [Test]
         public void TestLocateLeftIndex()
         {
             var abs = new[] {0.0, 0.5, 0.7, 1.0, 10.0};

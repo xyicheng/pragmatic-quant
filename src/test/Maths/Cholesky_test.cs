@@ -1,11 +1,11 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Maths;
 
 namespace test.Maths
 {
-    [TestClass]
+    [TestFixture]
     public class Cholesky_Test
     {
         #region private methods
@@ -24,7 +24,7 @@ namespace test.Maths
             }
         }
         #endregion
-        [TestMethod]
+        [Test]
         public void TestDecomposition1()
         {
             const double rho = 0.5;
@@ -38,7 +38,7 @@ namespace test.Maths
 
             TestDecomposition(a, 2);
         }
-        [TestMethod]
+        [Test]
         public void TestDecomposition2()
         {
             const double rho = 0.99;
@@ -52,7 +52,7 @@ namespace test.Maths
 
             TestDecomposition(a, 2);
         }
-        [TestMethod]
+        [Test]
         public void TestDecomposition3()
         {
             const double rho = 0.5;
@@ -66,7 +66,7 @@ namespace test.Maths
 
             TestDecomposition(a, 2);
         }
-        [TestMethod]
+        [Test]
         public void TestDecomposition4()
         {
             const double rho = 0.5;

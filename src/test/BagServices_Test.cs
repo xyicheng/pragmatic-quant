@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Globalization;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using pragmatic_quant_model;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Structure;
 
 namespace test
 {
-    [TestClass]
+    [TestFixture]
     public class BagServices_Test
     {
-        [TestMethod]
+        [Test]
         public void TestHas()
         {
             var bag1 = new object[,]
@@ -28,7 +28,7 @@ namespace test
             Assert.AreEqual(col, 2);
         }
 
-        [TestMethod]
+        [Test]
         public void TestProcessScalarString()
         {
             var bag = new object[,]
@@ -42,7 +42,7 @@ namespace test
             Assert.AreEqual(totoVal, "hello");
         }
 
-        [TestMethod]
+        [Test]
         public void TestProcessScalarDouble()
         {
             //Test 1
@@ -66,7 +66,7 @@ namespace test
             Assert.AreEqual(totoDoubleVal2, 3.14159265);
         }
 
-        [TestMethod]
+        [Test]
         public void TestProcessScalarDate()
         {
             //Test1
@@ -91,7 +91,7 @@ namespace test
             Assert.AreEqual(totoDateVal2.Date, date);
         }
 
-        [TestMethod]
+        [Test]
         public void TestProcessScalarDurationYear()
         {
             var dur = 10 * Duration.Year;
@@ -127,7 +127,7 @@ namespace test
             Assert.AreEqual(totoVal3.Duration, dur);
         }
 
-        [TestMethod]
+        [Test]
         public void TestProcessScalarDurationMonth()
         {
             var dur = 112 * Duration.Month;
@@ -163,7 +163,7 @@ namespace test
             Assert.AreEqual(totoVal3.Duration, dur);
         }
 
-        [TestMethod]
+        [Test]
         public void TestProcessScalarDurationDay()
         {
             var dur = 30 * Duration.Day;
@@ -199,7 +199,7 @@ namespace test
             Assert.AreEqual(totoVal3.Duration, dur);
         }
 
-        [TestMethod]
+        [Test]
         public void TestVectorString()
         {
 
@@ -265,7 +265,7 @@ namespace test
             UnitTestUtils.EqualArrays(myParamArray5, new[] { "val1", "val2" });
         }
         
-        [TestMethod]
+        [Test]
         public void TestMatrixString()
         {
             //Test1
@@ -293,7 +293,7 @@ namespace test
             UnitTestUtils.EqualMatrix(myParamArray2, new[,] {{"val11", "val12"}, {"val21", "val22"}});
         }
 
-        [TestMethod]
+        [Test]
         public void TestTimeMatrixDouble()
         {
             //Test1

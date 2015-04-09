@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Sobol;
 
 namespace test.Maths
 {
-    [TestClass]
+    [TestFixture]
     public class BrownianBridge_Test
     {
         #region private method
@@ -37,13 +37,13 @@ namespace test.Maths
             UnitTestUtils.EqualDoubleArray(variances, dates, precision, relativePrecision);
         }
         #endregion
-        [TestMethod]
+        [Test]
         public void SinglePathVariance1()
         {
             var dates = new[] {0.0, 0.083333333333, 0.25, 0.5, 0.901, 2.0, 3.10184, 4.0, 5.0};
             SinglePathVariance(dates, 1000000, 2.5e-4, false);
         }
-        [TestMethod]
+        [Test]
         public void SinglePathVariance2()
         {
             var dates = GridUtils.RegularGrid(1.0, 10.0, 10);
@@ -90,13 +90,13 @@ namespace test.Maths
             }
         }
         #endregion
-        [TestMethod]
+        [Test]
         public void MultiDimPathCovariance1()
         {
             var dates = new[] { 0.0, 0.083333333333, 0.25, 0.5, 0.901, 2.0, 3.10184, 4.0, 5.0 };
             MultiDimPathCovariance(dates, 3, 1000000, 2.5e-4);
         }
-        [TestMethod]
+        [Test]
         public void MultiDimPathCovariance2()
         {
             var dates = GridUtils.RegularGrid(1.0, 10.0, 100);

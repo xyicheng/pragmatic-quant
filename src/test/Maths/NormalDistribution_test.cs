@@ -1,14 +1,14 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Maths;
 
 namespace test.Maths
 {
-    [TestClass]
+    [TestFixture]
     public class NormalDistribution_Test
     {
-        [TestMethod]
+        [Test]
         public void SpecialValues()
         {
             Assert.AreEqual(NormalDistribution.Cumulative(0.0), 0.5);
@@ -18,7 +18,7 @@ namespace test.Maths
             Assert.AreEqual(NormalDistribution.Cumulative(double.MinValue), 0.0);
         }
 
-        [TestMethod]
+        [Test]
         public void CheckSymmetry()
         {
             var rand = new Random(1468);
@@ -42,7 +42,7 @@ namespace test.Maths
                    * t * (0.319381530 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
         }
         #endregion
-        [TestMethod]
+        [Test]
         public void ProxyCrossCheck()
         {
             var rand = new Random(1515);
@@ -57,7 +57,7 @@ namespace test.Maths
             }
         }
 
-        [TestMethod]
+        [Test]
         public void InverseLowerRegion()
         {
             var grid = GridUtils.RegularGrid(-37.0, -2.0, 1000);
@@ -70,7 +70,7 @@ namespace test.Maths
             }
         }
 
-        [TestMethod]
+        [Test]
         public void InverseCentralRegion()
         {
             var grid = GridUtils.RegularGrid(-2.0, 2.0, 1000);
@@ -83,7 +83,7 @@ namespace test.Maths
             }
         }
 
-        [TestMethod]
+        [Test]
         public void InverseHigherRegion()
         {
             var grid = GridUtils.RegularGrid(2.0, 6.0, 1000);
@@ -96,7 +96,7 @@ namespace test.Maths
             }
         }
 
-        [TestMethod]
+        [Test]
         public void FastVsPreciseInverse()
         {
             var bound = NormalDistribution.CumulativeInverse(1.0e-6);

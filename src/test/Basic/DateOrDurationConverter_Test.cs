@@ -1,13 +1,13 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using pragmatic_quant_model.Basic.Structure;
 
 namespace test.Basic
 {
-    [TestClass]
+    [TestFixture]
     public class DateOrDurationConverter_Test
     {
-        [TestMethod]
+        [Test]
         public void TestConvertDate()
         {
             var refDate = new DateTime(2015, 01, 27);
@@ -16,7 +16,7 @@ namespace test.Basic
             Assert.AreEqual(DateAndDurationConverter.ConvertDate("27 Jan 2015"), refDate);
             Assert.AreEqual(DateAndDurationConverter.ConvertDate("01/27/2015"), refDate);
         }
-        [TestMethod]
+        [Test]
         public void TestConvertDuration()
         {
             var refDuration = 10 * Duration.Year;
