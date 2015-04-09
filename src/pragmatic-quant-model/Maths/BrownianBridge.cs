@@ -82,7 +82,7 @@ namespace pragmatic_quant_model.Maths
             int[] rightIndex = EnumerableUtils.ConstantArray(dates.Length, dates.Length);
             double[] simulVariance = EnumerableUtils.ConstantArray(double.NaN, dates.Length);
 
-            double[] dateVariances = EnumerableUtils.Map(dates, d => d);
+            double[] dateVariances = FuncUtils.Map(dates, d => d);
             var importantIndexesList = new List<int>(importantIndexes);
 
             for (int k = 0; k < dates.Length; ++k)

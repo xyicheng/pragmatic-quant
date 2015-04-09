@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Function;
@@ -13,17 +14,17 @@ namespace pragmatic_quant_model.Market
         private readonly ITimeMeasure time;
         private readonly double spot;
         private readonly DiscountCurve repoCurve;
-        private readonly DividendDatas dividendDatas;
+        private readonly DividendQuote[] dividends;
         #endregion
         public AssetMarket(AssetId asset, DateTime refDate, ITimeMeasure time,
-            double spot, DiscountCurve repoCurve, DividendDatas dividendDatas)
+            double spot, DiscountCurve repoCurve, DividendQuote[] dividends)
         {
             this.asset = asset;
             this.refDate = refDate;
             this.time = time;
             this.spot = spot;
             this.repoCurve = repoCurve;
-            this.dividendDatas = dividendDatas;
+            this.dividends = dividends;
             if (refDate != repoCurve.RefDate || refDate != time.RefDate)
                 throw new Exception("AssetMarket : incompatible ref date !");
         }
@@ -40,65 +41,69 @@ namespace pragmatic_quant_model.Market
         {
             get { return spot; }
         }
-        public DividendDatas DividendDatas
+        public DividendQuote[] Dividends
         {
-            get { return dividendDatas; }
+            get { return dividends; }
         }
         public DiscountCurve RepoCurve
         {
             get { return repoCurve; }
         }
-        public AssetForwardProvider Forward(DiscountCurve cashFinancingCurve)
+
+        public AssetForwardCurve Forward(DiscountCurve cashFinancingCurve)
         {
             var assetFinancingCurve = DiscountCurve.Product(repoCurve, cashFinancingCurve);
-            return new AssetForwardProvider(spot, dividendDatas, assetFinancingCurve, time);
+            return new AssetForwardCurve(spot, dividends, assetFinancingCurve, time);
         }
     }
 
-    public class DividendDatas
+    public class DividendQuote
     {
-        public DividendDatas(DateTime[] dates, double[] cashPart, double[] yieldPart)
+        public DividendQuote(DateTime date, double cash, double yield)
         {
-            Dates = dates;
-            CashPart = cashPart;
-            YieldPart = yieldPart;
-            if (dates.Length != cashPart.Length || cashPart.Length != yieldPart.Length)
-                throw new Exception("DividendDatas : incompatible data size !");
-            if (!EnumerableUtils.IsSorted(dates))
-                throw new Exception("DividendDatas : dividend dates must be sorted !");
+            Date = date;
+            Yield = yield;
+            Cash = cash;
         }
-        public readonly DateTime[] Dates;
-        public readonly double[] CashPart;
-        public readonly double[] YieldPart;
+
+        public DateTime Date { get; private set; }
+        public double Cash { get; private set; }
+        public double Yield { get; private set; }
+
+        public double Value(double spotAsset)
+        {
+            return Cash + spotAsset * Yield;
+        }
     }
 
-    public class AssetForwardProvider
+    public class AssetForwardCurve
     {
         #region protected fields
         private readonly double spot;
         private readonly ITimeMeasure time;
-        private readonly DividendDatas dividendDatas;
+        private readonly DividendQuote[] dividends;
         private readonly DiscountCurve assetFinancingCurve;
         private readonly RRFunction cumulatedDividendFunc;
         #endregion
-        public AssetForwardProvider(double spot, DividendDatas dividendDatas, DiscountCurve assetFinancingCurve,
+        public AssetForwardCurve(double spot, DividendQuote[] dividends, DiscountCurve assetFinancingCurve,
             ITimeMeasure time)
         {
             this.spot = spot;
-            this.dividendDatas = dividendDatas;
+            this.dividends = dividends.OrderBy(d => d.Date).ToArray();
             this.assetFinancingCurve = assetFinancingCurve;
             this.time = time;
 
-            var cumulatedDividends = new double[dividendDatas.Dates.Length];
+            var cumulatedDividends = new double[dividends.Length];
             var yieldGrowth = 1.0;
             var cumulDiv = 0.0;
-            for (int i = 0; i < dividendDatas.Dates.Length; i++)
+            for (int i = 0; i < dividends.Length; i++)
             {
-                yieldGrowth *= 1.0 - dividendDatas.YieldPart[i];
-                cumulDiv += dividendDatas.CashPart[i] / yieldGrowth * assetFinancingCurve.Zc(dividendDatas.Dates[i]);
+                var div = dividends[i];
+                yieldGrowth *= 1.0 - div.Yield;
+                cumulDiv += div.Cash / yieldGrowth * assetFinancingCurve.Zc(div.Date);
                 cumulatedDividends[i] = cumulDiv;
             }
-            cumulatedDividendFunc = new StepFunction(time[dividendDatas.Dates], cumulatedDividends, 0.0);
+            cumulatedDividendFunc = new StepFunction(time[dividends.Select(d => d.Date).ToArray()], cumulatedDividends, 0.0);
         }
         public DateTime RefDate
         {
@@ -108,13 +113,14 @@ namespace pragmatic_quant_model.Market
         {
             return (spot - CumulatedDividends(d)) * AssetGrowth(d);
         }
-        public double AssetGrowth(DateTime d)
+        public double AssetGrowth(DateTime date)
         {
-            double growth = 1.0 / assetFinancingCurve.Zc(d);
-            for (int i = 0; i < dividendDatas.YieldPart.Length; i++)
+            double growth = 1.0 / assetFinancingCurve.Zc(date);
+            for (int i = 0; i < dividends.Length; i++)
             {
-                if (d > dividendDatas.Dates[i]) break;
-                growth *= 1.0 - dividendDatas.YieldPart[i];
+                var div = dividends[i];
+                if (date > div.Date) break;
+                growth *= 1.0 - div.Yield;
             }
             return growth;
         }

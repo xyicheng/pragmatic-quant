@@ -14,9 +14,13 @@ namespace pragmatic_quant_model.Factories
         {
             return BagServices.ProcessScalarDateOrDuration(bag, "RefDate").Date;
         }
+        private static ITimeMeasure RateTimeMeasure(DateTime refDate)
+        {
+            return TimeMeasure.Act365(refDate);
+        }
         private static IDictionary<FinancingCurveId, DiscountCurve> BuildDiscount(object[,] bag, DateTime refDate)
         {
-            var rateTimeInterpol = TimeMeasure.Act365(refDate);
+            var rateTimeInterpol = RateTimeMeasure(refDate);
 
             TimeMatrixDatas curveRawDatas = BagServices.ProcessTimeMatrixDatas(bag, "Discount");
             DateTime[] datePillars = curveRawDatas.RowLabels
@@ -27,8 +31,8 @@ namespace pragmatic_quant_model.Factories
             {
                 FinancingCurveId financingId;
                 if (!FinancingCurveId.TryParse(curveLabel, out financingId))
-                    throw new Exception(String.Format("RateMarketFactory, unable to parse Discount Curve Id : {0}", curveLabel));
-
+                    throw new ArgumentException(String.Format("RateMarketFactory, invalid Discount Curve Id : {0}", curveLabel));
+                
                 double[] zcs = curveRawDatas.GetCol(curveLabel);
                 var discountCurve = DiscountCurve.LinearRateInterpol(datePillars, zcs, rateTimeInterpol);
 
