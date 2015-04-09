@@ -56,11 +56,11 @@
     <Compile Include="Basic\DateOrDurationConverter_Test.cs" />
     <Compile Include="Maths\Function\LinearInterpolation_test.cs" />
     <Compile Include="Maths\Function\StepFunction.cs" />
-    <Compile Include="Maths\Cholesky_test.cs" />
+    <Compile Include="Maths\CholeskyTest.cs" />
     <Compile Include="Maths\NormalDistribution_test.cs" />
     <Compile Include="Maths\BlackOption_Test.cs" />
     <Compile Include="Maths\BachelierOption_Test.cs" />
-    <Compile Include="Maths\Sobol_Test.cs" />
+    <Compile Include="Maths\SobolTest.cs" />
     <Compile Include="Maths\BrownianBridge_Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BagServices_Test.cs" />

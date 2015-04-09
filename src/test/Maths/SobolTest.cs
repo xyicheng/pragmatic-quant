@@ -8,47 +8,24 @@ using pragmatic_quant_model.Maths.Sobol;
 namespace test.Maths
 {
     [TestFixture]
-    public class Sobol_Test
+    public class SobolTest
     {
-        [Test]
-        public void InitialisationTest()
+        [TestCase(32, SobolRsg.DirectionIntegers.Jaeckel)]
+        [TestCase(40, SobolRsg.DirectionIntegers.SobolLevitan)]
+        [TestCase(360, SobolRsg.DirectionIntegers.SobolLevitanLemieux)]
+        [TestCase(1999, SobolRsg.DirectionIntegers.JoeKuoD5)]
+        [TestCase(1799, SobolRsg.DirectionIntegers.JoeKuoD6)]
+        [TestCase(1899, SobolRsg.DirectionIntegers.JoeKuoD7)]
+        [TestCase(4925, SobolRsg.DirectionIntegers.Kuo)]
+        [TestCase(3946, SobolRsg.DirectionIntegers.Kuo2)]
+        [TestCase(4586, SobolRsg.DirectionIntegers.Kuo3)]
+        public void InitialisationTest(int dim, SobolRsg.DirectionIntegers direction)
         {
-            var chrono = new Stopwatch();
-            chrono.Start();
-
-            var jaeckel = new SobolRsg(32, 0, SobolRsg.DirectionIntegers.Jaeckel);
-            jaeckel.NextSequence();
-
-            var sobolLevitan = new SobolRsg(40, 0, SobolRsg.DirectionIntegers.SobolLevitan);
-            sobolLevitan.NextSequence();
-
-            var sobolLevitanLemieux = new SobolRsg(360, 0, SobolRsg.DirectionIntegers.SobolLevitanLemieux);
-            sobolLevitanLemieux.NextSequence();
-
-            var joeKuoD5 = new SobolRsg(1999, 0, SobolRsg.DirectionIntegers.JoeKuoD5);
-            joeKuoD5.NextSequence();
-
-            var joeKuoD6 = new SobolRsg(1799, 0, SobolRsg.DirectionIntegers.JoeKuoD6);
-            joeKuoD6.NextSequence();
-
-            var joeKuoD7 = new SobolRsg(1899, 0, SobolRsg.DirectionIntegers.JoeKuoD7);
-            joeKuoD7.NextSequence();
-
-            var kuo = new SobolRsg(4925, 0, SobolRsg.DirectionIntegers.Kuo);
-            kuo.NextSequence();
-
-            var kuo2 = new SobolRsg(3946, 0, SobolRsg.DirectionIntegers.Kuo2);
-            kuo2.NextSequence();
-
-            var kuo3 = new SobolRsg(4586, 0, SobolRsg.DirectionIntegers.Kuo3);
-            kuo3.NextSequence();
-
-            chrono.Stop();
-            Console.WriteLine("Elapsed " + chrono.Elapsed);
-
+            var sobol = new SobolRsg(dim, 0, direction);
+            sobol.NextSequence();
             Assert.IsTrue(true);
         }
-
+        
         [Test]
         public void Test1()
         {
@@ -73,11 +50,10 @@ namespace test.Maths
             Assert.IsTrue(Math.Abs((estimatedVolume - trueVolume) / trueVolume) < 1.0e-5);
         }
 
-        [Test]
-        public void TestCallBachelier()
+        [TestCase(200, SobolRsg.DirectionIntegers.JoeKuoD5)]
+        public void TestCallBachelier(int dim, SobolRsg.DirectionIntegers direction)
         {
-            const int dim = 200;
-            var sobol = new SobolRsg(dim, 0, SobolRsg.DirectionIntegers.JoeKuoD5);
+            var sobol = new SobolRsg(dim, 0, direction);
 
             var chrono = new Stopwatch();
             chrono.Start();    
