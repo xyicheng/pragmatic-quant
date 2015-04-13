@@ -4,7 +4,7 @@ using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Function;
 
-namespace pragmatic_quant_model.Market
+namespace pragmatic_quant_model.MarketDatas
 {
     public class AssetMarket
     {
@@ -105,6 +105,7 @@ namespace pragmatic_quant_model.Market
             }
             cumulatedDividendFunc = new StepFunction(time[dividends.Select(d => d.Date).ToArray()], cumulatedDividends, 0.0);
         }
+
         public DateTime RefDate
         {
             get { return time.RefDate; }

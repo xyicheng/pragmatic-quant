@@ -72,6 +72,9 @@
       <Name>pragmatic-quant-model</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="nunit.framework.dll" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

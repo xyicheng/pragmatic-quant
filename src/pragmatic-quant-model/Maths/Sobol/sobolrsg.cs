@@ -226,14 +226,14 @@ namespace pragmatic_quant_model.Maths.Sobol {
                     break;
                 case DirectionIntegers.Jaeckel:
                     // maxTabulated=32
-                    maxTabulated = initializers.Length + 1;
+                    maxTabulated = initializers.Value.Length + 1;
                     for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
                     {
                         j = 0;
                         // 0UL marks coefficients' end for a given dimension
-                        while (initializers[k - 1][j] != 0UL)
+                        while (initializers.Value[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[j][k] = initializers[k - 1][j];
+                            this.directionIntegers[j][k] = initializers.Value[k - 1][j];
                             this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }
@@ -241,14 +241,14 @@ namespace pragmatic_quant_model.Maths.Sobol {
                     break;
                 case DirectionIntegers.SobolLevitan:
                     // maxTabulated=40
-                    maxTabulated = SLinitializers.Length + 1;
+                    maxTabulated = SLinitializers.Value.Length + 1;
                     for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
                     {
                         j = 0;
                         // 0UL marks coefficients' end for a given dimension
-                        while (SLinitializers[k - 1][j] != 0UL)
+                        while (SLinitializers.Value[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[j][k] = SLinitializers[k - 1][j];
+                            this.directionIntegers[j][k] = SLinitializers.Value[k - 1][j];
                             this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }
@@ -256,14 +256,14 @@ namespace pragmatic_quant_model.Maths.Sobol {
                     break;
                 case DirectionIntegers.SobolLevitanLemieux:
                     // maxTabulated=360
-                    maxTabulated = Linitializers.Length + 1;
+                    maxTabulated = Linitializers.Value.Length + 1;
                     for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
                     {
                         j = 0;
                         // 0UL marks coefficients' end for a given dimension
-                        while (Linitializers[k - 1][j] != 0UL)
+                        while (Linitializers.Value[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[j][k] = Linitializers[k - 1][j];
+                            this.directionIntegers[j][k] = Linitializers.Value[k - 1][j];
                             this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }
@@ -271,14 +271,14 @@ namespace pragmatic_quant_model.Maths.Sobol {
                     break;
                 case DirectionIntegers.JoeKuoD5:
                     // maxTabulated=1898
-                    maxTabulated = JoeKuoD5Initializers.Length + 1;
+                    maxTabulated = JoeKuoD5Initializers.Value.Length + 1;
                     for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
                     {
                         j = 0;
                         // 0UL marks coefficients' end for a given dimension
-                        while (JoeKuoD5Initializers[k - 1][j] != 0UL)
+                        while (JoeKuoD5Initializers.Value[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[j][k] = JoeKuoD5Initializers[k - 1][j];
+                            this.directionIntegers[j][k] = JoeKuoD5Initializers.Value[k - 1][j];
                             this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }
@@ -286,14 +286,14 @@ namespace pragmatic_quant_model.Maths.Sobol {
                     break;
                 case DirectionIntegers.JoeKuoD6:
                     // maxTabulated=1799
-                    maxTabulated = JoeKuoD6Initializers.Length + 1;
+                    maxTabulated = JoeKuoD6Initializers.Value.Length + 1;
                     for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
                     {
                         j = 0;
                         // 0UL marks coefficients' end for a given dimension
-                        while (JoeKuoD6Initializers[k - 1][j] != 0UL)
+                        while (JoeKuoD6Initializers.Value[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[j][k] = JoeKuoD6Initializers[k - 1][j];
+                            this.directionIntegers[j][k] = JoeKuoD6Initializers.Value[k - 1][j];
                             this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }
@@ -301,14 +301,14 @@ namespace pragmatic_quant_model.Maths.Sobol {
                     break;
                 case DirectionIntegers.JoeKuoD7:
                     // maxTabulated=1898
-                    maxTabulated = JoeKuoD7Initializers.Length + 1;
+                    maxTabulated = JoeKuoD7Initializers.Value.Length + 1;
                     for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
                     {
                         j = 0;
                         // 0UL marks coefficients' end for a given dimension
-                        while (JoeKuoD7Initializers[k - 1][j] != 0UL)
+                        while (JoeKuoD7Initializers.Value[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[j][k] = JoeKuoD7Initializers[k - 1][j];
+                            this.directionIntegers[j][k] = JoeKuoD7Initializers.Value[k - 1][j];
                             this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }
@@ -317,14 +317,14 @@ namespace pragmatic_quant_model.Maths.Sobol {
 
                 case DirectionIntegers.Kuo:
                     // maxTabulated=4925
-                    maxTabulated = Kuoinitializers.Length + 1;
+                    maxTabulated = Kuoinitializers.Value.Length + 1;
                     for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
                     {
                         j = 0;
                         // 0UL marks coefficients' end for a given dimension
-                        while (Kuoinitializers[k - 1][j] != 0UL)
+                        while (Kuoinitializers.Value[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[j][k] = Kuoinitializers[k - 1][j];
+                            this.directionIntegers[j][k] = Kuoinitializers.Value[k - 1][j];
                             this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }
@@ -333,14 +333,14 @@ namespace pragmatic_quant_model.Maths.Sobol {
 
                 case DirectionIntegers.Kuo2:
                     // maxTabulated=3946
-                    maxTabulated = Kuo2initializers.Length + 1;
+                    maxTabulated = Kuo2initializers.Value.Length + 1;
                     for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
                     {
                         j = 0;
                         // 0UL marks coefficients' end for a given dimension
-                        while (Kuo2initializers[k - 1][j] != 0UL)
+                        while (Kuo2initializers.Value[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[j][k] = Kuo2initializers[k - 1][j];
+                            this.directionIntegers[j][k] = Kuo2initializers.Value[k - 1][j];
                             this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }
@@ -349,14 +349,14 @@ namespace pragmatic_quant_model.Maths.Sobol {
 
                 case DirectionIntegers.Kuo3:
                     // maxTabulated=4585
-                    maxTabulated = Kuo3initializers.Length + 1;
+                    maxTabulated = Kuo3initializers.Value.Length + 1;
                     for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
                     {
                         j = 0;
                         // 0UL marks coefficients' end for a given dimension
-                        while (Kuo3initializers[k - 1][j] != 0UL)
+                        while (Kuo3initializers.Value[k - 1][j] != 0UL)
                         {
-                            this.directionIntegers[j][k] = Kuo3initializers[k - 1][j];
+                            this.directionIntegers[j][k] = Kuo3initializers.Value[k - 1][j];
                             this.directionIntegers[j][k] <<= (Bits - j - 1);
                             j++;
                         }

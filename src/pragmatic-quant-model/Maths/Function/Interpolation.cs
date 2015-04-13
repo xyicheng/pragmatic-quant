@@ -96,7 +96,7 @@ namespace pragmatic_quant_model.Maths.Function
             int leftIndex = stepSearcher.LocateLeftIndex(x);
             int rightIndex = leftIndex + 1;
             if (leftIndex <= -1 || rightIndex >= abscissae.Length)
-                throw new Exception("Extrapolation not allowed");
+                throw new IndexOutOfRangeException("Extrapolation not allowed");
 
             double h = abscissae[rightIndex] - abscissae[leftIndex];
             if (DoubleUtils.EqualZero(h))

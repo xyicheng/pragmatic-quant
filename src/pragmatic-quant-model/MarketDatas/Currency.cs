@@ -1,4 +1,4 @@
-﻿namespace pragmatic_quant_model.Market
+﻿namespace pragmatic_quant_model.MarketDatas
 {
     public class Currency
     {

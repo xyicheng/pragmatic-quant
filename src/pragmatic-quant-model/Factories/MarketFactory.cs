@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Structure;
-using pragmatic_quant_model.Market;
+using pragmatic_quant_model.MarketDatas;
 
 namespace pragmatic_quant_model.Factories
 {
-    public class RateMarketFactory : IFactoryFromBag<RateMarket>
+    public class MarketFactory : IFactoryFromBag<Market>
     {
         #region private methods
         private static DateTime RefDate(object[,] bag)
@@ -18,11 +18,9 @@ namespace pragmatic_quant_model.Factories
         {
             return TimeMeasure.Act365(refDate);
         }
-        private static IDictionary<FinancingCurveId, DiscountCurve> BuildDiscount(object[,] bag, DateTime refDate)
+        private static IDictionary<FinancingCurveId, DiscountCurve> RateCurveFromRawDatas(TimeMatrixDatas curveRawDatas, DateTime refDate)
         {
             var rateTimeInterpol = RateTimeMeasure(refDate);
-
-            TimeMatrixDatas curveRawDatas = BagServices.ProcessTimeMatrixDatas(bag, "Discount");
             DateTime[] datePillars = curveRawDatas.RowLabels
                 .Select(dOrDur => dOrDur.ToDate(refDate)).ToArray();
 
@@ -32,7 +30,7 @@ namespace pragmatic_quant_model.Factories
                 FinancingCurveId financingId;
                 if (!FinancingCurveId.TryParse(curveLabel, out financingId))
                     throw new ArgumentException(String.Format("RateMarketFactory, invalid Discount Curve Id : {0}", curveLabel));
-                
+
                 double[] zcs = curveRawDatas.GetCol(curveLabel);
                 var discountCurve = DiscountCurve.LinearRateInterpol(datePillars, zcs, rateTimeInterpol);
 
@@ -41,11 +39,14 @@ namespace pragmatic_quant_model.Factories
             return curves;
         }
         #endregion
-        public RateMarket Build(object[,] bag)
+        public Market Build(object[,] bag)
         {
             DateTime refDate = RefDate(bag);
-            IDictionary<FinancingCurveId, DiscountCurve> discountCurves = BuildDiscount(bag, refDate);
-            return new RateMarket(discountCurves);
+            
+            TimeMatrixDatas curveRawDatas = BagServices.ProcessTimeMatrixDatas(bag, "Discount");
+            var discountCurves = RateCurveFromRawDatas(curveRawDatas, refDate);
+            
+            return new Market(discountCurves, null);
         }
     }
 }

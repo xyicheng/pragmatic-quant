@@ -50,13 +50,13 @@
     <Compile Include="Basic\Structure\TimeMatrixData.cs" />
     <Compile Include="Basic\TimeMeasure.cs" />
     <Compile Include="Factories\IFactoryFromBag.cs" />
-    <Compile Include="Factories\RateMarketFactory.cs" />
-    <Compile Include="Market\AssetId.cs" />
-    <Compile Include="Market\AssetMarket.cs" />
-    <Compile Include="Market\Currency.cs" />
-    <Compile Include="Market\DiscountCurve.cs" />
-    <Compile Include="Market\FinancingCurveId.cs" />
-    <Compile Include="Market\RateMarket.cs" />
+    <Compile Include="Factories\MarketFactory.cs" />
+    <Compile Include="MarketDatas\AssetId.cs" />
+    <Compile Include="MarketDatas\AssetMarket.cs" />
+    <Compile Include="MarketDatas\Currency.cs" />
+    <Compile Include="MarketDatas\DiscountCurve.cs" />
+    <Compile Include="MarketDatas\FinancingCurveId.cs" />
+    <Compile Include="MarketDatas\Market.cs" />
     <Compile Include="Maths\BachelierOption.cs" />
     <Compile Include="Maths\BlackScholesOption.cs" />
     <Compile Include="Maths\BrownianBridge.cs" />
@@ -69,12 +69,14 @@
     <Compile Include="Maths\NormalDistribution.cs" />
     <Compile Include="Maths\MatrixUtils.cs" />
     <Compile Include="Maths\Sobol\JoeKuoDirections.cs" />
+    <Compile Include="Maths\Sobol\KuoDirections.cs" />
     <Compile Include="Maths\Sobol\primitivepolynomials.cs" />
     <Compile Include="Maths\RationalCubic.cs" />
     <Compile Include="Maths\RRFunction.cs" />
     <Compile Include="Basic\StepSearcher.cs" />
     <Compile Include="Maths\Sobol\sobolrsg.cs" />
     <Compile Include="Maths\Sobol\sobolrsg2.cs" />
+    <Compile Include="Maths\Sobol\StdDirections.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
