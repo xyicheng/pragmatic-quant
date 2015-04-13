@@ -48,6 +48,17 @@ namespace pragmatic_quant_model.Basic
             return result;
         }
 
+        public static void SetRow<T>(ref T[,] array, int rowIndex, T[] row)
+        {
+            if (rowIndex < 0 || rowIndex >= array.GetLength(0))
+                throw new IndexOutOfRangeException();
+            if (row.Length != array.GetLength(1))
+                throw new IndexOutOfRangeException();
+
+            for (int i = 0; i < row.Length; i++)
+                array[rowIndex, i] = row[i];
+        }
+
         public static TB[,] Map<TA, TB>(this TA[,] array, Func<TA, TB> map)
         {
             var result = new TB[array.GetLength(0), array.GetLength(1)];

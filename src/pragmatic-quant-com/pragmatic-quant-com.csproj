@@ -41,6 +41,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MathFunctions.cs" />
     <Compile Include="PragmaticQuantAddin.cs" />
     <Compile Include="VanillaOption.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

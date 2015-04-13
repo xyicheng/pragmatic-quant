@@ -17,31 +17,13 @@
  FOR A PARTICAR PURPOSE.  See the license for more details.
 */
 
-
 using System;
 
 namespace pragmatic_quant_model.Maths.Sobol
 {
-
-#if NOPOLY
-   public partial class SobolRsg
-   {
-      const uint maxAltDegree = 0;
-      private readonly static long[][] AltPrimitivePolynomials;
-      private static readonly ulong[][] initializers;
-      private static readonly ulong[][] SLinitializers;
-      private static readonly ulong[][] Linitializers;
-      private static readonly ulong[][] JoeKuoD5initializers;
-      private static readonly ulong[][] JoeKuoD6initializers;
-      private static readonly ulong[][] JoeKuoD7initializers;
-      private static readonly ulong[][] Kuoinitializers;
-      private static readonly ulong[][] Kuo2initializers;
-      private static readonly ulong[][] Kuo3initializers;
-   }
-#else
    public partial class SobolRsg {
         // number of dimensions in the alternative primitive polynomials
-        const uint maxAltDegree = 52;
+        const uint MaxAltDegree = 52;
 
         private static readonly long[] AltPrimitivePolynomialDegree01 =
         {
@@ -155,14 +137,13 @@ namespace pragmatic_quant_model.Maths.Sobol
        private static readonly Lazy<ulong[][]> JoeKuoD6Initializers = new Lazy<ulong[][]>(JoeKuoDirections.JoeKuoD6);
 
        private static readonly Lazy<ulong[][]> SLinitializers = new Lazy<ulong[][]>(StdDirections.SLinitializers);
-       private static readonly Lazy<ulong[][]> initializers = new Lazy<ulong[][]>(StdDirections.JaeckelInitializers);
+       private static readonly Lazy<ulong[][]> JaeckelInitializers = new Lazy<ulong[][]>(StdDirections.JaeckelInitializers);
        private static readonly Lazy<ulong[][]> Linitializers = new Lazy<ulong[][]>(StdDirections.LemieuxInitializers);
 
-       private static readonly Lazy<ulong[][]> Kuoinitializers = new Lazy<ulong[][]>(KuoDirections.KuoInit);
-       private static readonly Lazy<ulong[][]> Kuo3initializers = new Lazy<ulong[][]>(KuoDirections.Kuo3Init);
-       private static readonly Lazy<ulong[][]> Kuo2initializers = new Lazy<ulong[][]>(KuoDirections.Kuo2Init);
+       private static readonly Lazy<ulong[][]> KuoInitializers = new Lazy<ulong[][]>(KuoDirections.KuoInit);
+       private static readonly Lazy<ulong[][]> Kuo3Initializers = new Lazy<ulong[][]>(KuoDirections.Kuo3Init);
+       private static readonly Lazy<ulong[][]> Kuo2Initializers = new Lazy<ulong[][]>(KuoDirections.Kuo2Init);
 		
     }
-#endif
 
 }

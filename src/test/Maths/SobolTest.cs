@@ -10,16 +10,16 @@ namespace test.Maths
     [TestFixture]
     public class SobolTest
     {
-        [TestCase(32, SobolRsg.DirectionIntegers.Jaeckel)]
-        [TestCase(40, SobolRsg.DirectionIntegers.SobolLevitan)]
-        [TestCase(360, SobolRsg.DirectionIntegers.SobolLevitanLemieux)]
-        [TestCase(1999, SobolRsg.DirectionIntegers.JoeKuoD5)]
-        [TestCase(1799, SobolRsg.DirectionIntegers.JoeKuoD6)]
-        [TestCase(1899, SobolRsg.DirectionIntegers.JoeKuoD7)]
-        [TestCase(4925, SobolRsg.DirectionIntegers.Kuo)]
-        [TestCase(3946, SobolRsg.DirectionIntegers.Kuo2)]
-        [TestCase(4586, SobolRsg.DirectionIntegers.Kuo3)]
-        public void InitialisationTest(int dim, SobolRsg.DirectionIntegers direction)
+        [TestCase(32, SobolDirection.Jaeckel)]
+        [TestCase(40, SobolDirection.SobolLevitan)]
+        [TestCase(360, SobolDirection.SobolLevitanLemieux)]
+        [TestCase(1999, SobolDirection.JoeKuoD5)]
+        [TestCase(1799, SobolDirection.JoeKuoD6)]
+        [TestCase(1899, SobolDirection.JoeKuoD7)]
+        [TestCase(4925, SobolDirection.Kuo)]
+        [TestCase(3946, SobolDirection.Kuo2)]
+        [TestCase(4586, SobolDirection.Kuo3)]
+        public void InitialisationTest(int dim, SobolDirection direction)
         {
             var sobol = new SobolRsg(dim, 0, direction);
             sobol.NextSequence();
@@ -30,7 +30,7 @@ namespace test.Maths
         public void Test1()
         {
             const int dim = 10;
-            var sobol = new SobolRsg(dim, 0, SobolRsg.DirectionIntegers.JoeKuoD5);
+            var sobol = new SobolRsg(dim, 0, SobolDirection.JoeKuoD5);
 
             var rand = new Random(255);
             var cubeSup = Enumerable.Range(0, dim).Select(i => 0.7 + 0.3 * rand.NextDouble()).ToArray();
@@ -50,8 +50,8 @@ namespace test.Maths
             Assert.IsTrue(Math.Abs((estimatedVolume - trueVolume) / trueVolume) < 1.0e-5);
         }
 
-        [TestCase(200, SobolRsg.DirectionIntegers.JoeKuoD5)]
-        public void TestCallBachelier(int dim, SobolRsg.DirectionIntegers direction)
+        [TestCase(200, SobolDirection.JoeKuoD5)]
+        public void TestCallBachelier(int dim, SobolDirection direction)
         {
             var sobol = new SobolRsg(dim, 0, direction);
 

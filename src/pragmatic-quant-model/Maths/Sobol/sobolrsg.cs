@@ -113,88 +113,70 @@ namespace pragmatic_quant_model.Maths.Sobol {
         private ulong sequenceCounter;
         private bool firstDraw;
         #endregion
-
-        public enum DirectionIntegers
+        #region private methods (initialisation)
+        private static void FillDirection(ulong[][] directionIntegers, int maxDim, ulong[][] initializer)
         {
-            Unit,
-            Jaeckel,
-            SobolLevitan,
-            SobolLevitanLemieux,
-            JoeKuoD5,
-            JoeKuoD6,
-            JoeKuoD7,
-            Kuo,
-            Kuo2,
-            Kuo3
-        };
-
-        /*! \pre dimensionality must be <= PPMT_MAX_DIM */
-        public SobolRsg(int dimensionality) : this(dimensionality, 0, DirectionIntegers.Jaeckel) { }
-        public SobolRsg(int dimensionality, ulong seed) : this(dimensionality, seed, DirectionIntegers.Jaeckel) { }
-        public SobolRsg(int dimensionality, ulong seed, DirectionIntegers directionIntegers) 
+            for (int k = 1; k < maxDim; k++)
+            {
+                int j = 0;
+                // 0UL marks coefficients' end for a given dimension
+                while (initializer[k - 1][j] != 0UL)
+                {
+                    directionIntegers[j][k] = initializer[k - 1][j];
+                    directionIntegers[j][k] <<= (Bits - j - 1);
+                    j++;
+                }
+            }
+        }
+        private static void FillDegreeAndPolynom(int dimensionality, SobolDirection direction,
+            out uint[] degree, out long[] ppmt)
         {
-            this.dimensionality = dimensionality;
-            sequenceCounter = 0;
-            firstDraw = true;
-
-            sequence = new double[dimensionality];
-            for (int i = 0; i < dimensionality; ++i) sequence[i] = 1.0;
-
-            integerSequence = new ulong[dimensionality];
-
-            this.directionIntegers = new ulong[Bits][];
-            for (int i = 0; i < Bits; i++)
-                this.directionIntegers[i] = new ulong[dimensionality];
-            
-            if (!(dimensionality > 0)) throw new ApplicationException("dimensionality must be greater than 0");
-            if (!(dimensionality<=PPMT_MAX_DIM))
-                throw new ApplicationException("dimensionality " + dimensionality + " exceeds the number of available "
-                       + "primitive polynomials modulo two (" + PPMT_MAX_DIM + ")");
-
             // initializes coefficient array of the k-th primitive polynomial
             // and degree of the k-th primitive polynomial
-            var degree = new uint[this.dimensionality];
-            var ppmt = new long[this.dimensionality];
+            degree = new uint[dimensionality];
+            ppmt = new long[dimensionality];
 
-            bool useAltPolynomials = directionIntegers == DirectionIntegers.Kuo
-                                     || directionIntegers == DirectionIntegers.Kuo2
-                                     || directionIntegers == DirectionIntegers.Kuo3
-                                     || directionIntegers == DirectionIntegers.SobolLevitan
-                                     || directionIntegers == DirectionIntegers.SobolLevitanLemieux;
+            bool useAltPolynomials = direction == SobolDirection.Kuo
+                                     || direction == SobolDirection.Kuo2
+                                     || direction == SobolDirection.Kuo3
+                                     || direction == SobolDirection.SobolLevitan
+                                     || direction == SobolDirection.SobolLevitanLemieux;
 
             // degree 0 is not used
-            ppmt[0]=0;
-            degree[0]=0;
-            uint currentDegree=1;
-            uint altDegree = useAltPolynomials ? maxAltDegree : 0;
+            ppmt[0] = 0;
+            degree[0] = 0;
+            uint currentDegree = 1;
+            uint altDegree = useAltPolynomials ? MaxAltDegree : 0;
             int k = 1;
             int index = 0;
-            for (; k<Math.Min(this.dimensionality,altDegree); k++,index++)
+            for (; k < Math.Min(dimensionality, altDegree); k++, index++)
             {
-                ppmt[k] = AltPrimitivePolynomials[currentDegree-1][index];
-                if (ppmt[k]==-1)
+                ppmt[k] = AltPrimitivePolynomials[currentDegree - 1][index];
+                if (ppmt[k] == -1)
                 {
                     ++currentDegree;
-                    index=0;
-                    ppmt[k] = AltPrimitivePolynomials[currentDegree-1][index];
+                    index = 0;
+                    ppmt[k] = AltPrimitivePolynomials[currentDegree - 1][index];
                 }
 
                 degree[k] = currentDegree;
             }
 
-            for (; k<this.dimensionality; k++,index++)
+            for (; k < dimensionality; k++, index++)
             {
-                ppmt[k] = PrimitivePolynomials[currentDegree-1][index];
-                if (ppmt[k]==-1)
+                ppmt[k] = PrimitivePolynomials[currentDegree - 1][index];
+                if (ppmt[k] == -1)
                 {
                     ++currentDegree;
-                    index=0;
-                    ppmt[k] = PrimitivePolynomials[currentDegree-1][index];
+                    index = 0;
+                    ppmt[k] = PrimitivePolynomials[currentDegree - 1][index];
                 }
                 degree[k] = currentDegree;
 
             }
-
+        }
+        private void DirectionInit(uint[] degree, ulong seed, SobolDirection direction)
+        {
             // initializes bits_ direction integers for each dimension
             // and store them into directionIntegers_[dimensionality_][bits_]
             //
@@ -202,173 +184,77 @@ namespace pragmatic_quant_model.Maths.Sobol {
             // the first degree_[k] direction integers can be chosen freely
             // provided that only the l leftmost bits can be non-zero, and
             // that the l-th leftmost bit must be set
-
-            // degenerate (no free direction integers) first dimension
             int j;
-            for (j=0; j<Bits; j++)
-                this.directionIntegers[j][0] = (1UL << (Bits - j - 1));
+            for (j = 0; j < Bits; j++)
+                directionIntegers[j][0] = (1UL << (Bits - j - 1));
 
             int maxTabulated = 0;
+            int maxDim;
             // dimensions from 2 (k=1) to maxTabulated (k=maxTabulated-1) included
             // are initialized from tabulated coefficients
-            switch (directionIntegers)
+            switch (direction)
             {
-                case DirectionIntegers.Unit:
-                    maxTabulated = this.dimensionality;
-                    for (k = 1; k < maxTabulated; k++)
-                    {
-                        for (int l = 1; l <= degree[k]; l++)
-                        {
-                            this.directionIntegers[l - 1][k] = 1UL;
-                            this.directionIntegers[l - 1][k] <<= (Bits - l);
-                        }
-                    }
-                    break;
-                case DirectionIntegers.Jaeckel:
+                case SobolDirection.Jaeckel:
                     // maxTabulated=32
-                    maxTabulated = initializers.Value.Length + 1;
-                    for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
-                    {
-                        j = 0;
-                        // 0UL marks coefficients' end for a given dimension
-                        while (initializers.Value[k - 1][j] != 0UL)
-                        {
-                            this.directionIntegers[j][k] = initializers.Value[k - 1][j];
-                            this.directionIntegers[j][k] <<= (Bits - j - 1);
-                            j++;
-                        }
-                    }
-                    break;
-                case DirectionIntegers.SobolLevitan:
-                    // maxTabulated=40
-                    maxTabulated = SLinitializers.Value.Length + 1;
-                    for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
-                    {
-                        j = 0;
-                        // 0UL marks coefficients' end for a given dimension
-                        while (SLinitializers.Value[k - 1][j] != 0UL)
-                        {
-                            this.directionIntegers[j][k] = SLinitializers.Value[k - 1][j];
-                            this.directionIntegers[j][k] <<= (Bits - j - 1);
-                            j++;
-                        }
-                    }
-                    break;
-                case DirectionIntegers.SobolLevitanLemieux:
-                    // maxTabulated=360
-                    maxTabulated = Linitializers.Value.Length + 1;
-                    for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
-                    {
-                        j = 0;
-                        // 0UL marks coefficients' end for a given dimension
-                        while (Linitializers.Value[k - 1][j] != 0UL)
-                        {
-                            this.directionIntegers[j][k] = Linitializers.Value[k - 1][j];
-                            this.directionIntegers[j][k] <<= (Bits - j - 1);
-                            j++;
-                        }
-                    }
-                    break;
-                case DirectionIntegers.JoeKuoD5:
-                    // maxTabulated=1898
-                    maxTabulated = JoeKuoD5Initializers.Value.Length + 1;
-                    for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
-                    {
-                        j = 0;
-                        // 0UL marks coefficients' end for a given dimension
-                        while (JoeKuoD5Initializers.Value[k - 1][j] != 0UL)
-                        {
-                            this.directionIntegers[j][k] = JoeKuoD5Initializers.Value[k - 1][j];
-                            this.directionIntegers[j][k] <<= (Bits - j - 1);
-                            j++;
-                        }
-                    }
-                    break;
-                case DirectionIntegers.JoeKuoD6:
-                    // maxTabulated=1799
-                    maxTabulated = JoeKuoD6Initializers.Value.Length + 1;
-                    for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
-                    {
-                        j = 0;
-                        // 0UL marks coefficients' end for a given dimension
-                        while (JoeKuoD6Initializers.Value[k - 1][j] != 0UL)
-                        {
-                            this.directionIntegers[j][k] = JoeKuoD6Initializers.Value[k - 1][j];
-                            this.directionIntegers[j][k] <<= (Bits - j - 1);
-                            j++;
-                        }
-                    }
-                    break;
-                case DirectionIntegers.JoeKuoD7:
-                    // maxTabulated=1898
-                    maxTabulated = JoeKuoD7Initializers.Value.Length + 1;
-                    for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
-                    {
-                        j = 0;
-                        // 0UL marks coefficients' end for a given dimension
-                        while (JoeKuoD7Initializers.Value[k - 1][j] != 0UL)
-                        {
-                            this.directionIntegers[j][k] = JoeKuoD7Initializers.Value[k - 1][j];
-                            this.directionIntegers[j][k] <<= (Bits - j - 1);
-                            j++;
-                        }
-                    }
+                    maxTabulated = JaeckelInitializers.Value.Length + 1;
+                    maxDim = Math.Min(dimensionality, maxTabulated);
+                    FillDirection(directionIntegers, maxDim, JaeckelInitializers.Value);
                     break;
 
-                case DirectionIntegers.Kuo:
-                    // maxTabulated=4925
-                    maxTabulated = Kuoinitializers.Value.Length + 1;
-                    for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
-                    {
-                        j = 0;
-                        // 0UL marks coefficients' end for a given dimension
-                        while (Kuoinitializers.Value[k - 1][j] != 0UL)
-                        {
-                            this.directionIntegers[j][k] = Kuoinitializers.Value[k - 1][j];
-                            this.directionIntegers[j][k] <<= (Bits - j - 1);
-                            j++;
-                        }
-                    }
+                case SobolDirection.SobolLevitan:
+                    maxTabulated = SLinitializers.Value.Length + 1;// maxTabulated=40
+                    maxDim = Math.Min(dimensionality, maxTabulated);
+                    FillDirection(directionIntegers, maxDim, SLinitializers.Value);
                     break;
 
-                case DirectionIntegers.Kuo2:
-                    // maxTabulated=3946
-                    maxTabulated = Kuo2initializers.Value.Length + 1;
-                    for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
-                    {
-                        j = 0;
-                        // 0UL marks coefficients' end for a given dimension
-                        while (Kuo2initializers.Value[k - 1][j] != 0UL)
-                        {
-                            this.directionIntegers[j][k] = Kuo2initializers.Value[k - 1][j];
-                            this.directionIntegers[j][k] <<= (Bits - j - 1);
-                            j++;
-                        }
-                    }
+                case SobolDirection.SobolLevitanLemieux:
+                    maxTabulated = Linitializers.Value.Length + 1;// maxTabulated=360
+                    maxDim = Math.Min(dimensionality, maxTabulated);
+                    FillDirection(directionIntegers, maxDim, Linitializers.Value);
                     break;
 
-                case DirectionIntegers.Kuo3:
-                    // maxTabulated=4585
-                    maxTabulated = Kuo3initializers.Value.Length + 1;
-                    for (k = 1; k < Math.Min(this.dimensionality, maxTabulated); k++)
-                    {
-                        j = 0;
-                        // 0UL marks coefficients' end for a given dimension
-                        while (Kuo3initializers.Value[k - 1][j] != 0UL)
-                        {
-                            this.directionIntegers[j][k] = Kuo3initializers.Value[k - 1][j];
-                            this.directionIntegers[j][k] <<= (Bits - j - 1);
-                            j++;
-                        }
-                    }
+                case SobolDirection.JoeKuoD5:
+                    maxTabulated = JoeKuoD5Initializers.Value.Length + 1;// maxTabulated=1898
+                    maxDim = Math.Min(dimensionality, maxTabulated);
+                    FillDirection(directionIntegers, maxDim, JoeKuoD5Initializers.Value);
+                    break;
+
+                case SobolDirection.JoeKuoD6:
+                    maxTabulated = JoeKuoD6Initializers.Value.Length + 1;// maxTabulated=1799
+                    maxDim = Math.Min(dimensionality, maxTabulated);
+                    FillDirection(directionIntegers, maxDim, JoeKuoD6Initializers.Value);
+                    break;
+
+                case SobolDirection.JoeKuoD7:
+                    maxTabulated = JoeKuoD7Initializers.Value.Length + 1;// maxTabulated=1898
+                    maxDim = Math.Min(dimensionality, maxTabulated);
+                    FillDirection(directionIntegers, maxDim, JoeKuoD7Initializers.Value);
+                    break;
+
+                case SobolDirection.Kuo:
+                    maxTabulated = KuoInitializers.Value.Length + 1;// maxTabulated = 4925
+                    maxDim = Math.Min(dimensionality, maxTabulated);
+                    FillDirection(directionIntegers, maxDim, KuoInitializers.Value);
+                    break;
+
+                case SobolDirection.Kuo2:
+                    maxTabulated = Kuo2Initializers.Value.Length + 1;// maxTabulated = 3946
+                    maxDim = Math.Min(dimensionality, maxTabulated);
+                    FillDirection(directionIntegers, maxDim, Kuo2Initializers.Value);
+                    break;
+
+                case SobolDirection.Kuo3:
+                    maxTabulated = Kuo3Initializers.Value.Length + 1;// maxTabulated = 4585
+                    maxDim = Math.Min(dimensionality, maxTabulated);
+                    FillDirection(directionIntegers, maxDim, Kuo3Initializers.Value);
                     break;
             }
 
             // random initialization for higher dimensions
-            if (this.dimensionality > maxTabulated)
+            if (dimensionality > maxTabulated)
             {
                 var uniformRng = new MersenneTwisterUniformRng(seed);
-                for (k = maxTabulated; k < this.dimensionality; k++)
+                for (int k = maxTabulated; k < dimensionality; k++)
                 {
                     for (int l = 1; l <= degree[k]; l++)
                     {
@@ -378,8 +264,8 @@ namespace pragmatic_quant_model.Maths.Sobol {
                             double u = uniformRng.Next();
                             // the direction integer has at most the
                             // rightmost l bits non-zero
-                            this.directionIntegers[l - 1][k] = (ulong)(u * (1UL << l));
-                        } while ((this.directionIntegers[l - 1][k] & 1UL) == 0);
+                            directionIntegers[l - 1][k] = (ulong)(u * (1UL << l));
+                        } while ((directionIntegers[l - 1][k] & 1UL) == 0);
                         // iterate until the direction integer is odd
                         // that is it has the rightmost bit set
 
@@ -387,18 +273,53 @@ namespace pragmatic_quant_model.Maths.Sobol {
                         // we are guaranteed that the l-th leftmost bit
                         // is set, and only the first l leftmost bit
                         // can be non-zero
-                        this.directionIntegers[l - 1][k] <<= (Bits - l);
+                        directionIntegers[l - 1][k] <<= (Bits - l);
                     }
                 }
             }
+        }
+        #endregion 
+        
+        public SobolRsg(int dimensionality) 
+            : this(dimensionality, 0, SobolDirection.Jaeckel) { }
+        public SobolRsg(int dimensionality, ulong seed) 
+            : this(dimensionality, seed, SobolDirection.Jaeckel) { }
+        public SobolRsg(int dimensionality, SobolDirection direction)
+            : this(dimensionality, 0, direction) { }
+        public SobolRsg(int dimensionality, ulong seed, SobolDirection direction)
+        {
+            this.dimensionality = dimensionality;
+            sequenceCounter = 0;
+            firstDraw = true;
+            integerSequence = new ulong[dimensionality];
+            
+            sequence = new double[dimensionality];
+            for (int i = 0; i < dimensionality; ++i) sequence[i] = 1.0;
+            
+            directionIntegers = new ulong[Bits][];
+            for (int i = 0; i < Bits; i++)
+                directionIntegers[i] = new ulong[dimensionality];
+
+            if (!(dimensionality > 0)) throw new ApplicationException("dimensionality must be greater than 0");
+            if (!(dimensionality <= PPMT_MAX_DIM))
+                throw new ApplicationException("dimensionality " + dimensionality + " exceeds the number of available "
+                                               + "primitive polynomials modulo two (" + PPMT_MAX_DIM + ")");
+
+            uint[] degree;
+            long[] ppmt;
+            FillDegreeAndPolynom(this.dimensionality, direction, out degree, out ppmt);
+
+            DirectionInit(degree, seed, direction);
 
             // computation of directionIntegers_[k][l] for l>=degree_[k]
             // by recurrence relation
-            for (k=1; k<this.dimensionality; k++) {
+            for (int k = 1; k < this.dimensionality; k++)
+            {
                 uint gk = degree[k];
-                for (var l=(int)gk; l<Bits; l++) {
+                for (var l = (int) gk; l < Bits; l++)
+                {
                     // eq. 8.19 "Monte Carlo Methods in Finance" by P. Jдckel
-                    ulong n = (this.directionIntegers[(int)(l - gk)][k] >> (int)gk);
+                    ulong n = (directionIntegers[(int) (l - gk)][k] >> (int) gk);
                     // a[k][j] are the coefficients of the monomials in ppmt[k]
                     // The highest order coefficient a[k][0] is not actually
                     // used in the recurrence relation, and the lowest order
@@ -407,23 +328,25 @@ namespace pragmatic_quant_model.Maths.Sobol {
                     // the polynomial ppmt[k] are not included in its encoding,
                     // provided that its degree is known.
                     // That is: a[k][j] = ppmt[k] >> (gk-j-1)
-                    for (uint z=1; z<gk; z++) {
+                    for (uint z = 1; z < gk; z++)
+                    {
                         // XORed with a selection of (unshifted) direction
                         // integers controlled by which of the a[k][j] are set
-                        if ((((ulong)ppmt[k] >> (int)(gk - z - 1)) & 1UL) != 0)
-                            n ^= this.directionIntegers[(int)(l - z)][k];
+                        if ((((ulong) ppmt[k] >> (int) (gk - z - 1)) & 1UL) != 0)
+                            n ^= directionIntegers[(int) (l - z)][k];
                     }
                     // a[k][gk] is always set, so directionIntegers_[k][l-gk]
                     // will always enter
-                    n ^= this.directionIntegers[(int)(l - gk)][k];
-                    this.directionIntegers[l][k] = n;
+                    n ^= directionIntegers[(int) (l - gk)][k];
+                    directionIntegers[l][k] = n;
                 }
             }
-            
+
             // initialize the Sobol integer/double vectors
             // first draw
-            for (k=0; k<this.dimensionality; k++) {
-                integerSequence[k] = this.directionIntegers[0][k];
+            for (int k = 0; k < this.dimensionality; k++)
+            {
+                integerSequence[k] = directionIntegers[0][k];
             }
         }
 
@@ -449,7 +372,6 @@ namespace pragmatic_quant_model.Maths.Sobol {
             }
             sequenceCounter = skip;
         }
-
         public ulong[] NextInt32Sequence()
         {
             if (firstDraw)
@@ -487,12 +409,24 @@ namespace pragmatic_quant_model.Maths.Sobol {
         public double[] NextSequence()
         {
             var v = NextInt32Sequence();
-            // normalize to get a double in (0,1)
             for (int k = 0; k < dimensionality; ++k)
-                sequence[k] = v[k] * NormalizationFactor;
+                sequence[k] = v[k] * NormalizationFactor; // normalize to get a double in (0,1)
             return sequence;
         }
         public double[] LastSequence() { return sequence; }
         public int Dimension() { return dimensionality; }
     }
+
+    public enum SobolDirection
+    {
+        Jaeckel,
+        SobolLevitan,
+        SobolLevitanLemieux,
+        JoeKuoD5,
+        JoeKuoD6,
+        JoeKuoD7,
+        Kuo,
+        Kuo2,
+        Kuo3
+    };
 }

@@ -31,7 +31,7 @@ namespace pragmatic_quant_model
             Func<object, double> doubleConverter = o =>
             {
                 double result;
-                if (DoubleConverter.TryConvert(o, out result)) return result;
+                if (NumberConverter.TryConvertDouble(o, out result)) return result;
                 throw new Exception("Parameter value for " + name + " is not a Double !");
             };
             return doubleConverter;

@@ -38,7 +38,7 @@
     <Compile Include="BagServices.cs" />
     <Compile Include="Basic\ArrayUtils.cs" />
     <Compile Include="Basic\Assertions.cs" />
-    <Compile Include="Basic\DoubleConverter.cs" />
+    <Compile Include="Basic\NumberConverter.cs" />
     <Compile Include="Basic\DoubleUtils.cs" />
     <Compile Include="Basic\EnumerableUtils.cs" />
     <Compile Include="Basic\GridUtils.cs" />
@@ -70,11 +70,11 @@
     <Compile Include="Maths\MatrixUtils.cs" />
     <Compile Include="Maths\Sobol\JoeKuoDirections.cs" />
     <Compile Include="Maths\Sobol\KuoDirections.cs" />
-    <Compile Include="Maths\Sobol\primitivepolynomials.cs" />
+    <Compile Include="Maths\Sobol\PrimitivePolynomials.cs" />
     <Compile Include="Maths\RationalCubic.cs" />
     <Compile Include="Maths\RRFunction.cs" />
     <Compile Include="Basic\StepSearcher.cs" />
-    <Compile Include="Maths\Sobol\sobolrsg.cs" />
+    <Compile Include="Maths\Sobol\SobolRsg.cs" />
     <Compile Include="Maths\Sobol\sobolrsg2.cs" />
     <Compile Include="Maths\Sobol\StdDirections.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -111,17 +111,6 @@ namespace pragmatic_quant_model.Maths.Sobol
  * below.
  */
 
-#if NOPOLY
-   public partial class SobolRsg
-   {
-      public const long PPMT_MAX_DIM = 0;
-      public const int N_MAX_DEGREE = 0;
-
-      public static long[][] PrimitivePolynomials;
-   }
-
-#else
-
    public partial class SobolRsg {
        
         public const long PPMT_MAX_DIM = 21200;
@@ -131,27 +120,20 @@ namespace pragmatic_quant_model.Maths.Sobol
         0, /* x+1 (1)(1) */
         -1 };
 
-        //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_01
         static readonly long[] PrimitivePolynomialDegree02 = {
         1, /* x^2+x+1 (1)1(1) */
         -1 };
-        ////#endif
-
-        //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_02
+        
         static readonly long[] PrimitivePolynomialDegree03 = {
         1, /* x^3    +x+1 (1)01(1) */
         2, /* x^3+x^2  +1 (1)10(1) */
         -1 };
-        ////#endif
-
-        //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_03
+        
         static readonly long[] PrimitivePolynomialDegree04 = {
         1, /* x^4+       +x+1 (1)001(1) */
         4, /* x^4+x^3+     +1 (1)100(1) */
         -1 };
-        ////#endif
-
-        //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_04
+        
         static readonly long[] PrimitivePolynomialDegree05 = {
         2,  /* x^5        +x^2  +1 (1)0010(1) */
         4,  /* x^5    +x^3      +1 (1)0100(1) */
@@ -160,9 +142,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         13, /* x^5+x^4+x^3    +x+1 (1)1101(1) */
         14, /* x^5+x^4+x^3+x^2  +1 (1)1110(1) */
         -1 };
-        ////#endif
-
-        //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_05
+        
         static readonly long[] PrimitivePolynomialDegree06 = {
         1,  /* x^6                +x+1 (1)00001(1) */
         13, /* x^6    +x^4+x^3    +x+1 (1)01101(1) */
@@ -171,9 +151,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         22, /* x^6+x^5    +x^3+x^2  +1 (1)10110(1) */
         25, /* x^6+x^5+x^4        +x+1 (1)11001(1) */
         -1 };
-        //#endif
-
-        //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_06
+        
         static readonly long[] PrimitivePolynomialDegree07 = {
         1,  /* x^7                    +x+1 (1)000001(1) */
         4,  /* x^7            +x^3      +1 (1)000100(1) */
@@ -195,9 +173,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         59, /* x^7+x^6+x^5+x^4    +x^2+x+1 (1)111011(1) */
         62, /* x^7+x^6+x^5+x^4+x^3+x^2  +1 (1)111110(1) */
         -1 };
-        //#endif
-
-        //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_07
+        
         static readonly long[] PrimitivePolynomialDegree08 = {
         14,
         21,
@@ -216,9 +192,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         115,
         122,
         -1 };
-        //#endif
-
-        //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_08
+        
         static readonly long[] PrimitivePolynomialDegree09 = {
         8,
         13,
@@ -269,9 +243,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         244,
         253,
         -1 };
-        //#endif
-
-        //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_09
+        
         static readonly long[] PrimitivePolynomialDegree10 = {
         4,
         13,
@@ -334,9 +306,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         505,
         508,
         -1 };
-        //#endif
-
-        //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_10
+        
         static readonly long[] PrimitivePolynomialDegree11 = {
         2,
         11,
@@ -515,9 +485,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         1010,
         1012,
         -1 };
-        //#endif
-
-        //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_11
+        
         static readonly long[] PrimitivePolynomialDegree12 = {
         41,
         52,
@@ -664,9 +632,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         2014,
         2020,
         -1 };
-        //#endif
-
-        //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_12
+        
         static readonly long[] PrimitivePolynomialDegree13 = {
         13,
         19,
@@ -2060,9 +2026,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         8168,
         8179,
         -1 };
-        //#endif
-
-        //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_14
+        
         static readonly long[] PrimitivePolynomialDegree15 = {
         1,
         8,
@@ -21414,7 +21378,6 @@ namespace pragmatic_quant_model.Maths.Sobol
         131020,
         131059,
         -1 };
-        //#endif
 
         /*! You can access the following array as in PrimitivePolynomials[i][j]
     with i and j counting from 0 in C convention. PrimitivePolynomials[i][j]
@@ -21422,64 +21385,27 @@ namespace pragmatic_quant_model.Maths.Sobol
     i+1. Each one-dimensional array of primitive polynomials of a given
     degree is terminated with an entry of -1. Accessing beyond this entry
     will result in a memory violation and must be avoided.  */
-        public static long[][] PrimitivePolynomials = new long[][] {
-            PrimitivePolynomialDegree01
-            //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_01
-            , PrimitivePolynomialDegree02
-            //#endif
-            //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_02
-            , PrimitivePolynomialDegree03
-            //#endif
-            //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_03
-            , PrimitivePolynomialDegree04
-            //#endif
-            //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_04
-            , PrimitivePolynomialDegree05
-            //#endif
-            //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_05
-            , PrimitivePolynomialDegree06
-            //#endif
-            //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_06
-            , PrimitivePolynomialDegree07
-            //#endif
-            //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_07
-            , PrimitivePolynomialDegree08
-            //#endif
-            //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_08
-            , PrimitivePolynomialDegree09
-            //#endif
-            //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_09
-            , PrimitivePolynomialDegree10
-            //#endif
-            //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_10
-            , PrimitivePolynomialDegree11
-            //#endif
-            //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_11
-            , PrimitivePolynomialDegree12
-            //#endif
-            //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_12
-            , PrimitivePolynomialDegree13
-            //#endif
-            //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_13
-            , PrimitivePolynomialDegree14
-            //#endif
-            //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_14
-            , PrimitivePolynomialDegree15
-            //#endif
-            //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_15
-            , PrimitivePolynomialDegree16
-            //#endif
-            //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_16
-            , PrimitivePolynomialDegree17
-            //#endif
-            //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_17
-            , PrimitivePolynomialDegree18
-            //#endif
-        };
-
-    }
-
-#endif
-
-
+       public static long[][] PrimitivePolynomials =
+       {
+           PrimitivePolynomialDegree01
+           , PrimitivePolynomialDegree02
+           , PrimitivePolynomialDegree03
+           , PrimitivePolynomialDegree04
+           , PrimitivePolynomialDegree05
+           , PrimitivePolynomialDegree06
+           , PrimitivePolynomialDegree07
+           , PrimitivePolynomialDegree08
+           , PrimitivePolynomialDegree09
+           , PrimitivePolynomialDegree10
+           , PrimitivePolynomialDegree11
+           , PrimitivePolynomialDegree12
+           , PrimitivePolynomialDegree13
+           , PrimitivePolynomialDegree14
+           , PrimitivePolynomialDegree15
+           , PrimitivePolynomialDegree16
+           , PrimitivePolynomialDegree17
+           , PrimitivePolynomialDegree18
+       };
+   }
+    
 }
