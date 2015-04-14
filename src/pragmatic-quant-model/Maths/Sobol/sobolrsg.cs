@@ -98,7 +98,7 @@ namespace pragmatic_quant_model.Maths.Sobol {
     public partial class SobolRsg
     {
         #region consts fields
-        const int Bits = 8 * sizeof(ulong);
+        const int Bits = 8 * sizeof(uint);
         const double Ln2 = 0.693147180559945309417;
         // 1/(2^bits_) (written as (1/2)/(2^(bits_-1)) to avoid long overflow)
         const double NormalizationFactor = 0.5 / (1UL << (Bits - 1));
@@ -106,21 +106,24 @@ namespace pragmatic_quant_model.Maths.Sobol {
         #region private fields
         private readonly int dimensionality;
         private readonly double[] sequence;
-        private readonly ulong[] integerSequence;
-        private readonly ulong[][] directionIntegers;
+        private readonly uint[] integerSequence;
+        private readonly uint[][] directionIntegers;
         #endregion
         #region private mutable fields
         private ulong sequenceCounter;
         private bool firstDraw;
         #endregion
         #region private methods (initialisation)
-        private static void FillDirection(ulong[][] directionIntegers, int maxDim, ulong[][] initializer)
+        private static void FillDirection(uint[][] directionIntegers, int maxDim, uint[][] initializer)
         {
+            if (maxDim > initializer.Length + 1)
+                throw new ApplicationException("dimensionality " + maxDim + " exceeds the number of available ");
+
             for (int k = 1; k < maxDim; k++)
             {
                 int j = 0;
-                // 0UL marks coefficients' end for a given dimension
-                while (initializer[k - 1][j] != 0UL)
+                // 0 marks coefficients' end for a given dimension
+                while (initializer[k - 1][j] != 0)
                 {
                     directionIntegers[j][k] = initializer[k - 1][j];
                     directionIntegers[j][k] <<= (Bits - j - 1);
@@ -175,7 +178,7 @@ namespace pragmatic_quant_model.Maths.Sobol {
 
             }
         }
-        private void DirectionInit(uint[] degree, ulong seed, SobolDirection direction)
+        private void DirectionInit(SobolDirection direction)
         {
             // initializes bits_ direction integers for each dimension
             // and store them into directionIntegers_[dimensionality_][bits_]
@@ -186,130 +189,75 @@ namespace pragmatic_quant_model.Maths.Sobol {
             // that the l-th leftmost bit must be set
             int j;
             for (j = 0; j < Bits; j++)
-                directionIntegers[j][0] = (1UL << (Bits - j - 1));
+                directionIntegers[j][0] = (uint)(1 << (Bits - j - 1));
 
-            int maxTabulated = 0;
-            int maxDim;
-            // dimensions from 2 (k=1) to maxTabulated (k=maxTabulated-1) included
-            // are initialized from tabulated coefficients
             switch (direction)
             {
                 case SobolDirection.Jaeckel:
-                    // maxTabulated=32
-                    maxTabulated = JaeckelInitializers.Value.Length + 1;
-                    maxDim = Math.Min(dimensionality, maxTabulated);
-                    FillDirection(directionIntegers, maxDim, JaeckelInitializers.Value);
+                    FillDirection(directionIntegers, dimensionality, JaeckelInitializers.Value);
                     break;
 
                 case SobolDirection.SobolLevitan:
-                    maxTabulated = SLinitializers.Value.Length + 1;// maxTabulated=40
-                    maxDim = Math.Min(dimensionality, maxTabulated);
-                    FillDirection(directionIntegers, maxDim, SLinitializers.Value);
+                    FillDirection(directionIntegers, dimensionality, SLinitializers.Value);
                     break;
 
                 case SobolDirection.SobolLevitanLemieux:
-                    maxTabulated = Linitializers.Value.Length + 1;// maxTabulated=360
-                    maxDim = Math.Min(dimensionality, maxTabulated);
-                    FillDirection(directionIntegers, maxDim, Linitializers.Value);
+                    FillDirection(directionIntegers, dimensionality, Linitializers.Value);
                     break;
 
                 case SobolDirection.JoeKuoD5:
-                    maxTabulated = JoeKuoD5Initializers.Value.Length + 1;// maxTabulated=1898
-                    maxDim = Math.Min(dimensionality, maxTabulated);
-                    FillDirection(directionIntegers, maxDim, JoeKuoD5Initializers.Value);
+                    FillDirection(directionIntegers, dimensionality, JoeKuoD5Initializers.Value);
                     break;
 
                 case SobolDirection.JoeKuoD6:
-                    maxTabulated = JoeKuoD6Initializers.Value.Length + 1;// maxTabulated=1799
-                    maxDim = Math.Min(dimensionality, maxTabulated);
-                    FillDirection(directionIntegers, maxDim, JoeKuoD6Initializers.Value);
+                    FillDirection(directionIntegers, dimensionality, JoeKuoD6Initializers.Value);
                     break;
 
                 case SobolDirection.JoeKuoD7:
-                    maxTabulated = JoeKuoD7Initializers.Value.Length + 1;// maxTabulated=1898
-                    maxDim = Math.Min(dimensionality, maxTabulated);
-                    FillDirection(directionIntegers, maxDim, JoeKuoD7Initializers.Value);
+                    FillDirection(directionIntegers, dimensionality, JoeKuoD7Initializers.Value);
                     break;
 
                 case SobolDirection.Kuo:
-                    maxTabulated = KuoInitializers.Value.Length + 1;// maxTabulated = 4925
-                    maxDim = Math.Min(dimensionality, maxTabulated);
-                    FillDirection(directionIntegers, maxDim, KuoInitializers.Value);
+                    FillDirection(directionIntegers, dimensionality, KuoInitializers.Value);
                     break;
 
                 case SobolDirection.Kuo2:
-                    maxTabulated = Kuo2Initializers.Value.Length + 1;// maxTabulated = 3946
-                    maxDim = Math.Min(dimensionality, maxTabulated);
-                    FillDirection(directionIntegers, maxDim, Kuo2Initializers.Value);
+                    FillDirection(directionIntegers, dimensionality, Kuo2Initializers.Value);
                     break;
 
                 case SobolDirection.Kuo3:
-                    maxTabulated = Kuo3Initializers.Value.Length + 1;// maxTabulated = 4585
-                    maxDim = Math.Min(dimensionality, maxTabulated);
-                    FillDirection(directionIntegers, maxDim, Kuo3Initializers.Value);
+                    FillDirection(directionIntegers, dimensionality, Kuo3Initializers.Value);
                     break;
-            }
-
-            // random initialization for higher dimensions
-            if (dimensionality > maxTabulated)
-            {
-                var uniformRng = new MersenneTwisterUniformRng(seed);
-                for (int k = maxTabulated; k < dimensionality; k++)
-                {
-                    for (int l = 1; l <= degree[k]; l++)
-                    {
-                        do
-                        {
-                            // u is in (0,1)
-                            double u = uniformRng.Next();
-                            // the direction integer has at most the
-                            // rightmost l bits non-zero
-                            directionIntegers[l - 1][k] = (ulong)(u * (1UL << l));
-                        } while ((directionIntegers[l - 1][k] & 1UL) == 0);
-                        // iterate until the direction integer is odd
-                        // that is it has the rightmost bit set
-
-                        // shifting bits_-l bits to the left
-                        // we are guaranteed that the l-th leftmost bit
-                        // is set, and only the first l leftmost bit
-                        // can be non-zero
-                        directionIntegers[l - 1][k] <<= (Bits - l);
-                    }
-                }
             }
         }
         #endregion 
         
         public SobolRsg(int dimensionality) 
-            : this(dimensionality, 0, SobolDirection.Jaeckel) { }
-        public SobolRsg(int dimensionality, ulong seed) 
-            : this(dimensionality, seed, SobolDirection.Jaeckel) { }
+            : this(dimensionality, SobolDirection.Jaeckel) { }
         public SobolRsg(int dimensionality, SobolDirection direction)
-            : this(dimensionality, 0, direction) { }
-        public SobolRsg(int dimensionality, ulong seed, SobolDirection direction)
         {
+            if (dimensionality < 0) throw new ApplicationException("dimensionality must be greater than 0");
+            if (!(dimensionality <= PPMT_MAX_DIM))
+                throw new ApplicationException("dimensionality " + dimensionality + " exceeds the number of available "
+                                               + "primitive polynomials modulo two (" + PPMT_MAX_DIM + ")");
+
             this.dimensionality = dimensionality;
             sequenceCounter = 0;
             firstDraw = true;
-            integerSequence = new ulong[dimensionality];
+            integerSequence = new uint[dimensionality];
             
             sequence = new double[dimensionality];
             for (int i = 0; i < dimensionality; ++i) sequence[i] = 1.0;
             
-            directionIntegers = new ulong[Bits][];
+            directionIntegers = new uint[Bits][];
             for (int i = 0; i < Bits; i++)
-                directionIntegers[i] = new ulong[dimensionality];
-
-            if (!(dimensionality > 0)) throw new ApplicationException("dimensionality must be greater than 0");
-            if (!(dimensionality <= PPMT_MAX_DIM))
-                throw new ApplicationException("dimensionality " + dimensionality + " exceeds the number of available "
-                                               + "primitive polynomials modulo two (" + PPMT_MAX_DIM + ")");
+                directionIntegers[i] = new uint[dimensionality];
 
             uint[] degree;
             long[] ppmt;
             FillDegreeAndPolynom(this.dimensionality, direction, out degree, out ppmt);
 
-            DirectionInit(degree, seed, direction);
+            DirectionInit(direction);
 
             // computation of directionIntegers_[k][l] for l>=degree_[k]
             // by recurrence relation
@@ -319,7 +267,7 @@ namespace pragmatic_quant_model.Maths.Sobol {
                 for (var l = (int) gk; l < Bits; l++)
                 {
                     // eq. 8.19 "Monte Carlo Methods in Finance" by P. Jдckel
-                    ulong n = (directionIntegers[(int) (l - gk)][k] >> (int) gk);
+                    uint n = (directionIntegers[(int) (l - gk)][k] >> (int) gk);
                     // a[k][j] are the coefficients of the monomials in ppmt[k]
                     // The highest order coefficient a[k][0] is not actually
                     // used in the recurrence relation, and the lowest order
@@ -372,7 +320,7 @@ namespace pragmatic_quant_model.Maths.Sobol {
             }
             sequenceCounter = skip;
         }
-        public ulong[] NextInt32Sequence()
+        public uint[] NextInt32Sequence()
         {
             if (firstDraw)
             {

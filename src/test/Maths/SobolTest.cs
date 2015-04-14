@@ -21,39 +21,17 @@ namespace test.Maths
         [TestCase(4586, SobolDirection.Kuo3)]
         public void InitialisationTest(int dim, SobolDirection direction)
         {
-            var sobol = new SobolRsg(dim, 0, direction);
+            var sobol = new SobolRsg(dim, direction);
             sobol.NextSequence();
             Assert.IsTrue(true);
         }
         
-        [Test]
-        public void Test1()
-        {
-            const int dim = 10;
-            var sobol = new SobolRsg(dim, 0, SobolDirection.JoeKuoD5);
-
-            var rand = new Random(255);
-            var cubeSup = Enumerable.Range(0, dim).Select(i => 0.7 + 0.3 * rand.NextDouble()).ToArray();
-
-            var estimatedVolume = 0.0;
-
-            const int nbPaths = 1000000;
-            for (int index = 0; index < nbPaths; index++)
-            {
-                var sample = sobol.NextSequence();
-                bool cubeContainSample = !sample.Where((t, i) => t > cubeSup[i]).Any();
-                estimatedVolume += cubeContainSample ? 1.0 : 0.0;
-            }
-            estimatedVolume /= nbPaths;
-
-            var trueVolume = cubeSup.Aggregate(1.0, (previous, c) => previous * c);
-            Assert.IsTrue(Math.Abs((estimatedVolume - trueVolume) / trueVolume) < 1.0e-5);
-        }
-
         [TestCase(200, SobolDirection.JoeKuoD5)]
+        [TestCase(100, SobolDirection.Kuo2)]
+        [TestCase(32, SobolDirection.Jaeckel)]
         public void TestCallBachelier(int dim, SobolDirection direction)
         {
-            var sobol = new SobolRsg(dim, 0, direction);
+            var sobol = new SobolRsg(dim, direction);
 
             var chrono = new Stopwatch();
             chrono.Start();    

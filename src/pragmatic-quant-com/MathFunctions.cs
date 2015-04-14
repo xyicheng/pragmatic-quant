@@ -14,10 +14,10 @@ namespace pragmatic_quant_com
             try
             {
                 SobolDirection direction;
-                if (!SobolDirection.TryParse(directionType, true, out direction))
+                if (!Enum.TryParse(directionType, true, out direction))
                     throw new Exception(string.Format("Unknow sobol direction type {0}", directionType));
                 
-                var sobolGen = new SobolRsg(dimension, 0, direction);
+                var sobolGen = new SobolRsg(dimension, direction);
                 sobolGen.SkipTo((ulong) nbSkippedPaths);
 
                 int startIndex ;

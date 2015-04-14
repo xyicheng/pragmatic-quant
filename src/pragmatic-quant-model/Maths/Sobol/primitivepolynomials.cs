@@ -113,28 +113,28 @@ namespace pragmatic_quant_model.Maths.Sobol
 
    public partial class SobolRsg {
        
-        public const long PPMT_MAX_DIM = 21200;
+        public const int PPMT_MAX_DIM = 21200;
         public const int N_MAX_DEGREE = 18;
 
-        static readonly long[] PrimitivePolynomialDegree01 = {
+        static readonly int[] PrimitivePolynomialDegree01 = {
         0, /* x+1 (1)(1) */
         -1 };
 
-        static readonly long[] PrimitivePolynomialDegree02 = {
+        static readonly int[] PrimitivePolynomialDegree02 = {
         1, /* x^2+x+1 (1)1(1) */
         -1 };
         
-        static readonly long[] PrimitivePolynomialDegree03 = {
+        static readonly int[] PrimitivePolynomialDegree03 = {
         1, /* x^3    +x+1 (1)01(1) */
         2, /* x^3+x^2  +1 (1)10(1) */
         -1 };
         
-        static readonly long[] PrimitivePolynomialDegree04 = {
+        static readonly int[] PrimitivePolynomialDegree04 = {
         1, /* x^4+       +x+1 (1)001(1) */
         4, /* x^4+x^3+     +1 (1)100(1) */
         -1 };
         
-        static readonly long[] PrimitivePolynomialDegree05 = {
+        static readonly int[] PrimitivePolynomialDegree05 = {
         2,  /* x^5        +x^2  +1 (1)0010(1) */
         4,  /* x^5    +x^3      +1 (1)0100(1) */
         7,  /* x^5    +x^3+x^2+x+1 (1)0111(1) */
@@ -143,7 +143,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         14, /* x^5+x^4+x^3+x^2  +1 (1)1110(1) */
         -1 };
         
-        static readonly long[] PrimitivePolynomialDegree06 = {
+        static readonly int[] PrimitivePolynomialDegree06 = {
         1,  /* x^6                +x+1 (1)00001(1) */
         13, /* x^6    +x^4+x^3    +x+1 (1)01101(1) */
         16, /* x^6+x^5              +1 (1)10000(1) */
@@ -152,7 +152,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         25, /* x^6+x^5+x^4        +x+1 (1)11001(1) */
         -1 };
         
-        static readonly long[] PrimitivePolynomialDegree07 = {
+        static readonly int[] PrimitivePolynomialDegree07 = {
         1,  /* x^7                    +x+1 (1)000001(1) */
         4,  /* x^7            +x^3      +1 (1)000100(1) */
         7,  /* x^7            +x^3+x^2+x+1 (1)000111(1) */
@@ -174,7 +174,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         62, /* x^7+x^6+x^5+x^4+x^3+x^2  +1 (1)111110(1) */
         -1 };
         
-        static readonly long[] PrimitivePolynomialDegree08 = {
+        static readonly int[] PrimitivePolynomialDegree08 = {
         14,
         21,
         22,
@@ -193,7 +193,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         122,
         -1 };
         
-        static readonly long[] PrimitivePolynomialDegree09 = {
+        static readonly int[] PrimitivePolynomialDegree09 = {
         8,
         13,
         16,
@@ -244,7 +244,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         253,
         -1 };
         
-        static readonly long[] PrimitivePolynomialDegree10 = {
+        static readonly int[] PrimitivePolynomialDegree10 = {
         4,
         13,
         19,
@@ -307,7 +307,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         508,
         -1 };
         
-        static readonly long[] PrimitivePolynomialDegree11 = {
+        static readonly int[] PrimitivePolynomialDegree11 = {
         2,
         11,
         21,
@@ -486,7 +486,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         1012,
         -1 };
         
-        static readonly long[] PrimitivePolynomialDegree12 = {
+        static readonly int[] PrimitivePolynomialDegree12 = {
         41,
         52,
         61,
@@ -633,7 +633,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         2020,
         -1 };
         
-        static readonly long[] PrimitivePolynomialDegree13 = {
+        static readonly int[] PrimitivePolynomialDegree13 = {
         13,
         19,
         26,
@@ -1268,7 +1268,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         //#endif
 
         //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_13
-        static readonly long[] PrimitivePolynomialDegree14 = {
+        static readonly int[] PrimitivePolynomialDegree14 = {
         21,
         28,
         41,
@@ -2027,7 +2027,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         8179,
         -1 };
         
-        static readonly long[] PrimitivePolynomialDegree15 = {
+        static readonly int[] PrimitivePolynomialDegree15 = {
         1,
         8,
         11,
@@ -3832,7 +3832,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         //#endif
 
         //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_15
-        static readonly long[] PrimitivePolynomialDegree16 = {
+        static readonly int[] PrimitivePolynomialDegree16 = {
         22,
         28,
         31,
@@ -5885,7 +5885,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         //#endif
 
         //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_16
-        static readonly long[] PrimitivePolynomialDegree17 = {
+        static readonly int[] PrimitivePolynomialDegree17 = {
         4,
         7,
         16,
@@ -13600,7 +13600,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         //#endif
 
         //#if PPMT_MAX_DIM > N_PRIMITIVES_UP_TO_DEGREE_17
-        static readonly long[] PrimitivePolynomialDegree18 = {
+        static readonly int[] PrimitivePolynomialDegree18 = {
         19,
         31,
         38,
@@ -21385,7 +21385,7 @@ namespace pragmatic_quant_model.Maths.Sobol
     i+1. Each one-dimensional array of primitive polynomials of a given
     degree is terminated with an entry of -1. Accessing beyond this entry
     will result in a memory violation and must be avoided.  */
-       public static long[][] PrimitivePolynomials =
+       public static int[][] PrimitivePolynomials =
        {
            PrimitivePolynomialDegree01
            , PrimitivePolynomialDegree02

@@ -19,7 +19,7 @@ namespace test.Maths
             var chrono = new Stopwatch();
             chrono.Start();
             
-            var sobol = new SobolRsg(dates.Length, 0, SobolDirection.JoeKuoD5);
+            var sobol = new SobolRsg(dates.Length, SobolDirection.JoeKuoD5);
             var variances = new double[dates.Length];
             for (int i = 0; i < nbPaths; ++i)
             {
@@ -60,7 +60,7 @@ namespace test.Maths
             var chrono = new Stopwatch();
             chrono.Start();
 
-            var sobol = new SobolRsg(dates.Length * brownianDim, 0, SobolDirection.JoeKuoD5);
+            var sobol = new SobolRsg(dates.Length * brownianDim, SobolDirection.JoeKuoD5);
             var covariances = new double[dates.Length][,];
             for (int j = 0; j < dates.Length; ++j) 
                 covariances[j] = new double[brownianDim, brownianDim];

@@ -25,26 +25,26 @@ namespace pragmatic_quant_model.Maths.Sobol
         // number of dimensions in the alternative primitive polynomials
         const uint MaxAltDegree = 52;
 
-        private static readonly long[] AltPrimitivePolynomialDegree01 =
+        private static readonly int[] AltPrimitivePolynomialDegree01 =
         {
             0, /* x+1 (1)(1) */
             -1
         };
 
-        private readonly static long[] AltPrimitivePolynomialDegree02 =
+        private readonly static int[] AltPrimitivePolynomialDegree02 =
         {
             1, /* x^2+x+1 (1)1(1) */
             -1
         };
 
-        private readonly static long[] AltPrimitivePolynomialDegree03 =
+        private readonly static int[] AltPrimitivePolynomialDegree03 =
         {
             1, /* x^3    +x+1 (1)01(1) */
             2, /* x^3+x^2  +1 (1)10(1) */
             -1
         };
 
-        private readonly static long[] AltPrimitivePolynomialDegree04 =
+        private readonly static int[] AltPrimitivePolynomialDegree04 =
         {
             1, /* x^4+       +x+1 (1)001(1) */
             4, /* x^4+x^3+     +1 (1)100(1) */
@@ -52,7 +52,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         };
 
 
-        private readonly static long[] AltPrimitivePolynomialDegree05 =
+        private readonly static int[] AltPrimitivePolynomialDegree05 =
         {
             2,  /* x^5        +x^2  +1 (1)0010(1) */
             13, /* x^5+x^4+x^3    +x+1 (1)1101(1) */
@@ -63,7 +63,7 @@ namespace pragmatic_quant_model.Maths.Sobol
             -1
         };
 
-        private readonly static long[] AltPrimitivePolynomialDegree06 =
+        private readonly static int[] AltPrimitivePolynomialDegree06 =
         {
             1,  /* x^6                +x+1 (1)00001(1) */
             16, /* x^6+x^5              +1 (1)10000(1) */
@@ -75,7 +75,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         };
 
 
-        private readonly static long[] AltPrimitivePolynomialDegree07 =
+        private readonly static int[] AltPrimitivePolynomialDegree07 =
         {
             1,  /* x^7                    +x+1 (1)000001(1) */
             32, /* x^7+x^6                  +1 (1)100000(1) */
@@ -98,7 +98,7 @@ namespace pragmatic_quant_model.Maths.Sobol
             -1
         };
 
-        private readonly static long[] AltPrimitivePolynomialDegree08 =
+        private readonly static int[] AltPrimitivePolynomialDegree08 =
         {
             14,
             56,
@@ -120,7 +120,7 @@ namespace pragmatic_quant_model.Maths.Sobol
         };
 
         // #define N_ALT_MAX_DEGREE 8;
-        private readonly static long[][] AltPrimitivePolynomials =
+        private readonly static int[][] AltPrimitivePolynomials =
         {
             AltPrimitivePolynomialDegree01,
             AltPrimitivePolynomialDegree02,
@@ -131,18 +131,18 @@ namespace pragmatic_quant_model.Maths.Sobol
             AltPrimitivePolynomialDegree07,
             AltPrimitivePolynomialDegree08
         };
-       
-       private static readonly Lazy<ulong[][]> JoeKuoD7Initializers = new Lazy<ulong[][]>(JoeKuoDirections.JoeKuoD7);
-       private static readonly Lazy<ulong[][]> JoeKuoD5Initializers = new Lazy<ulong[][]>(JoeKuoDirections.JoeKuoD5);
-       private static readonly Lazy<ulong[][]> JoeKuoD6Initializers = new Lazy<ulong[][]>(JoeKuoDirections.JoeKuoD6);
 
-       private static readonly Lazy<ulong[][]> SLinitializers = new Lazy<ulong[][]>(StdDirections.SLinitializers);
-       private static readonly Lazy<ulong[][]> JaeckelInitializers = new Lazy<ulong[][]>(StdDirections.JaeckelInitializers);
-       private static readonly Lazy<ulong[][]> Linitializers = new Lazy<ulong[][]>(StdDirections.LemieuxInitializers);
+        private static readonly Lazy<uint[][]> JoeKuoD7Initializers = new Lazy<uint[][]>(JoeKuoDirections.JoeKuoD7);
+        private static readonly Lazy<uint[][]> JoeKuoD5Initializers = new Lazy<uint[][]>(JoeKuoDirections.JoeKuoD5);
+        private static readonly Lazy<uint[][]> JoeKuoD6Initializers = new Lazy<uint[][]>(JoeKuoDirections.JoeKuoD6);
 
-       private static readonly Lazy<ulong[][]> KuoInitializers = new Lazy<ulong[][]>(KuoDirections.KuoInit);
-       private static readonly Lazy<ulong[][]> Kuo3Initializers = new Lazy<ulong[][]>(KuoDirections.Kuo3Init);
-       private static readonly Lazy<ulong[][]> Kuo2Initializers = new Lazy<ulong[][]>(KuoDirections.Kuo2Init);
+        private static readonly Lazy<uint[][]> SLinitializers = new Lazy<uint[][]>(StdDirections.SLinitializers);
+        private static readonly Lazy<uint[][]> JaeckelInitializers = new Lazy<uint[][]>(StdDirections.JaeckelInitializers);
+        private static readonly Lazy<uint[][]> Linitializers = new Lazy<uint[][]>(StdDirections.LemieuxInitializers);
+
+        private static readonly Lazy<uint[][]> KuoInitializers = new Lazy<uint[][]>(KuoDirections.KuoInit);
+        private static readonly Lazy<uint[][]> Kuo3Initializers = new Lazy<uint[][]>(KuoDirections.Kuo3Init);
+        private static readonly Lazy<uint[][]> Kuo2Initializers = new Lazy<uint[][]>(KuoDirections.Kuo2Init);
 		
     }
 
