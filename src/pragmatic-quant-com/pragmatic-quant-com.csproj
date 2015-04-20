@@ -41,6 +41,10 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Factories\BagServices.cs" />
+    <Compile Include="Factories\IFactoryFromBag.cs" />
+    <Compile Include="Factories\MarketFactory.cs" />
+    <Compile Include="MarketFunctions.cs" />
     <Compile Include="MathFunctions.cs" />
     <Compile Include="PragmaticQuantAddin.cs" />
     <Compile Include="VanillaOption.cs" />

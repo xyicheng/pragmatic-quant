@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ExcelDna.Integration">
+      <HintPath>..\pragmatic-quant-com\ExcelDna.Integration.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
@@ -67,6 +70,10 @@
     <Compile Include="UnitTestUtils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\pragmatic-quant-com\pragmatic-quant-com.csproj">
+      <Project>{4654d410-73c0-473a-9e6f-031104350e7c}</Project>
+      <Name>pragmatic-quant-com</Name>
+    </ProjectReference>
     <ProjectReference Include="..\pragmatic-quant-model\pragmatic-quant-model.csproj">
       <Project>{5214e422-5a30-4613-bb5e-ca7c190a0a1f}</Project>
       <Name>pragmatic-quant-model</Name>

@@ -65,15 +65,9 @@ namespace pragmatic_quant_model.MarketDatas
             Yield = yield;
             Cash = cash;
         }
-
         public DateTime Date { get; private set; }
         public double Cash { get; private set; }
         public double Yield { get; private set; }
-
-        public double Value(double spotAsset)
-        {
-            return Cash + spotAsset * Yield;
-        }
     }
 
     public class AssetForwardCurve

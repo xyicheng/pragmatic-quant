@@ -1,4 +1,4 @@
-﻿namespace pragmatic_quant_model.Factories
+﻿namespace pragmatic_quant_com.Factories
 {
     interface IFactoryFromBag<out T>
     {

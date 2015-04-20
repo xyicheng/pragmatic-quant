@@ -50,17 +50,17 @@ namespace pragmatic_quant_model.MarketDatas
 
             if (pillars[0] == refDate)
             {
-                if (!DoubleUtils.EqualZero(zcs[0]))
+                if (!DoubleUtils.MachineEquality(1.0, zcs[0]))
                     throw new Exception("LinearRateDiscountProvider : Discount for refDate must equal to 1.0 ");
                 zcRates[0] = 0.0;
             }
             else
             {
-                zcRates[0] = Math.Log(zcs[0]) / dates[0];
+                zcRates[0] = -Math.Log(zcs[0]) / dates[0];
             }
             for (int i = 1; i < zcs.Length; i++)
             {
-                zcRates[i] = Math.Log(zcs[i]) / dates[i];
+                zcRates[i] = -Math.Log(zcs[i]) / dates[i];
             }
         }
         public override double Zc(DateTime d)
@@ -70,19 +70,17 @@ namespace pragmatic_quant_model.MarketDatas
 
             if (leftIndex <= -1)
             {
-                throw new Exception(String.Format(
-                    "LinearRateDiscountProvider : discount date {0} previous to ref date {1}",
-                    d.ToShortDateString(), refDate.ToShortDateString()));
+                return Math.Exp(-zcRates[0] * t);
             }
 
             if (leftIndex >= dates.Length - 1)
             {
-                return Math.Exp(zcRates[zcRates.Length - 1] * t);
+                return Math.Exp(-zcRates[zcRates.Length - 1] * t);
             }
- 
-            var w = (dates[leftIndex] - t) / (dates[leftIndex + 1] - dates[leftIndex]);
+
+            var w = (t - dates[leftIndex]) / (dates[leftIndex + 1] - dates[leftIndex]);
             var rate = (1.0 - w) * zcRates[leftIndex] + w * zcRates[leftIndex + 1];
-            return Math.Exp(rate * t);
+            return Math.Exp(-rate * t);
         }
     }
 

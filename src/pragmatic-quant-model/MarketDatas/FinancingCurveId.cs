@@ -54,6 +54,15 @@ namespace pragmatic_quant_model.MarketDatas
 
             return false;
         }
+        public static FinancingCurveId Parse(string curveId)
+        {
+            FinancingCurveId result;
+            if (!TryParse(curveId, out result))
+            {
+                throw new Exception(string.Format("Unable to parse financing curve id : {0}", curveId));
+            }
+            return result;
+        }
 
         public override bool Equals(object obj)
         {

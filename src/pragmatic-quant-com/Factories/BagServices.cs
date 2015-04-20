@@ -3,19 +3,11 @@ using System.Collections.Generic;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Structure;
 
-namespace pragmatic_quant_model
+namespace pragmatic_quant_com.Factories
 {
     public class BagServices
     {
         #region private methods
-        private static Exception MissingParameter(string name)
-        {
-            return new Exception(String.Format("Missing parameter : {0} !", name));
-        }
-        private static string MissingValueMsg(string name)
-        {
-            return String.Format("Missing parameter value for {0} !", name);
-        } 
         private static bool IsEmptyCell(object cellValue)
         {
             if (cellValue == null)
@@ -24,8 +16,20 @@ namespace pragmatic_quant_model
             if ((cellValue is string) && ((string)cellValue).Trim() == "")
                 return true;
 
+            if (cellValue is ExcelDna.Integration.ExcelEmpty
+                || cellValue is ExcelDna.Integration.ExcelError)
+                return true;
+
             return false;
         }
+        private static Exception MissingParameter(string name)
+        {
+            return new Exception(String.Format("Missing parameter : {0} !", name));
+        }
+        private static string MissingValueMsg(string name)
+        {
+            return String.Format("Missing parameter value for {0} !", name);
+        } 
         private static Func<object, double> DoubleValueConverter(string name)
         {
             Func<object, double> doubleConverter = o =>
@@ -47,6 +51,7 @@ namespace pragmatic_quant_model
             return converter;
         }
         #endregion
+        
         public static bool Has(object[,] bag, string name, out int row, out int col)
         {
             var loweredName = name.ToLowerInvariant().Trim();
@@ -201,24 +206,24 @@ namespace pragmatic_quant_model
             int row, col;
             if (Has(bag, name, out row, out col))
             {
-                var valuesAndDates = ProcessMatrix(bag, row + 1, col, o => o, MissingValueMsg(name));
+                var valuesAndRowLabel = ProcessMatrix(bag, row + 1, col, o => o, MissingValueMsg(name));
 
-                var dates = new TRow[valuesAndDates.GetLength(0)];
-                for (int i = 0; i < dates.Length; i++)
+                var rowLabels = new TRow[valuesAndRowLabel.GetLength(0)];
+                for (int i = 0; i < rowLabels.Length; i++)
                 {
-                    dates[i] = rowLabelMap(valuesAndDates[i, 0]);
+                    rowLabels[i] = rowLabelMap(valuesAndRowLabel[i, 0]);
                 }
 
-                var values = valuesAndDates
-                    .ExtractSubArray(0, valuesAndDates.GetLength(0), 1, valuesAndDates.GetLength(1) - 1)
+                var values = valuesAndRowLabel
+                    .SubArray(0, valuesAndRowLabel.GetLength(0), 1, valuesAndRowLabel.GetLength(1) - 1)
                     .Map(valueMap);
 
                 var labels = bag
-                    .ExtractSubArray(row, 1, col + 1, valuesAndDates.GetLength(1) - 1)
-                    .ExtractRow(0)
+                    .SubArray(row, 1, col + 1, valuesAndRowLabel.GetLength(1) - 1)
+                    .Row(0)
                     .Map(colLabelMap);
 
-                return new LabelledMatrix<TRow, TCol, TVal>(dates, labels, values);
+                return new LabelledMatrix<TRow, TCol, TVal>(rowLabels, labels, values);
             }
             throw MissingParameter(name);
         }

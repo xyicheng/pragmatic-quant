@@ -35,7 +35,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BagServices.cs" />
     <Compile Include="Basic\ArrayUtils.cs" />
     <Compile Include="Basic\Assertions.cs" />
     <Compile Include="Basic\NumberConverter.cs" />
@@ -49,8 +48,6 @@
     <Compile Include="Basic\Structure\LabelledMatrix.cs" />
     <Compile Include="Basic\Structure\TimeMatrixData.cs" />
     <Compile Include="Basic\TimeMeasure.cs" />
-    <Compile Include="Factories\IFactoryFromBag.cs" />
-    <Compile Include="Factories\MarketFactory.cs" />
     <Compile Include="MarketDatas\AssetId.cs" />
     <Compile Include="MarketDatas\AssetMarket.cs" />
     <Compile Include="MarketDatas\Currency.cs" />

@@ -1,4 +1,6 @@
-﻿namespace pragmatic_quant_model.MarketDatas
+﻿using System;
+
+namespace pragmatic_quant_model.MarketDatas
 {
     public class Currency
     {
@@ -41,6 +43,13 @@
                     return false;
             }
             return true;
+        }
+        public static Currency Parse(string desc)
+        {
+            Currency cur;
+            if (!TryParse(desc, out cur))
+                throw new Exception(string.Format("Unknown currency : {0}", desc));
+            return cur;
         }
 
         public override bool Equals(object obj)

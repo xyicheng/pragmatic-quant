@@ -33,7 +33,7 @@ namespace pragmatic_quant_model.Basic.Structure
                 return false;
             }
 
-            labelValues = Values.ExtractColumn(labelIndex);
+            labelValues = Values.Column(labelIndex);
             return true;
         }
         public TVal[] GetCol(TCol label)

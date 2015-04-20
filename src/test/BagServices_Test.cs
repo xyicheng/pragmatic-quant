@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using NUnit.Framework;
-using pragmatic_quant_model;
+using pragmatic_quant_com.Factories;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Structure;
 

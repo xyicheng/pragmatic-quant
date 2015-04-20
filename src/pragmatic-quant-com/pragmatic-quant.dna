@@ -1,3 +1,5 @@
 <DnaLibrary Name="pragmatic-quant" RuntimeVersion="v4.0">
-  <ExternalLibrary Path="pragmatic-quant-com.dll" ComServer="false" />
+  <ExternalLibrary Path="pragmatic-quant-com.dll" 
+                   ComServer="false" 
+                   ExplicitExports="true" />
 </DnaLibrary>
