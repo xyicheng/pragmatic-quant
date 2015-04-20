@@ -10,7 +10,8 @@ namespace pragmatic_quant_com
 {
     public class MarketFunctions
     {
-        [ExcelFunction(Description = "Set market from range", Category = "PragmaticQuant_MarketFunctions")]
+        [ExcelFunction(Description = "Set market from xl range", 
+                       Category = "PragmaticQuant_MarketFunctions")]
         public static bool SetMarket(string mktId, object range)
         {
             try
@@ -39,6 +40,36 @@ namespace pragmatic_quant_com
                     var dateOrDuration = DateAndDurationConverter.ConvertDateOrDuration(o);
                     var date = dateOrDuration.ToDate(curve.RefDate);
                     return curve.Zc(date);
+                });
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var error = new object[1, 1];
+                error[0, 0] = string.Format("ERROR, {0}", e.Message);
+                return error;
+            }
+        }
+
+        [ExcelFunction(Description = "Equity Asset forward function",
+                       Category = "PragmaticQuant_MarketFunctions")]
+        public static object AssetForward(string mktId, object[,] dates, string assetName)
+        {
+            try
+            {
+                var market = MarketManager.Value.GetMarket(mktId);
+                var assetMarket = market.AssetMarketFromName(assetName);
+
+                Currency assetCurrency = assetMarket.Asset.Currency;
+                DiscountCurve cashCurve= market.DiscountCurve(FinancingCurveId.RiskFree(assetCurrency));
+                AssetForwardCurve assetForward = assetMarket.Forward(cashCurve);
+
+                var result = dates.Map(o =>
+                {
+                    var dateOrDuration = DateAndDurationConverter.ConvertDateOrDuration(o);
+                    var date = dateOrDuration.ToDate(assetForward.RefDate);
+                    return assetForward.Fwd(date);
                 });
 
                 return result;

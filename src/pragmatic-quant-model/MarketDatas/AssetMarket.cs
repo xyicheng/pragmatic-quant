@@ -114,7 +114,7 @@ namespace pragmatic_quant_model.MarketDatas
             for (int i = 0; i < dividends.Length; i++)
             {
                 var div = dividends[i];
-                if (date > div.Date) break;
+                if (date < div.Date) break;
                 growth *= 1.0 - div.Yield;
             }
             return growth;
