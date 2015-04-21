@@ -38,6 +38,25 @@ namespace pragmatic_quant_model.MarketDatas
         private readonly double[] dates;
         private readonly double[] zcRates;
         #endregion
+        #region private fields
+        private double ZcRate(double t)
+        {
+            var leftIndex = stepSearcher.LocateLeftIndex(t);
+
+            if (leftIndex <= -1)
+            {
+                return zcRates[0];
+            }
+
+            if (leftIndex >= dates.Length - 1)
+            {
+                return zcRates[zcRates.Length - 1];
+            }
+
+            var w = (t - dates[leftIndex]) / (dates[leftIndex + 1] - dates[leftIndex]);
+            return (1.0 - w) * zcRates[leftIndex] + w * zcRates[leftIndex + 1];
+        }
+        #endregion
         public LinearZcRateInterpolation(DateTime[] pillars, double[] zcs, ITimeMeasure time)
             : base(time.RefDate)
         {
@@ -63,24 +82,11 @@ namespace pragmatic_quant_model.MarketDatas
                 zcRates[i] = -Math.Log(zcs[i]) / dates[i];
             }
         }
+
         public override double Zc(DateTime d)
         {
             double t = time[d];
-            var leftIndex = stepSearcher.LocateLeftIndex(t);
-
-            if (leftIndex <= -1)
-            {
-                return Math.Exp(-zcRates[0] * t);
-            }
-
-            if (leftIndex >= dates.Length - 1)
-            {
-                return Math.Exp(-zcRates[zcRates.Length - 1] * t);
-            }
-
-            var w = (t - dates[leftIndex]) / (dates[leftIndex + 1] - dates[leftIndex]);
-            var rate = (1.0 - w) * zcRates[leftIndex] + w * zcRates[leftIndex + 1];
-            return Math.Exp(-rate * t);
+            return Math.Exp(-ZcRate(t) * t);
         }
     }
 

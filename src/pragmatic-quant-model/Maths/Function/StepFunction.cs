@@ -1,4 +1,5 @@
-﻿using pragmatic_quant_model.Basic;
+﻿using System;
+using pragmatic_quant_model.Basic;
 
 namespace pragmatic_quant_model.Maths.Function
 {
@@ -24,7 +25,7 @@ namespace pragmatic_quant_model.Maths.Function
             if (leftIndex <= -1)
                 return leftValue;
 
-            return values[System.Math.Min(leftIndex, abscissae.Length - 1)];
+            return values[Math.Min(leftIndex, abscissae.Length - 1)];
         }
     }
 

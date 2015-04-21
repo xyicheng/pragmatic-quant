@@ -1,7 +1,7 @@
 using System;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using pragmatic_quant_model.Basic;
-using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Function;
 
 namespace pragmatic_quant_model.MarketDatas
@@ -72,32 +72,31 @@ namespace pragmatic_quant_model.MarketDatas
 
     public class AssetForwardCurve
     {
-        #region protected fields
+        #region private fields
         private readonly double spot;
         private readonly ITimeMeasure time;
-        private readonly DividendQuote[] dividends;
         private readonly DiscountCurve assetFinancingCurve;
-        private readonly RRFunction cumulatedDividendFunc;
+
+        private readonly StepFunction yieldGrowthFunc;
+        private readonly StepFunction cumulatedDividendFunc;
         #endregion
         public AssetForwardCurve(double spot, DividendQuote[] dividends, DiscountCurve assetFinancingCurve,
             ITimeMeasure time)
         {
+            Contract.Requires(EnumerableUtils.IsSorted(dividends.Select(div => div.Date)));
+
             this.spot = spot;
-            this.dividends = dividends.OrderBy(d => d.Date).ToArray();
             this.assetFinancingCurve = assetFinancingCurve;
             this.time = time;
 
-            var cumulatedDividends = new double[dividends.Length];
-            var yieldGrowth = 1.0;
-            var cumulDiv = 0.0;
-            for (int i = 0; i < dividends.Length; i++)
-            {
-                var div = dividends[i];
-                yieldGrowth *= 1.0 - div.Yield;
-                cumulDiv += div.Cash / yieldGrowth * assetFinancingCurve.Zc(div.Date);
-                cumulatedDividends[i] = cumulDiv;
-            }
-            cumulatedDividendFunc = new StepFunction(time[dividends.Select(d => d.Date).ToArray()], cumulatedDividends, 0.0);
+            double[] yieldGrowths = dividends.Scan(1.0, (prev, div) => prev * (1.0 - div.Yield));
+            double[] discountedDivCash = dividends.ZipWith(yieldGrowths,
+                (div, yGrowth) => div.Cash / yGrowth * assetFinancingCurve.Zc(div.Date));
+            double[] cumulatedDividends = discountedDivCash.Scan(0.0, (prev, c) => prev + c);
+            var divDates = time[dividends.Select(d => d.Date).ToArray()];
+
+            yieldGrowthFunc = new StepFunction(divDates, yieldGrowths, 1.0);
+            cumulatedDividendFunc = new StepFunction(divDates, cumulatedDividends, 0.0);
         }
 
         public DateTime RefDate
@@ -110,14 +109,7 @@ namespace pragmatic_quant_model.MarketDatas
         }
         public double AssetGrowth(DateTime date)
         {
-            double growth = 1.0 / assetFinancingCurve.Zc(date);
-            for (int i = 0; i < dividends.Length; i++)
-            {
-                var div = dividends[i];
-                if (date < div.Date) break;
-                growth *= 1.0 - div.Yield;
-            }
-            return growth;
+            return yieldGrowthFunc.Eval(time[date]) / assetFinancingCurve.Zc(date);
         }
         public double CumulatedDividends(DateTime d)
         {
