@@ -11,17 +11,17 @@ namespace pragmatic_quant_model.MarketDatas
         private readonly IDictionary<AssetId, AssetMarket> assetMkts;
         #endregion
         public Market(IDictionary<FinancingCurveId, DiscountCurve> discountCurves,
-                      IDictionary<AssetId, AssetMarket> assetMkts)
+                      AssetMarket[] assetMkts)
         {
             this.discountCurves = discountCurves;
-            this.assetMkts = assetMkts;
+            this.assetMkts = assetMkts.ToDictionary(assetMkt => assetMkt.Asset, assetMkt => assetMkt);
 
             RefDate = discountCurves.First().Value.RefDate;
 
             if (discountCurves.Values.Any(c => c.RefDate != RefDate))
                 throw new Exception("RateMarket : many curve refDate's !");
 
-            if (assetMkts.Values.Any(m => m.RefDate != RefDate))
+            if (assetMkts.Any(m => m.RefDate != RefDate))
                 throw new Exception("AssetMarket : many curve refDate's !");
         }
 

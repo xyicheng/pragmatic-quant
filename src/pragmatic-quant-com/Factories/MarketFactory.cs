@@ -38,7 +38,7 @@ namespace pragmatic_quant_com.Factories
             }
             return curves;
         }
-        private static IDictionary<AssetId, AssetMarket> ProcessAssetMkt(object[,] bag, DateTime refDate)
+        private static AssetMarket[] ProcessAssetMkt(object[,] bag, DateTime refDate)
         {
             var eqtyTime = TimeMeasure.Act365(refDate);
             var assetRawDatas = BagServices.ProcessLabelledMatrix(bag, "Asset",
@@ -48,7 +48,7 @@ namespace pragmatic_quant_com.Factories
             var repoPillars = repoRawDatas.RowLabels
                 .Select(dOrDur => dOrDur.ToDate(refDate)).ToArray();
 
-            var assetMkts = new Dictionary<AssetId, AssetMarket>();
+            var assetMkts = new List<AssetMarket>();
             for (int i = 0; i < assetRawDatas.RowLabels.Length; i++)
             {
                 var assetName = assetRawDatas.RowLabels[i];
@@ -74,17 +74,17 @@ namespace pragmatic_quant_com.Factories
                     new DividendQuote(d.ToDate(refDate), cashs[idx], yields[idx])).ToArray();
                 
                 var mkt = new AssetMarket(assetId, refDate, eqtyTime, spot, repoCurve, divQuotes);
-                assetMkts.Add(assetId, mkt);
+                assetMkts.Add(mkt);
             }
 
-            return assetMkts;
+            return assetMkts.ToArray();
         }
         #endregion
         public static readonly MarketFactory Value = new MarketFactory();
         public Market Build(object[,] bag)
         {
             DateTime refDate = RefDate(bag);
-            var assetMarket = ProcessAssetMkt(bag, refDate);
+            AssetMarket[] assetMarket = ProcessAssetMkt(bag, refDate);
 
             TimeMatrixDatas curveRawDatas = BagServices.ProcessTimeMatrixDatas(bag, "Discount");
             var discountCurves = RateCurveFromRawDatas(curveRawDatas, refDate);

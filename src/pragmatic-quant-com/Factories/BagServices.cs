@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Structure;
 
