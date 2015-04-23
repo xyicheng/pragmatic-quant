@@ -66,7 +66,7 @@ namespace test.Maths
                 var p = NormalDistribution.Cumulative(x);
                 var proxy_x = NormalDistribution.CumulativeInverse(p); 
                 var errRelative = Math.Abs((proxy_x - x) / x);
-                Assert.IsTrue(errRelative < 6 * DoubleUtils.Epsilon);
+                Assert.IsTrue(errRelative < 6 * DoubleUtils.MachineEpsilon);
             }
         }
 
@@ -79,7 +79,7 @@ namespace test.Maths
                 var p = NormalDistribution.Cumulative(x);
                 var proxy_x = NormalDistribution.CumulativeInverse(p);
                 var errRelative = Math.Abs(proxy_x - x);
-                Assert.IsTrue(errRelative < 13 * DoubleUtils.Epsilon);
+                Assert.IsTrue(errRelative < 13 * DoubleUtils.MachineEpsilon);
             }
         }
 

@@ -34,7 +34,7 @@ namespace pragmatic_quant_model.Maths
                 var r = (1.0 + uSquare * (0.282379182817 + uSquare * (0.0247121443305 + uSquare * (0.000710539797155 + uSquare * 4.4377233994E-06))))
                         /(0.999999999996 +uSquare * (0.258780407354 + uSquare * (0.0199703240022 + uSquare * (0.000467308655509 + uSquare * 1.82925792864E-6))));
 
-                if (Math.Abs(z * z * z) < DoubleUtils.Epsilon)
+                if (Math.Abs(z * z * z) < DoubleUtils.MachineEpsilon)
                 {
                     return MathConsts.SqrtTwoPi * price * (1.0 + 0.5 * z - 0.0833333333333 * z * z) * r;
                 }

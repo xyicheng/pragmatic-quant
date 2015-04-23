@@ -19,7 +19,7 @@ namespace test.Maths
                 for (int j = 0; j < a.GetLength(1); j++)
                 {
                     var err = Math.Abs(a[i, j] - test[i, j]);
-                    Assert.IsTrue(err < precision * DoubleUtils.Epsilon);
+                    Assert.IsTrue(err < precision * DoubleUtils.MachineEpsilon);
                 }
             }
         }

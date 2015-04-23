@@ -25,7 +25,7 @@ namespace test.Maths.Function
                     var midPoint = 0.5 * (abs[i] + abs[i + 1]);
                     Assert.AreEqual(stepFunc.Eval(midPoint), vals[i]);
 
-                    var nextPointMinus = abs[i] + (1.0 - 5.0 * DoubleUtils.Epsilon) * (abs[i + 1] - abs[i]);
+                    var nextPointMinus = abs[i] + (1.0 - 5.0 * DoubleUtils.MachineEpsilon) * (abs[i + 1] - abs[i]);
                     Assert.AreEqual(stepFunc.Eval(nextPointMinus), vals[i]);
                 }
             }

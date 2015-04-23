@@ -7,7 +7,7 @@ namespace pragmatic_quant_model.Maths
     {
         #region private const
         private static readonly double MinimumRationalCubicControlParameterValue = -(1.0 - DoubleUtils.Sqrt_Epsilon);
-        private static readonly double MaximumRationalCubicControlParameterValue = 2 / (DoubleUtils.Epsilon * DoubleUtils.Epsilon);
+        private static readonly double MaximumRationalCubicControlParameterValue = 2 / (DoubleUtils.MachineEpsilon * DoubleUtils.MachineEpsilon);
         #endregion
         
         public static double rational_cubic_interpolation(double x, double x_l, double x_r, double y_l, double y_r, double d_l, double d_r, double r)

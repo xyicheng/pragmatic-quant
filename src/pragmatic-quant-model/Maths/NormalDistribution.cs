@@ -23,7 +23,7 @@ namespace pragmatic_quant_model.Maths
     {
         #region Cumulative const
         private const double Cdf_Asymptotic_First_Threshold = -10.0;
-        private static readonly double CdfAsymptoticSecondThreshold = -1 / Math.Sqrt(DoubleUtils.Epsilon);
+        private static readonly double CdfAsymptoticSecondThreshold = -1 / Math.Sqrt(DoubleUtils.MachineEpsilon);
         #endregion
         /// <summary>
         ///Cumulative normal distribution function
@@ -51,7 +51,7 @@ namespace pragmatic_quant_model.Maths
                         g *= y;
                         ++i;
                         a = Math.Abs(a);
-                    } while (lasta > a && a >= Math.Abs(sum * DoubleUtils.Epsilon));
+                    } while (lasta > a && a >= Math.Abs(sum * DoubleUtils.MachineEpsilon));
                 }
                 return -Density(z) * sum / z;
             }

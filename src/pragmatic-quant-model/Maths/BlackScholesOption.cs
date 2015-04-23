@@ -627,7 +627,7 @@ namespace pragmatic_quant_model.Maths
                     // The Householder(3) iteration is
                     //     s_n+1  =  s_n  +  newton · [ 1 + halley·newton/2 ] / [ 1 + newton·( halley + hh3·newton/6 ) ]
                     //
-                    for (; iterations < n && Math.Abs(ds) > DoubleUtils.Epsilon * s; ++iterations)
+                    for (; iterations < n && Math.Abs(ds) > DoubleUtils.MachineEpsilon * s; ++iterations)
                     {
                         if (ds * ds_previous < 0)
                             ++direction_reversal_count;
@@ -636,7 +636,7 @@ namespace pragmatic_quant_model.Maths
                             // If looping inefficently, or the forecast step takes us outside the bracket, or onto its edges, switch to binary nesting.
                             // NOTE that this can only really happen for very extreme values of |x|, such as |x| = |ln(F/K)| > 500.
                             s = 0.5 * (s_left + s_right);
-                            if (s_right - s_left <= DoubleUtils.Epsilon * s) break;
+                            if (s_right - s_left <= DoubleUtils.MachineEpsilon * s) break;
                             direction_reversal_count = 0;
                             ds = 0;
                         }
@@ -719,7 +719,7 @@ namespace pragmatic_quant_model.Maths
                         //              hh3    = g'''/g' =   b'''/b' +  g'·(2g'+3b''/b')
                         // and the iteration is
                         //     s_n+1  =  s_n  +  newton · [ 1 + halley·newton/2 ] / [ 1 + newton·( halley + hh3·newton/6 ) ].
-                        for (; iterations < n && Math.Abs(ds) > DoubleUtils.Epsilon * s; ++iterations)
+                        for (; iterations < n && Math.Abs(ds) > DoubleUtils.MachineEpsilon * s; ++iterations)
                         {
                             if (ds * ds_previous < 0)
                                 ++direction_reversal_count;
@@ -728,7 +728,7 @@ namespace pragmatic_quant_model.Maths
                                 // If looping inefficently, or the forecast step takes us outside the bracket, or onto its edges, switch to binary nesting.
                                 // NOTE that this can only really happen for very extreme values of |x|, such as |x| = |ln(F/K)| > 500.
                                 s = 0.5 * (s_left + s_right);
-                                if (s_right - s_left <= DoubleUtils.Epsilon * s) break;
+                                if (s_right - s_left <= DoubleUtils.MachineEpsilon * s) break;
                                 direction_reversal_count = 0;
                                 ds = 0.0;
                             }
@@ -759,7 +759,7 @@ namespace pragmatic_quant_model.Maths
             // and the iteration is
             //     s_n+1  =  s_n  +  newton · [ 1 + halley·newton/2 ] / [ 1 + newton·( halley + hh3·newton/6 ) ].
             //
-            for (; iterations < n && Math.Abs(ds) > DoubleUtils.Epsilon * s; ++iterations)
+            for (; iterations < n && Math.Abs(ds) > DoubleUtils.MachineEpsilon * s; ++iterations)
             {
                 if (ds * ds_previous < 0)
                     ++direction_reversal_count;
@@ -768,7 +768,7 @@ namespace pragmatic_quant_model.Maths
                     // If looping inefficently, or the forecast step takes us outside the bracket, or onto its edges, switch to binary nesting.
                     // NOTE that this can only really happen for very extreme values of |x|, such as |x| = |ln(F/K)| > 500.
                     s = 0.5 * (s_left + s_right);
-                    if (s_right - s_left <= DoubleUtils.Epsilon * s) break;
+                    if (s_right - s_left <= DoubleUtils.MachineEpsilon * s) break;
                     direction_reversal_count = 0;
                     ds = 0.0;
                 }

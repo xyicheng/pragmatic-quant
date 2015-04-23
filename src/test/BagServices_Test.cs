@@ -310,8 +310,8 @@ namespace test
             var helloDatas = timeDatas.GetCol("hello");
             var totoDatas = timeDatas.GetCol("toto");
             
-            UnitTestUtils.EqualDoubleArray(helloDatas, new[] {1.0, 2.0, 3.0}, DoubleUtils.Epsilon);
-            UnitTestUtils.EqualDoubleArray(totoDatas, new[] { 5.0, 4.0, 1.0 }, DoubleUtils.Epsilon);
+            UnitTestUtils.EqualDoubleArray(helloDatas, new[] {1.0, 2.0, 3.0}, DoubleUtils.MachineEpsilon);
+            UnitTestUtils.EqualDoubleArray(totoDatas, new[] { 5.0, 4.0, 1.0 }, DoubleUtils.MachineEpsilon);
         }
     }
 }

@@ -55,7 +55,7 @@ namespace pragmatic_quant_model.Maths
         /// <returns></returns>
         public static double[,] Decomposition(double[,] a)
         {
-            return Decomposition(a, DoubleUtils.Epsilon);
+            return Decomposition(a, DoubleUtils.MachineEpsilon);
         }
     }
 }

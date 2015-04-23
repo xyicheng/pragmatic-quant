@@ -55,7 +55,7 @@ namespace test.Maths
                 var impliedVol = BlackScholesOption.ImpliedVol(option, 1.0, strike, mat, m > 0 ? 1 : -1);
 
                 var errRelative = (impliedVol - vol) / vol;
-                Assert.IsTrue(Math.Abs(errRelative) < 6 * DoubleUtils.Epsilon);
+                Assert.IsTrue(Math.Abs(errRelative) < 6 * DoubleUtils.MachineEpsilon);
             }
         }
 
@@ -72,7 +72,7 @@ namespace test.Maths
                 var impliedVol = BlackScholesOption.ImpliedVol(option, 1.0, strike, mat, 1);
 
                 var errRelative = (impliedVol - vol) / vol;
-                Assert.IsTrue(Math.Abs(errRelative) < 6 * DoubleUtils.Epsilon);
+                Assert.IsTrue(Math.Abs(errRelative) < 6 * DoubleUtils.MachineEpsilon);
             }
         }
 
