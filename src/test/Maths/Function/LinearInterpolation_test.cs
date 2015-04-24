@@ -44,7 +44,7 @@ namespace test.Maths.Function
             var abs = new[] {0.0, 0.5, 0.99, 2.5};
             var vals = new[] {5.0, 5.4, 3.1, 1.0};
 
-            var stepFunc = new CubicSplineInterpolation(abs, vals, double.NaN, double.NaN);
+            var stepFunc = new CubicSplineInterpoler(abs, vals, double.NaN, double.NaN);
 
             foreach (var i in Enumerable.Range(0, abs.Length-1))
             {
