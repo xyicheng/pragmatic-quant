@@ -1,11 +1,12 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 using pragmatic_quant_model.Maths.Function;
+using pragmatic_quant_model.Maths.Interpolation;
 
 namespace test.Maths.Function
 {
     [TestFixture]
-    public class LinearInterpolation_Test
+    public class LinearInterpolationTest
     {
         [Test]
         public void TestEval()
@@ -36,7 +37,7 @@ namespace test.Maths.Function
     }
 
     [TestFixture]
-    public class CubicSplineInterpolation_Test
+    public class CubicSplineInterpolationTest
     {
         [Test]
         public void TestEval()

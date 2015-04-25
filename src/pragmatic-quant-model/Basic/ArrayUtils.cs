@@ -46,9 +46,9 @@ namespace pragmatic_quant_model.Basic
                 result[i] = array[startIndex + i];
             return result;
         }
-        public static TB[,] Map<TA, TB>(this TA[,] array, Func<TA, TB> map)
+        public static TResult[,] Map<T, TResult>(this T[,] array, Func<T, TResult> map)
         {
-            var result = new TB[array.GetLength(0), array.GetLength(1)];
+            var result = new TResult[array.GetLength(0), array.GetLength(1)];
             for(int i=0; i<result.GetLength(0); i++)
                 for (int j = 0; j < result.GetLength(1); j++)
                     result[i, j] = map(array[i, j]);

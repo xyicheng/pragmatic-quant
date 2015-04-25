@@ -147,7 +147,8 @@
     <Compile Include="Maths\Cholesky.cs" />
     <Compile Include="Maths\ErrorFunctions.cs" />
     <Compile Include="Maths\Function\BasicRRFunction.cs" />
-    <Compile Include="Maths\Function\Interpolation.cs" />
+    <Compile Include="Maths\Interpolation\CubicSplineInterpoler.cs" />
+    <Compile Include="Maths\Interpolation\LinearInterpolation.cs" />
     <Compile Include="Maths\Function\StepFunction.cs" />
     <Compile Include="Maths\mt19937uniformrng.cs" />
     <Compile Include="Maths\NormalDistribution.cs" />

@@ -7,6 +7,7 @@ namespace pragmatic_quant_model.Basic
         #region private fields
         private readonly double[] abcissae;
         #endregion
+
         public StepSearcher(double[] abcissae)
         {
             if (abcissae.Length==0)

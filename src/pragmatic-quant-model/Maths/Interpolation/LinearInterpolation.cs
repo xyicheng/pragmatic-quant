@@ -1,6 +1,6 @@
 ﻿using pragmatic_quant_model.Basic;
 
-namespace pragmatic_quant_model.Maths.Function
+namespace pragmatic_quant_model.Maths.Interpolation
 {
     public class LinearInterpolation : RRFunction
     {

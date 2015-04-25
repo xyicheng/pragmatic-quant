@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using pragmatic_quant_model.Basic;
 
-namespace pragmatic_quant_model.Maths.Function
+namespace pragmatic_quant_model.Maths.Interpolation
 {
     public class CubicSplineInterpoler : RRFunction
     {
@@ -13,13 +13,15 @@ namespace pragmatic_quant_model.Maths.Function
         private readonly double[] abscissae;
         private readonly CubicSplineElement[] cubicElements;
         #endregion
+
         public CubicSplineInterpoler(double[] abscissae, double[] values,
-            double leftDerivative = double.NaN, double rightDerivative = double.NaN)
+                                     double leftDerivative = double.NaN, double rightDerivative = double.NaN)
         {
             this.abscissae = abscissae;
             stepSearcher = new StepSearcher(abscissae);
             cubicElements = CubicSplineInterpolation.BuildSpline(abscissae, values, leftDerivative, rightDerivative);
         }
+
         public override double Eval(double x)
         {
             int leftIndex = Math.Max(0, Math.Min(cubicElements.Length - 1, stepSearcher.LocateLeftIndex(x)));
@@ -27,10 +29,63 @@ namespace pragmatic_quant_model.Maths.Function
             var cubic = cubicElements[leftIndex];
             return cubic.A + h * (cubic.B + h * (cubic.C + h * cubic.D));
         }
+
+    }
+
+    public class MixedLinearSplineInterpoler2D
+    {
+        #region private fields
+        private readonly int maxLinearStepIndex;
+        private readonly double[] linearSteps;
+        private readonly StepSearcher linearStepsSearch;
+
+        private readonly double[] splineSteps;
+        private readonly StepSearcher splineStepsSearch;
+        private readonly CubicSplineElement[][] cubicSplineElements;
+        #endregion
+
+        public MixedLinearSplineInterpoler2D(double[] linearSteps, double[] splineSteps, double[,] values)
+        {
+            Contract.Requires(values.GetLength(0) == linearSteps.Length);
+            Contract.Requires(values.GetLength(1) == splineSteps.Length);
+
+            this.linearSteps = linearSteps;
+            this.splineSteps = splineSteps;
+
+            maxLinearStepIndex = linearSteps.Length - 1;
+            linearStepsSearch = new StepSearcher(linearSteps);
+            splineStepsSearch = new StepSearcher(linearSteps);
+            cubicSplineElements = Enumerable.Range(0, values.GetLength(0))
+                                    .Select(i => CubicSplineInterpolation.BuildSpline(splineSteps, values.Row(i)))
+                                    .ToArray();
+        }
+
+        public double Eval(double x, double y)
+        {
+            var linearIndex = Math.Max(0, Math.Min(maxLinearStepIndex, linearStepsSearch.LocateLeftIndex(x)));
+            var splineIndex = splineStepsSearch.LocateLeftIndex(y);
+
+            var h = y - splineSteps[splineIndex];
+            var startCubic = cubicSplineElements[linearIndex][splineIndex];
+            var startSplineValue = startCubic.A + h * (startCubic.B + h * (startCubic.C + h * startCubic.D));
+
+            if (linearIndex == 0 || linearIndex == maxLinearStepIndex)
+            {
+                return startSplineValue;
+            }
+
+            var endCubic = cubicSplineElements[linearIndex + 1][splineIndex];
+            var endSplineValue = endCubic.A + h * (endCubic.B + h * (endCubic.C + h * endCubic.D));
+
+            double w = (x - linearSteps[linearIndex]) / (linearSteps[linearIndex + 1] - linearSteps[linearIndex]);
+            return (1.0 - w) * startSplineValue + w * endSplineValue;
+        }
+
     }
 
     public static class CubicSplineInterpolation
     {
+        
         /// <summary>
         /// Build cubic spline elements. Algorithm from numerical recipes.
         /// 
@@ -48,7 +103,7 @@ namespace pragmatic_quant_model.Maths.Function
         /// <param name="rightDerivative">Right boundary condition, default is "natural" : zero second derivative </param>
         /// <returns></returns>
         public static CubicSplineElement[] BuildSpline(double[] abscissae, double[] values,
-            double leftDerivative = double.NaN, double rightDerivative = double.NaN)
+                                                       double leftDerivative = double.NaN, double rightDerivative = double.NaN)
         {
             Contract.Requires(abscissae.Length == values.Length);
 
@@ -99,6 +154,7 @@ namespace pragmatic_quant_model.Maths.Function
                     new CubicSplineElement(abscissae[i + 1] - abscissae[i], values[i], values[i + 1], secondDerivatives[i], secondDerivatives[i + 1])
                 ).ToArray();
         }
+
     }
 
     /// <summary>
@@ -108,10 +164,6 @@ namespace pragmatic_quant_model.Maths.Function
     [DebuggerDisplay("{A} + x * ({B} + x * ({C} + x * {D}))")]
     public struct CubicSplineElement
     {
-        public readonly double A;
-        public readonly double B;
-        public readonly double C;
-        public readonly double D;
 
         public CubicSplineElement(double step,
             double leftVal, double rightVal,
@@ -122,5 +174,11 @@ namespace pragmatic_quant_model.Maths.Function
             C = leftSecondDeriv / 6.0 + leftSecondDeriv / 3.0;
             D = (rightSecondDeriv - leftSecondDeriv) / step / 6.0;
         }
+
+        public readonly double A;
+        public readonly double B;
+        public readonly double C;
+        public readonly double D;
+
     }
 }
