@@ -148,6 +148,7 @@
     <Compile Include="Maths\ErrorFunctions.cs" />
     <Compile Include="Maths\Function\BasicRRFunction.cs" />
     <Compile Include="Maths\Interpolation\CubicSplineInterpoler.cs" />
+    <Compile Include="Maths\Interpolation\Interpoler2D.cs" />
     <Compile Include="Maths\Interpolation\LinearInterpolation.cs" />
     <Compile Include="Maths\Function\StepFunction.cs" />
     <Compile Include="Maths\mt19937uniformrng.cs" />

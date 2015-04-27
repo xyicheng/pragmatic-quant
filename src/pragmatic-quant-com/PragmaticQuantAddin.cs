@@ -9,11 +9,11 @@ namespace pragmatic_quant_com
     {
         public void AutoOpen()
         {
-            ComServer.DllRegisterServer();
+            //ComServer.DllRegisterServer();
         }
         public void AutoClose()
         {
-            ComServer.DllUnregisterServer();
+            //ComServer.DllUnregisterServer();
         }
     }
 }

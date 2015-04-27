@@ -27,11 +27,11 @@ namespace pragmatic_quant_com
 
         [ExcelFunction(Description = "Discount zero coupon function", 
                        Category = "PragmaticQuant_MarketFunctions")]
-        public static object Discount(string mktId, object[,] dates, string curveId)
+        public static object Discount(object mktObj, object[,] dates, string curveId)
         {
             try
             {
-                var market = MarketManager.Value.GetMarket(mktId);
+                var market = MarketManager.Value.GetMarket(mktObj);
                 var finCurveId = FinancingCurveId.Parse(curveId);
                 DiscountCurve curve = market.DiscountCurve(finCurveId);
 
@@ -54,15 +54,15 @@ namespace pragmatic_quant_com
 
         [ExcelFunction(Description = "Equity Asset forward function",
                        Category = "PragmaticQuant_MarketFunctions")]
-        public static object AssetForward(string mktId, object[,] dates, string assetName)
+        public static object AssetForward(object mktObj, object[,] dates, string assetName)
         {
             try
             {
-                var market = MarketManager.Value.GetMarket(mktId);
+                var market = MarketManager.Value.GetMarket(mktObj);
                 var assetMarket = market.AssetMarketFromName(assetName);
 
                 Currency assetCurrency = assetMarket.Asset.Currency;
-                DiscountCurve cashCurve= market.DiscountCurve(FinancingCurveId.RiskFree(assetCurrency));
+                DiscountCurve cashCurve = market.DiscountCurve(FinancingCurveId.RiskFree(assetCurrency));
                 AssetForwardCurve assetForward = assetMarket.Forward(cashCurve);
 
                 var result = dates.Map(o =>
@@ -101,23 +101,10 @@ namespace pragmatic_quant_com
 
         public static MarketManager Value = new MarketManager();
 
-        public bool HasMarket(string mktId)
-        {
-            return marketByIds.ContainsKey(FormattedId(mktId));
-        }
-        public Market GetMarket(string mktId)
-        {
-            Market mkt;
-            if (!marketByIds.TryGetValue(FormattedId(mktId), out mkt))
-            {
-                throw new ApplicationException(string.Format("No market for id : {0}", mktId));
-            }
-            return mkt;
-        }
         public void SetMarket(string mktId, object[,] marketBag)
         {
             var market = MarketFactory.Value.Build(marketBag);
-            
+
             var formatedId = FormattedId(mktId);
             if (marketByIds.ContainsKey(formatedId))
             {
@@ -127,6 +114,28 @@ namespace pragmatic_quant_com
             {
                 marketByIds.Add(formatedId, market);
             }
+        }
+        public bool HasMarket(string mktId)
+        {
+            return marketByIds.ContainsKey(FormattedId(mktId));
+        }
+        public Market GetMarket(object mktObj)
+        {
+            var mktBag = mktObj as object[,];
+            if (mktBag != null)
+                return MarketFactory.Value.Build(mktBag);
+
+            if (!(mktObj is string))
+                throw new ApplicationException(string.Format("Unable to build market from : {0}", mktObj.ToString()));
+
+            var mktId = mktObj as String;
+
+            Market mkt;
+            if (!marketByIds.TryGetValue(FormattedId(mktId), out mkt))
+            {
+                throw new ApplicationException(string.Format("No market for id : {0}", mktId));
+            }
+            return mkt;
         }
     }
 }
