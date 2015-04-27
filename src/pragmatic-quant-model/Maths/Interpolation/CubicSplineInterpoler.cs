@@ -32,57 +32,6 @@ namespace pragmatic_quant_model.Maths.Interpolation
 
     }
 
-    public class MixedLinearSplineInterpoler2D
-    {
-        #region private fields
-        private readonly int maxLinearStepIndex;
-        private readonly double[] linearSteps;
-        private readonly StepSearcher linearStepsSearch;
-
-        private readonly double[] splineSteps;
-        private readonly StepSearcher splineStepsSearch;
-        private readonly CubicSplineElement[][] cubicSplineElements;
-        #endregion
-
-        public MixedLinearSplineInterpoler2D(double[] linearSteps, double[] splineSteps, double[,] values)
-        {
-            Contract.Requires(values.GetLength(0) == linearSteps.Length);
-            Contract.Requires(values.GetLength(1) == splineSteps.Length);
-
-            this.linearSteps = linearSteps;
-            this.splineSteps = splineSteps;
-
-            maxLinearStepIndex = linearSteps.Length - 1;
-            linearStepsSearch = new StepSearcher(linearSteps);
-            splineStepsSearch = new StepSearcher(linearSteps);
-            cubicSplineElements = Enumerable.Range(0, values.GetLength(0))
-                                    .Select(i => CubicSplineInterpolation.BuildSpline(splineSteps, values.Row(i)))
-                                    .ToArray();
-        }
-
-        public double Eval(double x, double y)
-        {
-            var linearIndex = Math.Max(0, Math.Min(maxLinearStepIndex, linearStepsSearch.LocateLeftIndex(x)));
-            var splineIndex = splineStepsSearch.LocateLeftIndex(y);
-
-            var h = y - splineSteps[splineIndex];
-            var startCubic = cubicSplineElements[linearIndex][splineIndex];
-            var startSplineValue = startCubic.A + h * (startCubic.B + h * (startCubic.C + h * startCubic.D));
-
-            if (linearIndex == 0 || linearIndex == maxLinearStepIndex)
-            {
-                return startSplineValue;
-            }
-
-            var endCubic = cubicSplineElements[linearIndex + 1][splineIndex];
-            var endSplineValue = endCubic.A + h * (endCubic.B + h * (endCubic.C + h * endCubic.D));
-
-            double w = (x - linearSteps[linearIndex]) / (linearSteps[linearIndex + 1] - linearSteps[linearIndex]);
-            return (1.0 - w) * startSplineValue + w * endSplineValue;
-        }
-
-    }
-
     public static class CubicSplineInterpolation
     {
         
@@ -158,10 +107,10 @@ namespace pragmatic_quant_model.Maths.Interpolation
     }
 
     /// <summary>
-    /// Cubic polynomial data for horner rule evaluation :
-    /// x -> A + x * (B + x * (C + x * D)) 
+    /// Cubic polynomial data :
+    /// x -> A + B*x + C*x^2 + D*x^3 
     /// </summary>
-    [DebuggerDisplay("{A} + x * ({B} + x * ({C} + x * {D}))")]
+    [DebuggerDisplay("{A} + {B}*x + {C}*x^2 + {D}*x^3")]
     public struct CubicSplineElement
     {
 
