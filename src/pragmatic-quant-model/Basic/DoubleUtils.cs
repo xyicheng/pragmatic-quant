@@ -31,6 +31,12 @@ namespace pragmatic_quant_model.Basic
         }
         public static bool Equality(double x, double y, double relativePrecision)
         {
+            if (double.IsInfinity(x) || double.IsInfinity(y))
+            {
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                return x == y;
+            }
+            
             return Math.Abs(x - y) <= Math.Max(Math.Abs(x), Math.Abs(y)) * relativePrecision;
         }
         public static bool EqualZero(double x)

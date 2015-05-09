@@ -27,6 +27,9 @@ namespace test.Basic
             Assert.IsFalse(DoubleUtils.MachineEquality((1.0 + 2 * DoubleUtils.MachineEpsilon) * 1.0e-28, 1.0e-28));
             Assert.IsTrue(DoubleUtils.MachineEquality((1.0 + DoubleUtils.MachineEpsilon) * 1.0e-28, 1.0e-28));
             Assert.IsTrue(DoubleUtils.MachineEquality(1.00000000000000000000000001e-28, 1.0e-28));
+            Assert.IsFalse(DoubleUtils.MachineEquality(double.NegativeInfinity, 0.0));
+            Assert.IsFalse(DoubleUtils.MachineEquality(double.NegativeInfinity, double.PositiveInfinity));
+            Assert.IsTrue(DoubleUtils.MachineEquality(double.NegativeInfinity, double.NegativeInfinity));
 
             var rand = new Random(255);
             for (int i = 0; i < 1e6; i++)

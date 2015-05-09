@@ -45,9 +45,12 @@ namespace test.Basic
                 Assert.AreEqual(index, i);
 
                 Assert.True(stepSearcher.TryFindPillarIndex(1.000000000000000000001 * pillars[i], out index));
-                if (i > 0)
-                    Assert.False(stepSearcher.TryFindPillarIndex(0.999999999999 * pillars[i], out index));
+                Assert.False(stepSearcher.TryFindPillarIndex(0.999999999999 * pillars[i], out index));
             }
+
+            int indexTest;
+            Assert.False(stepSearcher.TryFindPillarIndex(double.NegativeInfinity, out indexTest));
+            Assert.False(stepSearcher.TryFindPillarIndex(double.PositiveInfinity, out indexTest));
         }
     }
 }

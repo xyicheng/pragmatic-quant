@@ -55,7 +55,8 @@ namespace pragmatic_quant_model.Basic
         {
             var leftIndex = LocateLeftIndex(x);
 
-            if (DoubleUtils.Equality(x, pillars[leftIndex], precision))
+            if ((leftIndex >= 0)
+                && DoubleUtils.Equality(x, pillars[leftIndex], precision))
             {
                 i = leftIndex;
                 return true;
