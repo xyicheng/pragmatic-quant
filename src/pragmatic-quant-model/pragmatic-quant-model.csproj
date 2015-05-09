@@ -124,14 +124,15 @@
   <ItemGroup>
     <Compile Include="Basic\ArrayUtils.cs" />
     <Compile Include="Basic\Assertions.cs" />
+    <Compile Include="Basic\Dates\DayCountFrac.cs" />
     <Compile Include="Basic\NumberConverter.cs" />
     <Compile Include="Basic\DoubleUtils.cs" />
     <Compile Include="Basic\EnumerableUtils.cs" />
     <Compile Include="Basic\GridUtils.cs" />
     <Compile Include="Basic\MathConsts.cs" />
-    <Compile Include="Basic\Structure\DateAndDurationConverter.cs" />
-    <Compile Include="Basic\Structure\DateOrDuration.cs" />
-    <Compile Include="Basic\Structure\Duration.cs" />
+    <Compile Include="Basic\Dates\DateAndDurationConverter.cs" />
+    <Compile Include="Basic\Dates\DateOrDuration.cs" />
+    <Compile Include="Basic\Dates\Duration.cs" />
     <Compile Include="Basic\Structure\LabelledMatrix.cs" />
     <Compile Include="Basic\Structure\TimeMatrixData.cs" />
     <Compile Include="Basic\TimeMeasure.cs" />
@@ -163,6 +164,22 @@
     <Compile Include="Maths\Sobol\SobolRsg.cs" />
     <Compile Include="Maths\Sobol\sobolrsg2.cs" />
     <Compile Include="Maths\Sobol\StdDirections.cs" />
+    <Compile Include="Basic\Dates\CouponSchedule.cs" />
+    <Compile Include="Model\IFactorModelRepresentation.cs" />
+    <Compile Include="Model\IModel.cs" />
+    <Compile Include="Model\IModelDescription.cs" />
+    <Compile Include="MonteCarlo\McModel.cs" />
+    <Compile Include="MonteCarlo\McModelPathFlowGenerator.cs" />
+    <Compile Include="MonteCarlo\ArrayPathCalculator.cs" />
+    <Compile Include="Product\PaymentInfo.cs" />
+    <Compile Include="MonteCarlo\Product\IProductPathFlow.cs" />
+    <Compile Include="MonteCarlo\Product\McProductPathFlowCalculator.cs" />
+    <Compile Include="MonteCarlo\Product\McProductPathFlowFactory.cs" />
+    <Compile Include="MonteCarlo\McRunner.cs" />
+    <Compile Include="MonteCarlo\PathFlows.cs" />
+    <Compile Include="Product\Coupon.cs" />
+    <Compile Include="Product\IObservation.cs" />
+    <Compile Include="Product\IProduct.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

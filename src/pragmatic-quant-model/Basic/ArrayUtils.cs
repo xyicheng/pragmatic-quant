@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace pragmatic_quant_model.Basic
 {
@@ -64,6 +65,11 @@ namespace pragmatic_quant_model.Basic
 
             for (int i = 0; i < row.Length; i++)
                 array[rowIndex, i] = row[i];
+        }
+
+        public static int FindIndex<T>(this T[] array, T element)
+        {
+            return array.ToList().FindIndex(e => e.Equals(element));
         }
     }
 }

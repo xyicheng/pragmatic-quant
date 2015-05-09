@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace pragmatic_quant_model.Basic.Structure
+namespace pragmatic_quant_model.Basic.Dates
 {
     public class DateOrDuration
     {

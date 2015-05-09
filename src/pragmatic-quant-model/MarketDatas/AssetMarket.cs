@@ -73,7 +73,11 @@ namespace pragmatic_quant_model.MarketDatas
         public DateTime Date { get; private set; }
         public double Cash { get; private set; }
         public double Yield { get; private set; }
+    }
 
+    public class VolatilityQuote
+    {
+        
     }
 
     public class AssetForwardCurve

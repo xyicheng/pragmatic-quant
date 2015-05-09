@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 
-namespace pragmatic_quant_model.Basic.Structure
+namespace pragmatic_quant_model.Basic.Dates
 {
     public class DateAndDurationConverter
     {

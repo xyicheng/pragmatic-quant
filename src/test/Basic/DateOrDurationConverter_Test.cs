@@ -1,6 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
-using pragmatic_quant_model.Basic.Structure;
+using pragmatic_quant_model.Basic.Dates;
 
 namespace test.Basic
 {

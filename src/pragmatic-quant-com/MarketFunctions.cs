@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using ExcelDna.Integration;
 using pragmatic_quant_com.Factories;
 using pragmatic_quant_model.Basic;
-using pragmatic_quant_model.Basic.Structure;
+using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.MarketDatas;
 
 namespace pragmatic_quant_com
