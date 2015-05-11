@@ -6,7 +6,7 @@ using pragmatic_quant_model.Basic;
 
 namespace pragmatic_quant_model.Maths.Interpolation
 {
-    public class CubicSplineInterpoler : RRFunction
+    public class CubicSplineInterpoler : RrFunction
     {
         #region private fields
         private readonly StepSearcher stepSearcher;

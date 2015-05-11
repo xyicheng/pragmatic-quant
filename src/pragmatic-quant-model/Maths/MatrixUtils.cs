@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace pragmatic_quant_model.Maths
 {
@@ -125,6 +126,32 @@ namespace pragmatic_quant_model.Maths
                     result[i, j] += a[i] * b[j];
                 }
             }
+        }
+
+        public static void Add(ref double[] a, double[] b)
+        {
+            for (int i = 0; i < a.Length; i++)
+            {
+                a[i] += b[i];
+            }
+        }
+
+        public static double DotProduct(this double[] a, double[] b)
+        {
+            Contract.Requires(a.Length == b.Length);
+            var dotProduct = 0.0;
+            for (int i = 0; i < a.Length; i++)
+            {
+                dotProduct += a[i] * b[i];
+            }
+            return dotProduct;
+        }
+        public static double[] Add(this double[] a, double[] b)
+        {
+            var add = new double[a.Length];
+            Array.Copy(a, add, a.Length);
+            Add(ref add, b);
+            return add;
         }
     }
 }

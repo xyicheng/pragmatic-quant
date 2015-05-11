@@ -5,56 +5,84 @@ using pragmatic_quant_model.Maths.Interpolation;
 
 namespace pragmatic_quant_model.Maths
 {
-    public abstract class RRFunction
+    public abstract class RrFunction
     {
         public abstract double Eval(double x);
-        public virtual RRFunction Add(RRFunction other)
+
+        public virtual RrFunction Integral(double basePoint)
         {
-            return RRFunctions.Sum(this, other);
+            throw new NotImplementedException();
         }
-        public virtual RRFunction Mult(RRFunction other)
+        public virtual RrFunction Add(RrFunction other)
         {
-            return RRFunctions.Product(this, other);
+            return RrFunctions.Sum(this, other);
+        }
+        public virtual RrFunction Mult(RrFunction other)
+        {
+            return RrFunctions.Product(this, other);
         }
 
-        public static RRFunction operator +(RRFunction f, RRFunction g)
+        public static RrFunction operator +(RrFunction f, RrFunction g)
         {
             return f.Add(g);
         }
-        public static RRFunction operator *(RRFunction f, RRFunction g)
+        public static RrFunction operator +(RrFunction f, double a)
+        {
+            return f.Add(RrFunctions.Constant(a));
+        }
+        public static RrFunction operator +(double a, RrFunction f)
+        {
+            return f.Add(RrFunctions.Constant(a));
+        }
+        
+        public static RrFunction operator -(RrFunction f, double a)
+        {
+            return f.Add(RrFunctions.Constant(-a));
+        }
+        
+        public static RrFunction operator *(RrFunction f, RrFunction g)
         {
             return f.Mult(g);
         }
+        public static RrFunction operator *(RrFunction f, double a)
+        {
+            return f.Mult(RrFunctions.Constant(a));
+        }
+        public static RrFunction operator *(double a, RrFunction f)
+        {
+            return f.Mult(RrFunctions.Constant(a));
+        }
     }
 
-    public static class RRFunctions
+    public static class RrFunctions
     {
-        public static RRFunction Constant(double value)
+        public static readonly RrFunction Zero = Constant(0.0);
+        public static RrFunction Constant(double value)
         {
-            return new ConstantRRFunction(value);
+            return new ConstantRrFunction(value);
         }
-        public static RRFunction Exp(double slope)
+        public static RrFunction Exp(double slope)
         {
-            return new ExpRRFunction(1.0, slope);
+            return ExpRrFunction.Create(1.0, slope);
         }
-        public static RRFunction Func(Func<double, double> f)
+        public static RrFunction Func(Func<double, double> f)
         {
-            return new FuncRRFunction(f);
+            return new FuncRrFunction(f);
         }
-        public static RRFunction Sum(params RRFunction[] functions)
+        public static RrFunction Sum(params RrFunction[] functions)
         {
-            return new LinearCombinationRRFunction(functions.Select(f => 1.0).ToArray(), functions);
+            return new LinearCombinationRrFunction(functions.Select(f => 1.0).ToArray(), functions);
         }
-        public static RRFunction LinearCombination(double[] weights, RRFunction[] funcs)
+        public static RrFunction LinearCombination(double[] weights, RrFunction[] funcs)
         {
-            return new LinearCombinationRRFunction(weights, funcs);
+            return new LinearCombinationRrFunction(weights, funcs);
         }
-        public static RRFunction Product(RRFunction f, RRFunction g)
+        public static RrFunction Product(RrFunction f, RrFunction g)
         {
-            return new ProductRRFunction(1.0, f, g);
+            return new ProductRrFunction(1.0, f, g);
         }
 
-        public static RRFunction LinearInterpolation(double[] abscissae, double[] values,
+        public static RrFunction LinearInterpolation(double[] abscissae, double[] values,
                                                     double leftExtrapolationSlope, double rightExtrapolationSlope)
         {
             return new LinearInterpolation(abscissae, values, leftExtrapolationSlope, rightExtrapolationSlope);

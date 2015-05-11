@@ -1,8 +1,10 @@
-﻿using pragmatic_quant_model.Basic;
+﻿using System.Linq;
+using pragmatic_quant_model.Basic;
+using pragmatic_quant_model.Maths.Function;
 
 namespace pragmatic_quant_model.Maths.Interpolation
 {
-    public class LinearInterpolation : RRFunction
+    public class LinearInterpolation : RrFunction
     {
         #region private fields
         private readonly StepSearcher stepSearcher;
@@ -34,6 +36,27 @@ namespace pragmatic_quant_model.Maths.Interpolation
                 ? (values[leftIndex + 1] - values[leftIndex]) / (abscissae[leftIndex + 1] - abscissae[leftIndex])
                 : 0.0;
             return values[leftIndex] + (x - abscissae[leftIndex]) * slope;
+        }
+        public override RrFunction Add(RrFunction other)
+        {
+            var cst = other as ConstantRrFunction;
+            if (cst != null)
+            {
+                var shiftedValues = values.Map(v => v + cst.Value);
+                return new LinearInterpolation(abscissae, shiftedValues, leftExtrapolationSlope, rightExtrapolationSlope);
+            }
+
+            var linear = other as LinearInterpolation;
+            if (linear != null)
+            {
+                var mergedAbscissae = abscissae.Union(linear.abscissae).OrderBy(p => p).ToArray();
+                var addValues = mergedAbscissae.Map(p => Eval(p) + linear.Eval(p));
+                return new LinearInterpolation(mergedAbscissae, addValues,
+                    leftExtrapolationSlope + linear.leftExtrapolationSlope,
+                    rightExtrapolationSlope + linear.rightExtrapolationSlope);
+            }
+
+            return base.Add(other);
         }
     }
 }
