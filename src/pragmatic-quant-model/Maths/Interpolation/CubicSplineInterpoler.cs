@@ -2,31 +2,35 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using pragmatic_quant_model.Basic;
+using pragmatic_quant_model.Maths.Function;
 
 namespace pragmatic_quant_model.Maths.Interpolation
 {
     public class CubicSplineInterpoler : RrFunction
     {
         #region private fields
-        private readonly StepSearcher stepSearcher;
+        private readonly StepFunction<CubicSplineElement> stepCubic; 
         private readonly double[] abscissae;
-        private readonly CubicSplineElement[] cubicElements;
         #endregion
 
         public CubicSplineInterpoler(double[] abscissae, double[] values,
                                      double leftDerivative = double.NaN, double rightDerivative = double.NaN)
         {
             this.abscissae = abscissae;
-            stepSearcher = new StepSearcher(abscissae);
-            cubicElements = CubicSplineInterpolation.BuildSpline(abscissae, values, leftDerivative, rightDerivative);
+            
+            var cubicElements = CubicSplineInterpolation.BuildSpline(abscissae, values, leftDerivative, rightDerivative);
+            var rightExtrapol = cubicElements.Last();
+            var leftExtrapol = cubicElements.First();
+
+            cubicElements = cubicElements.Concat(new[] { rightExtrapol }).ToArray();
+            stepCubic = new StepFunction<CubicSplineElement>(abscissae, cubicElements, leftExtrapol);
         }
 
         public override double Eval(double x)
         {
-            int leftIndex = Math.Max(0, Math.Min(cubicElements.Length - 1, stepSearcher.LocateLeftIndex(x)));
-            var h = x - abscissae[leftIndex];
-            var cubic = cubicElements[leftIndex];
+            int leftIndex;
+            var cubic = stepCubic.Eval(x, out leftIndex);
+            var h = x - abscissae[Math.Max(0, leftIndex)]; 
             return cubic.A + h * (cubic.B + h * (cubic.C + h * cubic.D));
         }
 

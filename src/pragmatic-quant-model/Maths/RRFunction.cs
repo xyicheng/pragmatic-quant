@@ -11,7 +11,7 @@ namespace pragmatic_quant_model.Maths
 
         public virtual RrFunction Integral(double basePoint)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("RrFunction.Integral");
         }
         public virtual RrFunction Add(RrFunction other)
         {

@@ -135,7 +135,35 @@ namespace pragmatic_quant_model.Maths
                 a[i] += b[i];
             }
         }
-
+        public static void AddW(ref double[] a, double[] b, double weight)
+        {
+            for (int i = 0; i < a.Length; i++)
+            {
+                a[i] += b[i] * weight;
+            }
+        }
+        public static void AddW(ref double[] a, double[] b, double[] weight)
+        {
+            for (int i = 0; i < a.Length; i++)
+            {
+                a[i] += b[i] * weight[i];
+            }
+        }
+        public static void Mult(ref double[] a, double[] b)
+        {
+            for (int i = 0; i < a.Length; i++)
+            {
+                a[i] *= b[i];
+            }
+        }
+        public static void Mult(ref double[] a, double w)
+        {
+            for (int i = 0; i < a.Length; i++)
+            {
+                a[i] *= w;
+            }
+        }
+        
         public static double DotProduct(this double[] a, double[] b)
         {
             Contract.Requires(a.Length == b.Length);
@@ -152,6 +180,27 @@ namespace pragmatic_quant_model.Maths
             Array.Copy(a, add, a.Length);
             Add(ref add, b);
             return add;
+        }
+        public static double[] Add(this double[] a, double[] b, double weight)
+        {
+            var addW = new double[a.Length];
+            Array.Copy(a, addW, a.Length);
+            AddW(ref addW, b, weight);
+            return addW;
+        }
+        public static double[] Mult(this double[] a, double[] b)
+        {
+            var mult = new double[a.Length];
+            Array.Copy(a, mult, a.Length);
+            Mult(ref mult, b);
+            return mult;
+        }
+        public static double[] Mult(this double[] a, double weight)
+        {
+            var mult = new double[a.Length];
+            Array.Copy(a, mult, a.Length);
+            Mult(ref mult, weight);
+            return mult;
         }
     }
 }

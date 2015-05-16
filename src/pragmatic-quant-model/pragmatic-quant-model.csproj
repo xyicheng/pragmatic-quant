@@ -166,10 +166,12 @@
     <Compile Include="Maths\Sobol\sobolrsg2.cs" />
     <Compile Include="Maths\Sobol\StdDirections.cs" />
     <Compile Include="Basic\Dates\CouponSchedule.cs" />
-    <Compile Include="Model\Hw1Model.cs" />
+    <Compile Include="Model\HullWhite\Hw1Model.cs" />
+    <Compile Include="Model\HullWhite\OrnsteinUhlenbeck.cs" />
     <Compile Include="Model\IFactorModelRepresentation.cs" />
     <Compile Include="Model\IModel.cs" />
     <Compile Include="Model\IModelDescription.cs" />
+    <Compile Include="Maths\IRandomGenerator.cs" />
     <Compile Include="MonteCarlo\McModel.cs" />
     <Compile Include="MonteCarlo\McModelPathFlowGenerator.cs" />
     <Compile Include="MonteCarlo\ArrayPathCalculator.cs" />
