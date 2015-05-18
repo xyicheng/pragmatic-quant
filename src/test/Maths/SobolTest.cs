@@ -31,7 +31,7 @@ namespace test.Maths
         [TestCase(32, SobolDirection.Jaeckel)]
         public void TestCallBachelier(int dim, SobolDirection direction)
         {
-            var sobol = new SobolRsg(dim, direction);
+            var gaussianGen = RandomGenerators.GaussianSobol(dim, direction);
 
             var chrono = new Stopwatch();
             chrono.Start();    
@@ -44,10 +44,10 @@ namespace test.Maths
             const int nbPaths = 1000000;
             for (int index = 0; index < nbPaths; index++)
             {
-                var sample = sobol.NextSequence();
+                var sample = gaussianGen.Next();
                 for (int i = 0; i < dim; i++)
                 {
-                    var gaussian = NormalDistribution.FastCumulativeInverse(sample[i]);
+                    var gaussian = sample[i];
                     atmCalls[i] += Math.Max(0.0, gaussian);
                     strikeCall1[i] += Math.Max(0.0, gaussian - 1.0);
                     strikeCall2[i] += Math.Max(0.0, gaussian - 2.0);

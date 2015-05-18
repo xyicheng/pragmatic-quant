@@ -23,15 +23,21 @@ namespace pragmatic_quant_model.Model.HullWhite
         public ITimeMeasure Time { get; private set; }
     }
 
-
     public static class HwModelUtils
     {
-        public static double ZcRateCoeff(double t, double meanReversion)
+        public static double ZcRateCoeff(double duration, double meanReversion)
         {
-            return Math.Pow(t * meanReversion, 2.0) < 6.0 * DoubleUtils.MachineEpsilon
-                ? - t * (1.0 - 0.5 * meanReversion * t)
-                : - (1.0 - Math.Exp(-t * meanReversion)) / meanReversion;
+            return Math.Pow(duration * meanReversion, 2.0) < 6.0 * DoubleUtils.MachineEpsilon
+                ? -duration * (1.0 - 0.5 * meanReversion * duration)
+                : -(1.0 - Math.Exp(-duration * meanReversion)) / meanReversion;
         }
+        public static RnRFunction ZcFunction(double duration, double fwdZc, double[] meanReversions, double[,] covariances)
+        {
+            var zcRateCoeffs = meanReversions.Map(l => ZcRateCoeff(duration, l));
+            double cvx = covariances.BilinearProd(zcRateCoeffs, zcRateCoeffs);
+            return RnRFunctions.ExpAffine(fwdZc * Math.Exp(-0.5 * cvx), zcRateCoeffs);
+        }
+        
         public static RrFunction DriftTerm(this Hw1Model hw1Model)
         {
             return OrnsteinUhlenbeckUtils.IntegratedVariance(hw1Model.Sigma, hw1Model.MeanReversion);
@@ -56,9 +62,8 @@ namespace pragmatic_quant_model.Model.HullWhite
         {
             Contract.Requires(date <= maturity);
             double d = time[date];
-            var coeff = HwModelUtils.ZcRateCoeff(time[maturity] - d, meanReversion);
             var drift = driftTerm.Eval(d);
-            return RnRFunctions.ExpAffine(fwdZc * Math.Exp(-0.5 * coeff * coeff * drift), new[] {coeff});
+            return HwModelUtils.ZcFunction(time[maturity] - d, fwdZc, new[] {meanReversion}, new[,] {{drift}});
         }
     }
 }

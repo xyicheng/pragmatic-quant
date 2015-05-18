@@ -100,6 +100,21 @@ namespace pragmatic_quant_model.Maths
                 result[i, i] = a;
             return result;
         }
+
+        public static double BilinearProd(this double[,] m, double[] left, double[] right)
+        {
+            double prod = 0.0;
+            for (int i = 0; i < m.GetLength(0); i++)
+            {
+                double partial = 0.0;
+                for (int j = 0; j < m.GetLength(1); j++)
+                {
+                    partial += m[i, j] * right[j];
+                }
+                prod += left[i] * partial;
+            }
+            return prod;
+        }
     }
 
     public static class VectorUtils

@@ -148,6 +148,7 @@
     <Compile Include="Maths\Cholesky.cs" />
     <Compile Include="Maths\ErrorFunctions.cs" />
     <Compile Include="Maths\Function\BasicRRFunction.cs" />
+    <Compile Include="Maths\Integration\GaussHermite.cs" />
     <Compile Include="Maths\Interpolation\CubicSplineInterpoler.cs" />
     <Compile Include="Maths\Interpolation\Interpoler2D.cs" />
     <Compile Include="Maths\Interpolation\LinearInterpolation.cs" />

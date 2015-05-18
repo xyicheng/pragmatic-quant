@@ -19,12 +19,11 @@ namespace test.Maths
             var chrono = new Stopwatch();
             chrono.Start();
             
-            var sobol = new SobolRsg(dates.Length, SobolDirection.JoeKuoD5);
+            var gaussianGen = RandomGenerators.GaussianSobol(dates.Length, SobolDirection.JoeKuoD5);
             var variances = new double[dates.Length];
             for (int i = 0; i < nbPaths; ++i)
             {
-                var uniforms = sobol.NextSequence();
-                var gaussians = uniforms.Select(NormalDistribution.FastCumulativeInverse).ToArray();
+                var gaussians = gaussianGen.Next();
                 var path = brownian.NextPath(gaussians);
                 for (int j = 0; j < variances.Length; ++j)
                     variances[j] += path[j] * path[j];
@@ -60,15 +59,14 @@ namespace test.Maths
             var chrono = new Stopwatch();
             chrono.Start();
 
-            var sobol = new SobolRsg(dates.Length * brownianDim, SobolDirection.JoeKuoD5);
+            var gaussianGen = RandomGenerators.GaussianSobol(dates.Length * brownianDim, SobolDirection.JoeKuoD5);
             var covariances = new double[dates.Length][,];
             for (int j = 0; j < dates.Length; ++j) 
                 covariances[j] = new double[brownianDim, brownianDim];
 
             for (int i = 0; i < nbPaths; ++i)
             {
-                var uniforms = sobol.NextSequence();
-                var gaussians = uniforms.Select(NormalDistribution.FastCumulativeInverse).ToArray();
+                var gaussians = gaussianGen.Next();
                 var path = brownian.NextPath(gaussians, brownianDim);
                 for (int j = 0; j < covariances.Length; ++j)
                 {
