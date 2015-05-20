@@ -14,9 +14,9 @@ namespace pragmatic_quant_model.Product
         Currency Currency { get; }
     }
 
-    public class SpotAsset : IFixing
+    public class EquitySpot : IFixing
     {
-        public SpotAsset(DateTime date, AssetId assetId)
+        public EquitySpot(DateTime date, AssetId assetId)
         {
             AssetId = assetId;
             Date = date;
@@ -47,7 +47,7 @@ namespace pragmatic_quant_model.Product
 
     public class Zc : IFixing
     {
-        public Zc(DateTime date, DateTime payDate, Currency currency, FinancingCurveId financingId)
+        public Zc(DateTime date, DateTime payDate, Currency currency, FinancingId financingId)
         {
             FinancingId = financingId;
             Currency = currency;
@@ -57,6 +57,6 @@ namespace pragmatic_quant_model.Product
         public DateTime Date { get; private set; }
         public DateTime PayDate { get; private set; }
         public Currency Currency { get; private set; }
-        public FinancingCurveId FinancingId { get; private set; }
+        public FinancingId FinancingId { get; private set; }
     }
 }

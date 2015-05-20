@@ -32,7 +32,7 @@ namespace pragmatic_quant_com
             try
             {
                 var market = MarketManager.Value.GetMarket(mktObj);
-                var finCurveId = FinancingCurveId.Parse(curveId);
+                var finCurveId = FinancingId.Parse(curveId);
                 DiscountCurve curve = market.DiscountCurve(finCurveId);
 
                 var result = dates.Map(o =>
@@ -62,7 +62,7 @@ namespace pragmatic_quant_com
                 var assetMarket = market.AssetMarketFromName(assetName);
 
                 Currency assetCurrency = assetMarket.Asset.Currency;
-                DiscountCurve cashCurve = market.DiscountCurve(FinancingCurveId.RiskFree(assetCurrency));
+                DiscountCurve cashCurve = market.DiscountCurve(FinancingId.RiskFree(assetCurrency));
                 AssetForwardCurve assetForward = assetMarket.Forward(cashCurve);
 
                 var result = dates.Map(o =>

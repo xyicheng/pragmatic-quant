@@ -17,13 +17,13 @@ namespace pragmatic_quant_model.Product
         public double Nominal { get; private set; }
         public PaymentInfo PaymentInfo { get; private set; }
 
-        public FinancingCurveId Financing { get { return PaymentInfo.Financing; } }
+        public FinancingId Financing { get { return PaymentInfo.Financing; } }
         public abstract TResult Accept<TResult>(IProductVisitor<TResult> visitor);
     }
 
     public abstract class RateCoupon : Coupon
     {
-        protected RateCoupon(FinancingCurveId financing, Currency payCurrency, double nominal, CouponSchedule schedule, DayCountFrac basis)
+        protected RateCoupon(FinancingId financing, Currency payCurrency, double nominal, CouponSchedule schedule, DayCountFrac basis)
             : base(new PaymentInfo(payCurrency, schedule.Pay, financing), nominal)
         {
             Basis = basis;
@@ -43,7 +43,7 @@ namespace pragmatic_quant_model.Product
         private readonly double mult;
         #endregion
         
-        public FloatCoupon(FinancingCurveId financing, Libor libor, double add, double mult,
+        public FloatCoupon(FinancingId financing, Libor libor, double add, double mult,
             double nominal, CouponSchedule schedule, DayCountFrac basis)
             : base(financing, libor.Currency, nominal, schedule, basis)
         {
@@ -52,7 +52,7 @@ namespace pragmatic_quant_model.Product
             this.mult = mult;
         }
 
-        public static FloatCoupon Standard(FinancingCurveId financing, Libor libor, double nominal)
+        public static FloatCoupon Standard(FinancingId financing, Libor libor, double nominal)
         {
             return new FloatCoupon(financing, libor, 0.0, 1.0, nominal, libor.Schedule, libor.Basis);
         }
@@ -104,7 +104,7 @@ namespace pragmatic_quant_model.Product
         }
 
         public TCoupon[] Coupons { get; private set; }
-        public FinancingCurveId Financing
+        public FinancingId Financing
         {
             get { return Coupons.Select(cpn => cpn.Financing).Distinct().Single(); }
         }

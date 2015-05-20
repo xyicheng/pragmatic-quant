@@ -21,6 +21,10 @@ namespace pragmatic_quant_model.Model.HullWhite
         public RrFunction Sigma { get; private set; }
 
         public ITimeMeasure Time { get; private set; }
+        public Currency PivotCurrency
+        {
+            get { return Currency; }
+        }
     }
 
     public static class HwModelUtils
@@ -66,4 +70,14 @@ namespace pragmatic_quant_model.Model.HullWhite
             return HwModelUtils.ZcFunction(time[maturity] - d, fwdZc, new[] {meanReversion}, new[,] {{drift}});
         }
     }
+
+    public class Hw1FactorRepresentationFactory : IFactorRepresentationFactory<Hw1Model>
+    {
+        public IFactorModelRepresentation Build(Hw1Model model, Market market)
+        {
+            var zcRepresentation = new Hw1ModelZcRepresentation(model);
+            return new FactorRepresentation(market, zcRepresentation);
+        }
+    }
+
 }

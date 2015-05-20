@@ -31,7 +31,7 @@ namespace test.Maths
         [TestCase(32, SobolDirection.Jaeckel)]
         public void TestCallBachelier(int dim, SobolDirection direction)
         {
-            var gaussianGen = RandomGenerators.GaussianSobol(dim, direction);
+            var gaussianGen = RandomGenerators.GaussianSobol(direction).Build(dim);
 
             var chrono = new Stopwatch();
             chrono.Start();    

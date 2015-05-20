@@ -18,8 +18,9 @@ namespace test.Maths
 
             var chrono = new Stopwatch();
             chrono.Start();
-            
-            var gaussianGen = RandomGenerators.GaussianSobol(dates.Length, SobolDirection.JoeKuoD5);
+
+            var gaussianGen = RandomGenerators.GaussianSobol(SobolDirection.JoeKuoD5)
+                                              .Build(dates.Length);
             var variances = new double[dates.Length];
             for (int i = 0; i < nbPaths; ++i)
             {
@@ -59,7 +60,8 @@ namespace test.Maths
             var chrono = new Stopwatch();
             chrono.Start();
 
-            var gaussianGen = RandomGenerators.GaussianSobol(dates.Length * brownianDim, SobolDirection.JoeKuoD5);
+            var gaussianGen = RandomGenerators.GaussianSobol(SobolDirection.JoeKuoD5)
+                                              .Build(dates.Length * brownianDim);
             var covariances = new double[dates.Length][,];
             for (int j = 0; j < dates.Length; ++j) 
                 covariances[j] = new double[brownianDim, brownianDim];

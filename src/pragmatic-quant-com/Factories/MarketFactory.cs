@@ -18,17 +18,17 @@ namespace pragmatic_quant_com.Factories
         {
             return TimeMeasure.Act365(refDate);
         }
-        private static IDictionary<FinancingCurveId, DiscountCurve> RateCurveFromRawDatas(TimeMatrixDatas curveRawDatas, DateTime refDate)
+        private static IDictionary<FinancingId, DiscountCurve> RateCurveFromRawDatas(TimeMatrixDatas curveRawDatas, DateTime refDate)
         {
             var rateTimeInterpol = RateTimeMeasure(refDate);
             DateTime[] datePillars = curveRawDatas.RowLabels
                 .Select(dOrDur => dOrDur.ToDate(refDate)).ToArray();
 
-            var curves = new Dictionary<FinancingCurveId, DiscountCurve>();
+            var curves = new Dictionary<FinancingId, DiscountCurve>();
             foreach (var curveLabel in curveRawDatas.ColLabels)
             {
-                FinancingCurveId financingId;
-                if (!FinancingCurveId.TryParse(curveLabel, out financingId))
+                FinancingId financingId;
+                if (!FinancingId.TryParse(curveLabel, out financingId))
                     throw new ArgumentException(String.Format("RateMarketFactory, invalid Discount Curve Id : {0}", curveLabel));
 
                 double[] zcs = curveRawDatas.GetCol(curveLabel);

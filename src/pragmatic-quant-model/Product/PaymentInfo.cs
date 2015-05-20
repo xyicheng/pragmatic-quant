@@ -5,7 +5,7 @@ namespace pragmatic_quant_model.Product
 {
     public class PaymentInfo
     {
-        public PaymentInfo(Currency currency, DateTime date, FinancingCurveId financing)
+        public PaymentInfo(Currency currency, DateTime date, FinancingId financing)
         {
             Financing = financing;
             Date = date;
@@ -14,6 +14,6 @@ namespace pragmatic_quant_model.Product
 
         public Currency Currency { get; private set; }
         public DateTime Date { get; private set; }
-        public FinancingCurveId Financing { get; private set; }
+        public FinancingId Financing { get; private set; }
     }
 }

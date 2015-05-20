@@ -20,8 +20,8 @@ namespace pragmatic_quant_model.MonteCarlo.Product
 
             var zc = new Zc(payment.Date, modelMeasure.Date, payment.Currency, payment.Financing);
             var zcFunc = model.FactorRepresentation[zc];
-
-            return f => model.Numeraire0 / zcFunc(f);
+            double num0 = model.Numeraire0;
+            return f => num0/ zcFunc(f);
         }
         private static ArrayPathCalculator<PaymentInfo> NumerairePathCalc(IEnumerable<PaymentInfo> payments,
                                                                            McModel model)

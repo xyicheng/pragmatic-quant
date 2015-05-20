@@ -8,12 +8,32 @@ namespace pragmatic_quant_model.Maths
         int Dim { get; }
     }
 
+    public interface IRandomGeneratorFactory
+    {
+        IRandomGenerator Build(int dimension);
+    }
+
     public static class RandomGenerators
     {
-        public static IRandomGenerator GaussianSobol(int dimension, SobolDirection sobolDirection)
+        public static IRandomGeneratorFactory GaussianSobol(SobolDirection sobolDirection)
         {
-            return new GaussianSobolGenerator(new SobolRsg(dimension, sobolDirection));
+            return new GaussSobolGeneratorFactory(sobolDirection);
         }
+
+        #region private class
+        private class GaussSobolGeneratorFactory : IRandomGeneratorFactory
+        {
+            private readonly SobolDirection sobolDirection;
+            public GaussSobolGeneratorFactory(SobolDirection sobolDirection)
+            {
+                this.sobolDirection = sobolDirection;
+            }
+            public IRandomGenerator Build(int dimension)
+            {
+                return new GaussianSobolGenerator(new SobolRsg(dimension, sobolDirection));
+            }
+        }
+        #endregion
     }
 
     internal class GaussianSobolGenerator : IRandomGenerator
@@ -41,4 +61,5 @@ namespace pragmatic_quant_model.Maths
             get { return dim; }
         }
     }
+    
 }

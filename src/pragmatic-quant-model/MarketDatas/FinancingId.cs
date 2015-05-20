@@ -2,19 +2,19 @@
 
 namespace pragmatic_quant_model.MarketDatas
 {
-    public class FinancingCurveId
+    public class FinancingId
     {
         #region private fields
         private readonly string id;
         private readonly Currency currency;
         #endregion
         #region protected fields
-        protected FinancingCurveId(string id, Currency currency)
+        protected FinancingId(string id, Currency currency)
         {
             this.id = id;
             this.currency = currency;
         }
-        protected bool Equals(FinancingCurveId other)
+        protected bool Equals(FinancingId other)
         {
             return string.Equals(id, other.id) && Equals(currency, other.currency);
         }
@@ -29,11 +29,11 @@ namespace pragmatic_quant_model.MarketDatas
             get { return currency; }
         }
         
-        public static FinancingCurveId RiskFree(Currency currency)
+        public static FinancingId RiskFree(Currency currency)
         {
-            return new FinancingCurveId("RiskFree", currency);
+            return new FinancingId("RiskFree", currency);
         }
-        public static bool TryParse(string curveId, out FinancingCurveId result)
+        public static bool TryParse(string curveId, out FinancingId result)
         {
             result = null;
 
@@ -54,9 +54,9 @@ namespace pragmatic_quant_model.MarketDatas
 
             return false;
         }
-        public static FinancingCurveId Parse(string curveId)
+        public static FinancingId Parse(string curveId)
         {
-            FinancingCurveId result;
+            FinancingId result;
             if (!TryParse(curveId, out result))
             {
                 throw new Exception(string.Format("Unable to parse financing curve id : {0}", curveId));
@@ -69,7 +69,7 @@ namespace pragmatic_quant_model.MarketDatas
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((FinancingCurveId)obj);
+            return Equals((FinancingId)obj);
         }
         public override int GetHashCode()
         {

@@ -101,6 +101,13 @@ namespace pragmatic_quant_model.Maths
             return result;
         }
 
+        /// <summary>
+        /// Compute transpose(left) * m * right
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
         public static double BilinearProd(this double[,] m, double[] left, double[] right)
         {
             double prod = 0.0;

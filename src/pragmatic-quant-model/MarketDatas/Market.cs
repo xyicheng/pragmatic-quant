@@ -7,10 +7,10 @@ namespace pragmatic_quant_model.MarketDatas
     public class Market
     {
         #region private fields
-        private readonly IDictionary<FinancingCurveId, DiscountCurve> discountCurves;
+        private readonly IDictionary<FinancingId, DiscountCurve> discountCurves;
         private readonly IDictionary<AssetId, AssetMarket> assetMkts;
         #endregion
-        public Market(IDictionary<FinancingCurveId, DiscountCurve> discountCurves,
+        public Market(IDictionary<FinancingId, DiscountCurve> discountCurves,
                       AssetMarket[] assetMkts)
         {
             this.discountCurves = discountCurves;
@@ -25,7 +25,7 @@ namespace pragmatic_quant_model.MarketDatas
                 throw new Exception("AssetMarket : many curve refDate's !");
         }
 
-        public DiscountCurve DiscountCurve(FinancingCurveId financingId)
+        public DiscountCurve DiscountCurve(FinancingId financingId)
         {
             DiscountCurve curve;
             if (!discountCurves.TryGetValue(financingId, out curve))
@@ -41,7 +41,7 @@ namespace pragmatic_quant_model.MarketDatas
         }
         
         public DateTime RefDate { get; private set; }
-        public FinancingCurveId[] DiscountCurveIds
+        public FinancingId[] DiscountCurveIds
         {
             get { return discountCurves.Keys.ToArray(); }
         }

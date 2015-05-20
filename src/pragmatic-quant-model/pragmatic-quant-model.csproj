@@ -140,7 +140,7 @@
     <Compile Include="MarketDatas\AssetMarket.cs" />
     <Compile Include="MarketDatas\Currency.cs" />
     <Compile Include="MarketDatas\DiscountCurve.cs" />
-    <Compile Include="MarketDatas\FinancingCurveId.cs" />
+    <Compile Include="MarketDatas\FinancingId.cs" />
     <Compile Include="MarketDatas\Market.cs" />
     <Compile Include="Maths\BachelierOption.cs" />
     <Compile Include="Maths\BlackScholesOption.cs" />
@@ -173,6 +173,7 @@
     <Compile Include="Model\IModel.cs" />
     <Compile Include="Model\IModelDescription.cs" />
     <Compile Include="Maths\IRandomGenerator.cs" />
+    <Compile Include="MonteCarlo\IFactorRepresentationFactory.cs" />
     <Compile Include="MonteCarlo\McModel.cs" />
     <Compile Include="MonteCarlo\McModelPathFlowGenerator.cs" />
     <Compile Include="MonteCarlo\ArrayPathCalculator.cs" />

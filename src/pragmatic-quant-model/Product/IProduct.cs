@@ -6,7 +6,7 @@ namespace pragmatic_quant_model.Product
 {
     public interface IProduct
     {
-        FinancingCurveId Financing { get; }
+        FinancingId Financing { get; }
 
         TResult Accept<TResult>(IProductVisitor<TResult> visitor);
     }
