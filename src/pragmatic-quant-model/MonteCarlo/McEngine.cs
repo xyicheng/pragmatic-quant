@@ -3,14 +3,14 @@ using pragmatic_quant_model.Maths;
 
 namespace pragmatic_quant_model.MonteCarlo
 {
-    public class McRunner<TPath, TResult>
+    public class McEngine<TPath, TResult>
     {
         #region private fields
         private readonly IRandomGenerator randomGenerator;
         private readonly IPathGenerator<TPath> pathCalculator;
         private readonly IPathResultAgregator<TPath, TResult> pathResultAggregator;
         #endregion
-        public McRunner(IRandomGenerator randomGenerator,
+        public McEngine(IRandomGenerator randomGenerator,
                         IPathGenerator<TPath> pathCalculator,
                         IPathResultAgregator<TPath, TResult> pathResultAggregator)
         {
