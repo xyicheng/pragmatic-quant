@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Maths.Function;
 using pragmatic_quant_model.Maths.Interpolation;
 
@@ -19,6 +20,10 @@ namespace pragmatic_quant_model.Maths
         }
         public virtual RrFunction Mult(RrFunction other)
         {
+            var step = other as StepFunction;
+            if (step != null)
+                return step.Mult(this);
+
             return RrFunctions.Product(this, other);
         }
 
@@ -64,6 +69,12 @@ namespace pragmatic_quant_model.Maths
         public static RrFunction Exp(double slope)
         {
             return ExpRrFunction.Create(1.0, slope);
+        }
+        public static RrFunction Affine(double slope, double origin)
+        {
+            if (DoubleUtils.EqualZero(slope))
+                return Constant(origin);
+            return Constant(slope).Integral(-origin / slope);
         }
         public static RrFunction Func(Func<double, double> f)
         {

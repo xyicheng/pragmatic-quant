@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace pragmatic_quant_model.MonteCarlo
+﻿namespace pragmatic_quant_model.MonteCarlo
 {
 
     public class McModelPathFlowGenerator<TPathFlow, TLabel> : IPathGenerator<TPathFlow>
@@ -32,40 +30,5 @@ namespace pragmatic_quant_model.MonteCarlo
         TPathFlow Compute(IProcessPath processPath);
         TLabel Labels { get; }
         int SizeOfPathInBits { get; }
-    }
-
-    public interface IProcessPath
-    {
-        double[] GetProcessValue(int dateIndex); //Faire un contract pour l'indice et la taille du tableaux
-        double[] Dates { get; }
-        int Dimension { get; }
-    }
-
-    [ContractClass(typeof(ProcessPathGenContract))]
-    public interface IProcessPathGenerator
-    {
-        IProcessPath Path(double[] randoms);
-        double[] Dates { get; }
-        int ProcessDim { get; }
-        int RandomDim { get; }
-    }
-
-    [ContractClassFor(typeof(IProcessPathGenerator))]
-    internal abstract class ProcessPathGenContract : IProcessPathGenerator
-    {
-        public IProcessPath Path(double[] randoms)
-        {
-            Contract.Requires(randoms.Length == RandomDim);
-            return null;
-        }
-        public double[] Dates
-        {
-            get { return null; }
-        }
-        public int ProcessDim
-        {
-            get { return default(int); }
-        }
-        public int RandomDim { get { return default(int); } }
     }
 }

@@ -142,21 +142,20 @@ namespace pragmatic_quant_model.Maths.Function
 
         public override RrFunction Integral(double basePoint)
         {
-            var weightIntegralPart = new WeightedStepFunction(weight.Integral(0.0),
-                abscissae, values, leftValue);
+            var weightIntegral = weight.Integral(basePoint);
             
             var stepPartVals = new double[abscissae.Length];
             double prev = 0.0;
             for (int i = 0; i < abscissae.Length; i++)
             {
-                prev += weight.Eval(abscissae[i]) * (values[i] - (i > 0 ? values[i - 1] : leftValue));
-                stepPartVals[i] = prev;
+                prev += weightIntegral.Eval(abscissae[i]) * (values[i] - (i > 0 ? values[i - 1] : leftValue));
+                stepPartVals[i] = -prev;
             }
             
             RrFunction stepPart = new StepFunction(abscissae, stepPartVals, 0.0);
-            stepPart -= weightIntegralPart.Eval(basePoint) + stepPart.Eval(basePoint);
 
-            return weightIntegralPart + stepPart;
+            var unbasedResult = new WeightedStepFunction(weightIntegral, abscissae, values, leftValue) + stepPart ;
+            return unbasedResult - unbasedResult.Eval(basePoint);
         }
         public override RrFunction Mult(RrFunction other)
         {

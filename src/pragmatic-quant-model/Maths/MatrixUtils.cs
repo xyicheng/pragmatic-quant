@@ -171,6 +171,13 @@ namespace pragmatic_quant_model.Maths
                 a[i] += b[i] * weight[i];
             }
         }
+        public static void Substract(ref double[] a, double[] b)
+        {
+            for (int i = 0; i < a.Length; i++)
+            {
+                a[i] -= b[i];
+            }
+        }
         public static void Mult(ref double[] a, double[] b)
         {
             for (int i = 0; i < a.Length; i++)
@@ -209,6 +216,13 @@ namespace pragmatic_quant_model.Maths
             Array.Copy(a, addW, a.Length);
             AddW(ref addW, b, weight);
             return addW;
+        }
+        public static double[] Substract(this double[] a, double[] b)
+        {
+            var sub = new double[a.Length];
+            Array.Copy(a, sub, a.Length);
+            Substract(ref sub, b);
+            return sub;
         }
         public static double[] Mult(this double[] a, double[] b)
         {

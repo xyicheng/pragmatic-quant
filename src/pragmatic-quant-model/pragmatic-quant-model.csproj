@@ -168,12 +168,17 @@
     <Compile Include="Maths\Sobol\StdDirections.cs" />
     <Compile Include="Basic\Dates\CouponSchedule.cs" />
     <Compile Include="Model\HullWhite\Hw1Model.cs" />
+    <Compile Include="Model\HullWhite\Hw1ModelPathGeneratorFactory.cs" />
+    <Compile Include="Model\HullWhite\Hw1ModelZcRepresentation.cs" />
     <Compile Include="Model\HullWhite\OrnsteinUhlenbeck.cs" />
+    <Compile Include="Model\HullWhite\OrnsteinUhlenbeck1DGenerator.cs" />
     <Compile Include="Model\IFactorModelRepresentation.cs" />
     <Compile Include="Model\IModel.cs" />
     <Compile Include="Model\IModelDescription.cs" />
     <Compile Include="Maths\IRandomGenerator.cs" />
-    <Compile Include="MonteCarlo\IFactorRepresentationFactory.cs" />
+    <Compile Include="Model\IFactorRepresentationFactory.cs" />
+    <Compile Include="MonteCarlo\IProcessPath.cs" />
+    <Compile Include="MonteCarlo\IProcessPathGenerator.cs" />
     <Compile Include="MonteCarlo\McModel.cs" />
     <Compile Include="MonteCarlo\McModelPathFlowGenerator.cs" />
     <Compile Include="MonteCarlo\ArrayPathCalculator.cs" />
@@ -181,7 +186,7 @@
     <Compile Include="MonteCarlo\Product\IProductPathFlow.cs" />
     <Compile Include="MonteCarlo\Product\McProductPathFlowCalculator.cs" />
     <Compile Include="MonteCarlo\Product\McProductPathFlowFactory.cs" />
-    <Compile Include="MonteCarlo\McRunner.cs" />
+    <Compile Include="MonteCarlo\McEngine.cs" />
     <Compile Include="MonteCarlo\PathFlows.cs" />
     <Compile Include="Product\Coupon.cs" />
     <Compile Include="Product\IObservation.cs" />

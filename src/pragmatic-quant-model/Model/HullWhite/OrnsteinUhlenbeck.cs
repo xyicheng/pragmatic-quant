@@ -4,8 +4,9 @@ namespace pragmatic_quant_model.Model.HullWhite
 {
     public class OrnsteinUhlenbeck
     {
-        public OrnsteinUhlenbeck(double meanReversion, RrFunction drift, RrFunction volatility)
+        public OrnsteinUhlenbeck(double meanReversion, RrFunction drift, RrFunction volatility, double value0)
         {
+            Value0 = value0;
             Volatility = volatility;
             Drift = drift;
             MeanReversion = meanReversion;
@@ -13,7 +14,7 @@ namespace pragmatic_quant_model.Model.HullWhite
         public double MeanReversion { get; private set; }
         public RrFunction Drift { get; private set; }
         public RrFunction Volatility { get; private set; }
-        
+        public double Value0 { get; private set; }
     }
 
     public class OrnsteinUhlenbeckUtils

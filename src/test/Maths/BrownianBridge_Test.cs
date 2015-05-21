@@ -25,7 +25,7 @@ namespace test.Maths
             for (int i = 0; i < nbPaths; ++i)
             {
                 var gaussians = gaussianGen.Next();
-                var path = brownian.NextPath(gaussians);
+                var path = brownian.Path(gaussians);
                 for (int j = 0; j < variances.Length; ++j)
                     variances[j] += path[j] * path[j];
             }

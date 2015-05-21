@@ -129,7 +129,7 @@ namespace pragmatic_quant_model.Maths
             return new BrownianBridge(dates, simulationIndexes, simulationStdDevs, leftIndex, rightIndex);
         }
 
-        public double[] NextPath(double[] gaussians)
+        public double[] Path(double[] gaussians)
         {
             Debug.Assert(gaussians.Length == dates.Length);
             var path = new double[dates.Length];
@@ -169,6 +169,17 @@ namespace pragmatic_quant_model.Maths
                 path[currentIndex] = currentVal;
             }
             return path;
+        }
+        public double[][] PathIncrements(double[] gaussians, int dimension)
+        {
+            var paths = NextPath(gaussians, dimension);
+            var increments = new double[paths.Length][];
+            increments[0] = paths[0];
+            for (int i = 1; i < paths.Length; i++)
+            {
+                increments[i] = paths[i].Substract(paths[i - 1]);
+            }
+            return increments;
         }
         public int GaussianSize(int dimension)
         {

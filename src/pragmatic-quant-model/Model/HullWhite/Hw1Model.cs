@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Maths;
@@ -29,6 +28,16 @@ namespace pragmatic_quant_model.Model.HullWhite
 
     public static class HwModelUtils
     {
+        public static RrFunction ZcRateCoeffFunction(double maturity, double meanReversion)
+        {
+            var expMat = Math.Exp(-meanReversion * maturity);
+            if (DoubleUtils.MachineEquality(1.0, expMat))
+            {
+                return RrFunctions.Affine(1.0, -maturity);
+            }
+
+            return (expMat / meanReversion) * RrFunctions.Exp(meanReversion) - (1.0 / meanReversion);
+        }
         public static double ZcRateCoeff(double duration, double meanReversion)
         {
             return Math.Pow(duration * meanReversion, 2.0) < 6.0 * DoubleUtils.MachineEpsilon
@@ -47,37 +56,4 @@ namespace pragmatic_quant_model.Model.HullWhite
             return OrnsteinUhlenbeckUtils.IntegratedVariance(hw1Model.Sigma, hw1Model.MeanReversion);
         }
     }
-
-    public class Hw1ModelZcRepresentation : RateZcRepresentation
-    {
-        #region private fields
-        private readonly ITimeMeasure time;
-        private readonly double meanReversion;
-        private readonly RrFunction driftTerm;
-        #endregion
-        public Hw1ModelZcRepresentation(Hw1Model hw1Model)
-            : base(hw1Model.Currency)
-        {
-            time = hw1Model.Time;
-            meanReversion = hw1Model.MeanReversion;
-            driftTerm = hw1Model.DriftTerm();
-        }
-        public override RnRFunction Zc(DateTime date, DateTime maturity, double fwdZc)
-        {
-            Contract.Requires(date <= maturity);
-            double d = time[date];
-            var drift = driftTerm.Eval(d);
-            return HwModelUtils.ZcFunction(time[maturity] - d, fwdZc, new[] {meanReversion}, new[,] {{drift}});
-        }
-    }
-
-    public class Hw1FactorRepresentationFactory : IFactorRepresentationFactory<Hw1Model>
-    {
-        public IFactorModelRepresentation Build(Hw1Model model, Market market)
-        {
-            var zcRepresentation = new Hw1ModelZcRepresentation(model);
-            return new FactorRepresentation(market, zcRepresentation);
-        }
-    }
-
 }

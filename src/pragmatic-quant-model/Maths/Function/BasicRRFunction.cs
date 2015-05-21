@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Maths.Interpolation;
 
 namespace pragmatic_quant_model.Maths.Function
 {
+    [DebuggerDisplay("ConstantRrFunction Value={Value}")]
     public class ConstantRrFunction : RrFunction
     {
         public ConstantRrFunction(double value)
@@ -20,7 +22,7 @@ namespace pragmatic_quant_model.Maths.Function
         public override RrFunction Mult(RrFunction other)
         {
             var cst = other as ConstantRrFunction;
-            if (cst!=null)
+            if (cst != null)
                 return new ConstantRrFunction(Value * cst.Value);
 
             var exp = other as ExpRrFunction;
@@ -30,6 +32,10 @@ namespace pragmatic_quant_model.Maths.Function
             var step = other as StepFunction;
             if (step != null)
                 return StepFunction.Mult(step, this);
+
+            var lc = other as LinearCombinationRrFunction;
+            if (lc != null)
+                return LinearCombinationRrFunction.Mult(lc, this);
 
             return base.Mult(other);
         }
