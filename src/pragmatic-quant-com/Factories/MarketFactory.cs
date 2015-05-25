@@ -18,13 +18,13 @@ namespace pragmatic_quant_com.Factories
         {
             return TimeMeasure.Act365(refDate);
         }
-        private static IDictionary<FinancingId, DiscountCurve> RateCurveFromRawDatas(TimeMatrixDatas curveRawDatas, DateTime refDate)
+        private static  DiscountCurve[] RateCurveFromRawDatas(TimeMatrixDatas curveRawDatas, DateTime refDate)
         {
             var rateTimeInterpol = RateTimeMeasure(refDate);
             DateTime[] datePillars = curveRawDatas.RowLabels
                 .Select(dOrDur => dOrDur.ToDate(refDate)).ToArray();
 
-            var curves = new Dictionary<FinancingId, DiscountCurve>();
+            var curves = new List<DiscountCurve>();
             foreach (var curveLabel in curveRawDatas.ColLabels)
             {
                 FinancingId financingId;
@@ -32,11 +32,11 @@ namespace pragmatic_quant_com.Factories
                     throw new ArgumentException(String.Format("RateMarketFactory, invalid Discount Curve Id : {0}", curveLabel));
 
                 double[] zcs = curveRawDatas.GetCol(curveLabel);
-                var discountCurve = DiscountCurve.LinearRateInterpol(datePillars, zcs, rateTimeInterpol);
+                var discountCurve = DiscountCurve.LinearRateInterpol(financingId, datePillars, zcs, rateTimeInterpol);
 
-                curves.Add(financingId, discountCurve);
+                curves.Add(discountCurve);
             }
-            return curves;
+            return curves.ToArray();
         }
         private static AssetMarket[] ProcessAssetMkt(object[,] bag, DateTime refDate)
         {
@@ -64,7 +64,7 @@ namespace pragmatic_quant_com.Factories
 
                 double[] repoRates = repoRawDatas.GetCol(assetName);
                 var repoZcs = repoRates.Select((r, idx) => Math.Exp(-eqtyTime[repoPillars[idx]] * r)).ToArray();
-                var repoCurve = DiscountCurve.LinearRateInterpol(repoPillars, repoZcs, eqtyTime);
+                var repoCurve = DiscountCurve.LinearRateInterpol(null, repoPillars, repoZcs, eqtyTime);
 
                 var divId = String.Format("Dividend.{0}", assetName);
                 var dividendsRawDatas = BagServices.ProcessTimeMatrixDatas(bag, divId);

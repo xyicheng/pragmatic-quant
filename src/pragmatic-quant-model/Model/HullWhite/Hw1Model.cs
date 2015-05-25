@@ -2,6 +2,7 @@
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Maths;
+using pragmatic_quant_model.Maths.Stochastic;
 
 namespace pragmatic_quant_model.Model.HullWhite
 {

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using pragmatic_quant_model.Maths;
+﻿using pragmatic_quant_model.Maths;
 
 namespace pragmatic_quant_model.MonteCarlo
 {
@@ -29,16 +28,5 @@ namespace pragmatic_quant_model.MonteCarlo
             var result = pathResultAggregator.Aggregate(pathResults);
             return result;
         }
-    }
-
-    public interface IPathResultAgregator<in TPathResult, out TResult>
-    {
-        TResult Aggregate(IEnumerable<TPathResult> paths);
-    }
-
-    public interface IPathGenerator<out TPath>
-    {
-        TPath ComputePath(double[] randoms);
-        int SizeOfPathInBits { get; }
     }
 }

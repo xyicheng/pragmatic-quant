@@ -126,7 +126,7 @@ namespace pragmatic_quant_com
                 return MarketFactory.Value.Build(mktBag);
 
             if (!(mktObj is string))
-                throw new ApplicationException(string.Format("Unable to build market from : {0}", mktObj.ToString()));
+                throw new ApplicationException(string.Format("Unable to build market from : {0}", mktObj));
 
             var mktId = mktObj as String;
 

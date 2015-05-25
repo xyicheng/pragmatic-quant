@@ -53,13 +53,20 @@ namespace pragmatic_quant_model.Product
 
         private class EventDateProductVisitor : IProductVisitor<DateTime[]>
         {
+            #region private methods
+            private static DateTime[] CouponEventDates(Coupon coupon)
+            {
+                var fixingsDates = coupon.Fixings.Select(f => f.Date).Distinct();
+                return fixingsDates.Union(new[] {coupon.PaymentInfo.Date}).ToArray();
+            }
+            #endregion
             public DateTime[] Visit(FloatCoupon floatCoupon)
             {
-                return floatCoupon.Fixings.Select(f => f.Date).ToArray();
+                return CouponEventDates(floatCoupon);
             }
             public DateTime[] Visit(FixedCoupon fixedCoupon)
             {
-                return new DateTime[0];
+                return CouponEventDates(fixedCoupon);
             }
             public DateTime[] Visit<TCoupon>(Leg<TCoupon> leg) where TCoupon : Coupon
             {

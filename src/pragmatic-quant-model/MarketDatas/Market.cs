@@ -10,15 +10,14 @@ namespace pragmatic_quant_model.MarketDatas
         private readonly IDictionary<FinancingId, DiscountCurve> discountCurves;
         private readonly IDictionary<AssetId, AssetMarket> assetMkts;
         #endregion
-        public Market(IDictionary<FinancingId, DiscountCurve> discountCurves,
-                      AssetMarket[] assetMkts)
+        public Market(DiscountCurve[] discountCurves, AssetMarket[] assetMkts)
         {
-            this.discountCurves = discountCurves;
+            this.discountCurves = discountCurves.ToDictionary(d=>d.Financing, d=>d );
             this.assetMkts = assetMkts.ToDictionary(assetMkt => assetMkt.Asset, assetMkt => assetMkt);
 
-            RefDate = discountCurves.First().Value.RefDate;
+            RefDate = discountCurves.First().RefDate;
 
-            if (discountCurves.Values.Any(c => c.RefDate != RefDate))
+            if (discountCurves.Any(c => c.RefDate != RefDate))
                 throw new Exception("RateMarket : many curve refDate's !");
 
             if (assetMkts.Any(m => m.RefDate != RefDate))

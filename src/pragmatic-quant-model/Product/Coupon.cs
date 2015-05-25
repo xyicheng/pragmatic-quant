@@ -73,6 +73,8 @@ namespace pragmatic_quant_model.Product
 
     public class FixedCoupon : Coupon
     {
+        public FixedCoupon(PaymentInfo paymentInfo, double coupon)
+            : this(paymentInfo, 1.0, coupon) { }
         public FixedCoupon(PaymentInfo paymentInfo, double nominal, double coupon)
             : base(paymentInfo, nominal)
         {
@@ -94,7 +96,6 @@ namespace pragmatic_quant_model.Product
         }
     }
     
-
     public class Leg<TCoupon>
         : IProduct where TCoupon : Coupon
     {

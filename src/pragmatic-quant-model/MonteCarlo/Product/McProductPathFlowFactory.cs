@@ -14,9 +14,9 @@ namespace pragmatic_quant_model.MonteCarlo.Product
             var modelMeasure = model.ProbaMeasure;
 
             if (modelMeasure.Date < payment.Date
-                || modelMeasure.Currency.Equals(payment.Currency)
-                || modelMeasure.Financing.Equals(payment.Financing))
-                throw new NotImplementedException(); //TODO finish the job !
+                || !modelMeasure.Currency.Equals(payment.Currency)
+                || !modelMeasure.Financing.Equals(payment.Financing))
+                throw new NotImplementedException("Flow Rebasement not yet handled !"); //TODO finish the job !
 
             var zc = new Zc(payment.Date, modelMeasure.Date, payment.Currency, payment.Financing);
             var zcFunc = model.FactorRepresentation[zc];

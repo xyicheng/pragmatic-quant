@@ -29,9 +29,10 @@ namespace pragmatic_quant_model.Model.HullWhite
         }
     }
 
-    public class Hw1FactorRepresentationFactory : IFactorRepresentationFactory<Hw1Model>
+    public class Hw1FactorRepresentationFactory : FactorRepresentationFactory<Hw1Model>
     {
-        public IFactorModelRepresentation Build(Hw1Model model, Market market)
+        public static FactorRepresentationFactory<Hw1Model> Value = new Hw1FactorRepresentationFactory();
+        protected override IFactorModelRepresentation Build(Hw1Model model, Market market)
         {
             var zcRepresentation = new Hw1ModelZcRepresentation(model);
             return new FactorRepresentation(market, zcRepresentation);

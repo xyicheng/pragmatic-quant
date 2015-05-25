@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using pragmatic_quant_model.Basic;
 
-namespace pragmatic_quant_model.Maths
+namespace pragmatic_quant_model.Maths.Stochastic
 {
     public class BrownianBridge
     {
@@ -145,7 +145,7 @@ namespace pragmatic_quant_model.Maths
             }
             return path;
         }
-        public double[][] NextPath(double[] gaussians, int dimension)
+        public double[][] Path(double[] gaussians, int dimension)
         {
             Debug.Assert(gaussians.Length == dates.Length * dimension);
             var path = new double[dates.Length][];
@@ -172,7 +172,7 @@ namespace pragmatic_quant_model.Maths
         }
         public double[][] PathIncrements(double[] gaussians, int dimension)
         {
-            var paths = NextPath(gaussians, dimension);
+            var paths = Path(gaussians, dimension);
             var increments = new double[paths.Length][];
             increments[0] = paths[0];
             for (int i = 1; i < paths.Length; i++)

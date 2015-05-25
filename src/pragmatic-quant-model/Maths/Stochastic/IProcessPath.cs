@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Linq;
 
-namespace pragmatic_quant_model.MonteCarlo
+namespace pragmatic_quant_model.Maths.Stochastic
 {
     public interface IProcessPath
     {
@@ -19,7 +19,7 @@ namespace pragmatic_quant_model.MonteCarlo
         public ProcessPath(double[] dates, int dimension, double[][] values)
         {
             Debug.Assert(values.Length == dates.Length, "values.Length != dimension");
-            Debug.Assert(values.Select(v => v.Length).Single() == dimension);
+            Debug.Assert(values.All(v => v.Length == dimension));
             this.values = values;
             Dates = dates;
             Dimension = dimension;

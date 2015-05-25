@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.Contracts;
 
-namespace pragmatic_quant_model.MonteCarlo
+namespace pragmatic_quant_model.Maths.Stochastic
 {
     [ContractClass(typeof(ProcessPathGenContract))]
     public interface IProcessPathGenerator

@@ -1,11 +1,11 @@
 using System;
 using pragmatic_quant_model.Maths;
-using pragmatic_quant_model.MonteCarlo;
+using pragmatic_quant_model.Maths.Stochastic;
 using pragmatic_quant_model.Product;
 
 namespace pragmatic_quant_model.Model.HullWhite
 {
-    public class Hw1ModelPathGeneratorFactory : IModelPathGenereratorFactory<Hw1Model>
+    public class Hw1ModelPathGeneratorFactory : ModelPathGenereratorFactory<Hw1Model>
     {
         #region private methods
         private static RrFunction Drift(Hw1Model model, PaymentInfo probaMeasure)
@@ -25,7 +25,9 @@ namespace pragmatic_quant_model.Model.HullWhite
             return drift;
         }
         #endregion
-        public IProcessPathGenerator Build(Hw1Model model, PaymentInfo probaMeasure, DateTime[] simulatedDates)
+        public static ModelPathGenereratorFactory<Hw1Model> Value = new Hw1ModelPathGeneratorFactory();
+
+        protected override IProcessPathGenerator Build(Hw1Model model, PaymentInfo probaMeasure, DateTime[] simulatedDates)
         {
             var dates = model.Time[simulatedDates];
             var drift = Drift(model, probaMeasure);

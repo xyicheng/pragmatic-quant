@@ -133,6 +133,7 @@
     <Compile Include="Basic\Dates\DateAndDurationConverter.cs" />
     <Compile Include="Basic\Dates\DateOrDuration.cs" />
     <Compile Include="Basic\Dates\Duration.cs" />
+    <Compile Include="Basic\Price.cs" />
     <Compile Include="Basic\Structure\LabelledMatrix.cs" />
     <Compile Include="Basic\Structure\TimeMatrixData.cs" />
     <Compile Include="Basic\TimeMeasure.cs" />
@@ -144,7 +145,7 @@
     <Compile Include="MarketDatas\Market.cs" />
     <Compile Include="Maths\BachelierOption.cs" />
     <Compile Include="Maths\BlackScholesOption.cs" />
-    <Compile Include="Maths\BrownianBridge.cs" />
+    <Compile Include="Maths\Stochastic\BrownianBridge.cs" />
     <Compile Include="Maths\Cholesky.cs" />
     <Compile Include="Maths\ErrorFunctions.cs" />
     <Compile Include="Maths\Function\BasicRRFunction.cs" />
@@ -170,18 +171,26 @@
     <Compile Include="Model\HullWhite\Hw1Model.cs" />
     <Compile Include="Model\HullWhite\Hw1ModelPathGeneratorFactory.cs" />
     <Compile Include="Model\HullWhite\Hw1ModelZcRepresentation.cs" />
-    <Compile Include="Model\HullWhite\OrnsteinUhlenbeck.cs" />
-    <Compile Include="Model\HullWhite\OrnsteinUhlenbeck1DGenerator.cs" />
+    <Compile Include="Maths\Stochastic\OrnsteinUhlenbeck.cs" />
+    <Compile Include="Maths\Stochastic\OrnsteinUhlenbeck1DGenerator.cs" />
     <Compile Include="Model\IFactorModelRepresentation.cs" />
     <Compile Include="Model\IModel.cs" />
     <Compile Include="Model\IModelDescription.cs" />
     <Compile Include="Maths\IRandomGenerator.cs" />
     <Compile Include="Model\IFactorRepresentationFactory.cs" />
-    <Compile Include="MonteCarlo\IProcessPath.cs" />
-    <Compile Include="MonteCarlo\IProcessPathGenerator.cs" />
+    <Compile Include="Maths\Stochastic\IProcessPath.cs" />
+    <Compile Include="Maths\Stochastic\IProcessPathGenerator.cs" />
+    <Compile Include="Model\IModelPathGenereratorFactory.cs" />
+    <Compile Include="Model\INumericalMethodConfig.cs" />
+    <Compile Include="MonteCarlo\IPathGenerator.cs" />
+    <Compile Include="MonteCarlo\IPathResultAgregator.cs" />
     <Compile Include="MonteCarlo\McModel.cs" />
+    <Compile Include="MonteCarlo\McModelFactory.cs" />
     <Compile Include="MonteCarlo\McModelPathFlowGenerator.cs" />
     <Compile Include="MonteCarlo\ArrayPathCalculator.cs" />
+    <Compile Include="MonteCarlo\Product\PriceFlowsAggregator.cs" />
+    <Compile Include="Pricing\McPricer.cs" />
+    <Compile Include="Pricing\PriceConverter.cs" />
     <Compile Include="Product\PaymentInfo.cs" />
     <Compile Include="MonteCarlo\Product\IProductPathFlow.cs" />
     <Compile Include="MonteCarlo\Product\McProductPathFlowCalculator.cs" />
@@ -191,6 +200,7 @@
     <Compile Include="Product\Coupon.cs" />
     <Compile Include="Product\IObservation.cs" />
     <Compile Include="Product\IProduct.cs" />
+    <Compile Include="Product\PriceResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

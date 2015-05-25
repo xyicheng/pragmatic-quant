@@ -1,9 +1,7 @@
 using System;
 using System.Diagnostics;
-using pragmatic_quant_model.Maths;
-using pragmatic_quant_model.MonteCarlo;
 
-namespace pragmatic_quant_model.Model.HullWhite
+namespace pragmatic_quant_model.Maths.Stochastic
 {
     public class OrnsteinUhlenbeck1DGenerator : IProcessPathGenerator
     {

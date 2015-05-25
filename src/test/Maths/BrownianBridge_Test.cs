@@ -5,6 +5,7 @@ using NUnit.Framework;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Sobol;
+using pragmatic_quant_model.Maths.Stochastic;
 
 namespace test.Maths
 {
@@ -69,7 +70,7 @@ namespace test.Maths
             for (int i = 0; i < nbPaths; ++i)
             {
                 var gaussians = gaussianGen.Next();
-                var path = brownian.NextPath(gaussians, brownianDim);
+                var path = brownian.Path(gaussians, brownianDim);
                 for (int j = 0; j < covariances.Length; ++j)
                 {
                     VectorUtils.AddCov(ref covariances[j], path[j], path[j]);

@@ -1,4 +1,5 @@
-﻿using pragmatic_quant_model.Product;
+﻿using pragmatic_quant_model.Maths.Stochastic;
+using pragmatic_quant_model.Product;
 
 namespace pragmatic_quant_model.MonteCarlo.Product
 {

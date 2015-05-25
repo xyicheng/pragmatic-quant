@@ -1,6 +1,5 @@
-using pragmatic_quant_model.Maths;
 
-namespace pragmatic_quant_model.Model.HullWhite
+namespace pragmatic_quant_model.Maths.Stochastic
 {
     public class OrnsteinUhlenbeck
     {
@@ -15,6 +14,7 @@ namespace pragmatic_quant_model.Model.HullWhite
         public RrFunction Drift { get; private set; }
         public RrFunction Volatility { get; private set; }
         public double Value0 { get; private set; }
+        public int Dimension { get { return 1; } }
     }
 
     public class OrnsteinUhlenbeckUtils
@@ -34,4 +34,15 @@ namespace pragmatic_quant_model.Model.HullWhite
             return integratedExpCov * RrFunctions.Exp(-(meanReversion1 + meanReversion2));
         }
     }
+
+    public class OrnsteinUhlenbeckNd
+    {
+        public double[] MeanReversions { get; private set; }
+        public RrFunction[] Drifts { get; private set; }
+        public RrFunction[,] Covariances { get; private set; }
+        public double[] Value0 { get; private set; }
+        public int Dimension { get; private set; }
+    }
+    
+
 }

@@ -1,4 +1,6 @@
-﻿namespace pragmatic_quant_model.MonteCarlo
+﻿using pragmatic_quant_model.Maths.Stochastic;
+
+namespace pragmatic_quant_model.MonteCarlo
 {
 
     public class McModelPathFlowGenerator<TPathFlow, TLabel> : IPathGenerator<TPathFlow>
