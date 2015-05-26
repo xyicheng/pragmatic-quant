@@ -10,7 +10,7 @@ using pragmatic_quant_model.Product;
 
 namespace pragmatic_quant_model.Pricing
 {
-    public class McPricer
+    public class McPricer : IPricer
     {
         #region private fields
         private readonly IModel model;
@@ -47,7 +47,8 @@ namespace pragmatic_quant_model.Pricing
             PathFlows<double, PaymentInfo> result = mcEngine.Run(mcConfig.NbPaths);
 
             time.Stop();
-            Console.WriteLine(string.Format("Monte-Carlo elpased {0}", time.Elapsed));
+            var mcTime = time.Elapsed;
+            Console.WriteLine(string.Format("Monte-Carlo done in {0} min {1} s {2} ms", mcTime.Minutes, mcTime.Seconds, mcTime.Milliseconds));
 
             var refCurrency = product.Financing.Currency;
             var priceDetails = new Dictionary<PaymentInfo, Price>();

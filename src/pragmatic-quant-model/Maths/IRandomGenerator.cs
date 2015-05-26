@@ -51,6 +51,7 @@ namespace pragmatic_quant_model.Maths
         public double[] Next()
         {
             var uniforms = sobol.NextSequence();
+            
             var gaussians = new double[dim];
             for (int i = 0; i < gaussians.Length; i++)
                 gaussians[i] = NormalDistribution.FastCumulativeInverse(uniforms[i]);

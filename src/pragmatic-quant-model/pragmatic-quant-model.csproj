@@ -189,6 +189,8 @@
     <Compile Include="MonteCarlo\McModelPathFlowGenerator.cs" />
     <Compile Include="MonteCarlo\ArrayPathCalculator.cs" />
     <Compile Include="MonteCarlo\Product\PriceFlowsAggregator.cs" />
+    <Compile Include="Pricing\FormulaePricer.cs" />
+    <Compile Include="Pricing\IPricer.cs" />
     <Compile Include="Pricing\McPricer.cs" />
     <Compile Include="Pricing\PriceConverter.cs" />
     <Compile Include="Product\PaymentInfo.cs" />

@@ -139,7 +139,7 @@ namespace pragmatic_quant_model.MonteCarlo.Product
                 var couponFixings = fixingsIndexes[i].Map(index => fixings[index.Item1][index.Item2]);
                 var flowRebasement = flowRebasementPath.Flows[flowRebasementIndex[i].Item1]
                                                              [flowRebasementIndex[i].Item2];
-                payoffFlows[i] = coupons[i].Payoff(couponFixings) / flowRebasement; 
+                payoffFlows[i] = coupons[i].Payoff(couponFixings) * flowRebasement; 
             }
 
             return new PathFlows<double, PaymentInfo>(payoffFlows, Payments);

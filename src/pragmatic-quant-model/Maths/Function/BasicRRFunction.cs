@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Maths.Interpolation;
@@ -82,7 +83,7 @@ namespace pragmatic_quant_model.Maths.Function
             var exp = other as ExpRrFunction;
             if (exp != null)
                 return Mult(this, exp);
-            
+
             return base.Mult(other);
         }
         public static RrFunction Mult(ExpRrFunction exp, ConstantRrFunction cst)

@@ -61,14 +61,14 @@ namespace pragmatic_quant_model.Maths.Stochastic
         #endregion
         public static OrnsteinUhlenbeck1DGenerator Build(double[] dates, OrnsteinUhlenbeck ouProcess)
         {
-
             var stepSlopes = new double[dates.Length];
             var stepDrifts = new double[dates.Length];
             var stepVols = new double[dates.Length];
             for (int i = 0; i < dates.Length; i++)
             {
                 var previous = (i == 0) ? 0.0 : dates[i - 1];
-                stepSlopes[i] = Math.Exp(-ouProcess.MeanReversion * dates[i]);
+                var step = dates[i] - previous;
+                stepSlopes[i] = Math.Exp(-ouProcess.MeanReversion * step);
                 stepDrifts[i] = StepDrift(previous, dates[i], ouProcess);
                 stepVols[i] = StepVol(previous, dates[i], ouProcess);
             }

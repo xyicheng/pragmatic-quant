@@ -35,13 +35,11 @@ namespace test.MonteCarlo
         }
         private static Leg<FixedCoupon> Leg(DateTime refDate)
         {
-            var financing = FinancingId.RiskFree(Currency.Eur);
             const int mat = 10;
-            var coupons = Enumerable.Range(0, mat)
-                .Select(i =>
-                    new FixedCoupon(new PaymentInfo(financing.Currency, refDate + (i+1) * Duration.Year, financing), 1.0)
-                ).ToArray();
-
+            var dates = Enumerable.Range(0, mat).Select(i => refDate + (i + 1) * Duration.Year);
+            
+            var financing = FinancingId.RiskFree(Currency.Eur);
+            var coupons = dates.Map(d => new FixedCoupon(new PaymentInfo(financing.Currency, d, financing), 1.0));
             return new Leg<FixedCoupon>(coupons);
         }
         #endregion
@@ -54,16 +52,25 @@ namespace test.MonteCarlo
             const double lambda = 0.01;
             var sigma = new StepFunction(new[] { 0.0, 1.0, 2.0 }, new[] { 0.007, 0.004, 0.0065 }, 0.0);
             var hw1 = new Hw1Model(TimeMeasure.Act365(market.RefDate), Currency.Eur, lambda, sigma);
-            var mcConfig = new MonteCarloConfig(10000, SobolDirection.JoeKuoD7);
+            var mcConfig = new MonteCarloConfig(20000, SobolDirection.JoeKuoD5);
 
-            var mcModelFactory = new McModelFactory(Hw1FactorRepresentationFactory.Value,
+            var mcModelFactory = new McModelFactory(
+                Hw1FactorRepresentationFactory.Value,
                 Hw1ModelPathGeneratorFactory.Value,
                 RandomGenerators.GaussianSobol(mcConfig.SobolDirection));
             var mcPricer = new McPricer(hw1, mcModelFactory, mcConfig);
 
             var fixedLeg = Leg(market.RefDate);
-            var legPriceResult = mcPricer.Price(fixedLeg, market);
-            
+            var mcPriceResult = mcPricer.Price(fixedLeg, market);
+
+            var mcCoupons = mcPriceResult.Details.Values.Map(p => p.Value);
+            var refCoupons = mcPriceResult.Details.Keys.Map(pi => market.DiscountCurve(pi.Financing).Zc(pi.Date));
+
+            var errAbs = Math.Abs(mcCoupons.Sum() - refCoupons.Sum());
+            Assert.LessOrEqual(errAbs, 7.0e-5);
+
+            var errRel = Math.Abs(mcCoupons.Sum() / refCoupons.Sum() - 1.0);
+            Assert.LessOrEqual(errRel, 8.0e-6);
         }
     }
 }
