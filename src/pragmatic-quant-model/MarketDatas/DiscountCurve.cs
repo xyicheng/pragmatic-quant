@@ -1,5 +1,7 @@
 ﻿using System;
 using pragmatic_quant_model.Basic;
+using pragmatic_quant_model.Maths;
+using pragmatic_quant_model.Maths.Interpolation;
 
 namespace pragmatic_quant_model.MarketDatas
 {
@@ -25,14 +27,57 @@ namespace pragmatic_quant_model.MarketDatas
 
         public static DiscountCurve LinearRateInterpol(FinancingId financing, DateTime[] pillars, double[] zcs, ITimeMeasure time)
         {
-            return new LinearZcRateInterpolation(financing, pillars, zcs, time);
+            if (pillars.Length != zcs.Length)
+                throw new Exception("LinearRateDiscountProvider : Incompatible size");
+            var dates = time[pillars];
+
+            var zcRates = new double[pillars.Length];
+
+            if (DoubleUtils.EqualZero(dates[0]))
+            {
+                if (!DoubleUtils.MachineEquality(1.0, zcs[0]))
+                    throw new Exception("LinearRateInterpol : Discount for refDate must equal to 1.0 ");
+                zcRates[0] = 0.0;
+            }
+            else
+            {
+                zcRates[0] = -Math.Log(zcs[0]) / dates[0];
+            }
+
+            for (int i = 1; i < zcs.Length; i++)
+            {
+                zcRates[i] = -Math.Log(zcs[i]) / dates[i];
+            }
+
+            return new DiscountCurveFromRate(financing, time, new LinearInterpolation(dates, zcRates, 0.0, 0.0));
         }
-        public static DiscountCurve Product(DiscountCurve discount1, DiscountCurve discount2)
+        public static DiscountCurve Product(DiscountCurve discount1, DiscountCurve discount2, FinancingId financing)
         {
-            return new ProductDiscount(discount1, discount2);
+            return new ProductDiscount(discount1, discount2, financing);
         }
     }
 
+
+    public class DiscountCurveFromRate : DiscountCurve
+    {
+        #region private fields
+        private readonly ITimeMeasure time;
+        private readonly RrFunction zcRate;
+        #endregion
+        public DiscountCurveFromRate(FinancingId financing, ITimeMeasure time, RrFunction zcRate)
+            : base(time.RefDate, financing)
+        {
+            this.time = time;
+            this.zcRate = zcRate;
+        }
+        public override double Zc(DateTime d)
+        {
+            double t = time[d];
+            return Math.Exp(-zcRate.Eval(t) * t);
+        }
+    }
+    
+    /*
     public class LinearZcRateInterpolation : DiscountCurve
     {
         #region private fields
@@ -92,6 +137,7 @@ namespace pragmatic_quant_model.MarketDatas
             return Math.Exp(-ZcRate(t) * t);
         }
     }
+    */
 
     public class ProductDiscount : DiscountCurve
     {
@@ -99,14 +145,12 @@ namespace pragmatic_quant_model.MarketDatas
         private readonly DiscountCurve discount1;
         private readonly DiscountCurve discount2;
         #endregion
-        public ProductDiscount(DiscountCurve discount1, DiscountCurve discount2)
-            : base(discount1.RefDate, discount1.Financing)
+        public ProductDiscount(DiscountCurve discount1, DiscountCurve discount2, FinancingId financing)
+            : base(discount1.RefDate, financing)
         {
             if (discount1.RefDate != discount2.RefDate)
                 throw new Exception("ProductDiscount : incompatible ref date !");
-            if (!discount1.Financing.Equals(discount2.Financing))
-                throw new Exception("ProductDiscount : incompatible financing !");
-
+            
             this.discount1 = discount1;
             this.discount2 = discount2;
         }

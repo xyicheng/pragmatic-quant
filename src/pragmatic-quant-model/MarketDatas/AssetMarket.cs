@@ -3,7 +3,6 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Maths.Function;
-using pragmatic_quant_model.Maths.Interpolation;
 
 namespace pragmatic_quant_model.MarketDatas
 {
@@ -54,7 +53,7 @@ namespace pragmatic_quant_model.MarketDatas
 
         public AssetForwardCurve Forward(DiscountCurve cashFinancingCurve)
         {
-            var assetFinancingCurve = DiscountCurve.Product(repoCurve, cashFinancingCurve);
+            var assetFinancingCurve = DiscountCurve.Product(repoCurve, cashFinancingCurve, FinancingId.AssetCollat(asset));
             return new AssetForwardCurve(spot, dividends, assetFinancingCurve, time);
         }
 

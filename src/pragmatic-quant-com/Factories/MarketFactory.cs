@@ -64,7 +64,7 @@ namespace pragmatic_quant_com.Factories
 
                 double[] repoRates = repoRawDatas.GetCol(assetName);
                 var repoZcs = repoRates.Select((r, idx) => Math.Exp(-eqtyTime[repoPillars[idx]] * r)).ToArray();
-                var repoCurve = DiscountCurve.LinearRateInterpol(null, repoPillars, repoZcs, eqtyTime);
+                var repoCurve = DiscountCurve.LinearRateInterpol(FinancingId.AssetCollat(assetId), repoPillars, repoZcs, eqtyTime);
 
                 var divId = String.Format("Dividend.{0}", assetName);
                 var dividendsRawDatas = BagServices.ProcessTimeMatrixDatas(bag, divId);

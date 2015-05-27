@@ -48,9 +48,9 @@ namespace test
             Assert.AreEqual(rng.GetLength(0), refRng.GetLength(0));
             Assert.AreEqual(rng.GetLength(1), refRng.GetLength(1));
 
-            for (int i = rng.GetLowerBound(0); i < rng.GetLength(0); i++)
+            for (int i = rng.GetLowerBound(0); i <= rng.GetUpperBound(0); i++)
             {
-                for (int j = rng.GetLowerBound(1); j < rng.GetLength(1); j++)
+                for (int j = rng.GetLowerBound(1); j <= rng.GetUpperBound(1); j++)
                 {
                     double value, refValue;
                     if (!(NumberConverter.TryConvertDouble(rng[i, j], out value)

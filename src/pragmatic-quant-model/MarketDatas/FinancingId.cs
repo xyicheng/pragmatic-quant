@@ -33,6 +33,10 @@ namespace pragmatic_quant_model.MarketDatas
         {
             return new FinancingId("RiskFree", currency);
         }
+        public static FinancingId AssetCollat(AssetId asset)
+        {
+            return new FinancingId(asset.Name, asset.Currency);
+        }
         public static bool TryParse(string curveId, out FinancingId result)
         {
             result = null;
@@ -42,10 +46,10 @@ namespace pragmatic_quant_model.MarketDatas
                 throw new Exception(string.Format("Not a valid FinancingCurveId : {0}", curveId));
             
             Currency currency;
-            if (!Currency.TryParse(splitted[1], out currency))
+            if (!Currency.TryParse(splitted[0], out currency))
                 return false;
             
-            switch (splitted[0].Trim().ToLowerInvariant())
+            switch (splitted[1].Trim().ToLowerInvariant())
             {
                 case "riskfree":
                     result = RiskFree(currency);
@@ -80,7 +84,7 @@ namespace pragmatic_quant_model.MarketDatas
         }
         public override string ToString()
         {
-            return id + "." + currency.Name;
+            return currency.Name + "." + id;
         }
     }
 }

@@ -30,9 +30,16 @@ namespace pragmatic_quant_model.Product
             Schedule = schedule;
             PayoffAdjustement = Basis.Count(schedule.Start, schedule.End) * nominal;
         }
+        protected abstract double RateFixing(double[] fixings);
+
         public CouponSchedule Schedule { get; private set; }
         public DayCountFrac Basis { get; private set; }
         public double PayoffAdjustement { get; set; }
+
+        public override double Payoff(double[] fixings)
+        {
+            return PayoffAdjustement * RateFixing(fixings);
+        }
     }
 
     public class FloatCoupon : RateCoupon
@@ -57,13 +64,13 @@ namespace pragmatic_quant_model.Product
             return new FloatCoupon(financing, libor, 0.0, 1.0, nominal, libor.Schedule, libor.Basis);
         }
 
+        protected override double RateFixing(double[] fixings)
+        {
+            return add + mult * fixings[0];
+        }
         public override IFixing[] Fixings
         {
             get { return new IFixing[] {libor}; }
-        }
-        public override double Payoff(double[] fixings)
-        {
-            return add + mult * fixings[0];
         }
         public override TResult Accept<TResult>(IProductVisitor<TResult> visitor)
         {
