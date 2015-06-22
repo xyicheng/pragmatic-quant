@@ -238,5 +238,11 @@ namespace pragmatic_quant_model.Maths
             Mult(ref mult, weight);
             return mult;
         }
-    }
+        public static double[] Copy(this double[] a)
+        {
+            var c = new double[a.Length];
+            a.CopyTo(c, 0);
+            return c;
+        }
+    }  
 }

@@ -56,6 +56,16 @@ namespace pragmatic_quant_model.Basic
             return result;
         }
 
+        public static void SetCol<T>(ref T[,] array, int colIndex, T[] col)
+        {
+            if (colIndex < 0 || colIndex >= array.GetLength(1))
+                throw new IndexOutOfRangeException();
+            if (col.Length != array.GetLength(0))
+                throw new IndexOutOfRangeException();
+
+            for (int i = 0; i < col.Length; i++)
+                array[i, colIndex] = col[i];
+        }
         public static void SetRow<T>(ref T[,] array, int rowIndex, T[] row)
         {
             if (rowIndex < 0 || rowIndex >= array.GetLength(0))
@@ -66,7 +76,7 @@ namespace pragmatic_quant_model.Basic
             for (int i = 0; i < row.Length; i++)
                 array[rowIndex, i] = row[i];
         }
-
+        
         public static int FindIndex<T>(this T[] array, T element)
         {
             return array.ToList().FindIndex(e => e.Equals(element));

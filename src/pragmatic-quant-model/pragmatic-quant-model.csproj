@@ -146,6 +146,7 @@
     <Compile Include="MarketDatas\Market.cs" />
     <Compile Include="Maths\BachelierOption.cs" />
     <Compile Include="Maths\BlackScholesOption.cs" />
+    <Compile Include="Maths\FiniteDifferenceUtils.cs" />
     <Compile Include="Maths\Stochastic\BrownianBridge.cs" />
     <Compile Include="Maths\Cholesky.cs" />
     <Compile Include="Maths\ErrorFunctions.cs" />
