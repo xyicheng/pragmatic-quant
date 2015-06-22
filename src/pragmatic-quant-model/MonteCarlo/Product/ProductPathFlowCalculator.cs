@@ -3,16 +3,16 @@ using pragmatic_quant_model.Product;
 
 namespace pragmatic_quant_model.MonteCarlo.Product
 {
-    public class McProductPathFlowCalculator 
-        : IMcPathFlowCalculator<PathFlows<double, PaymentInfo>, PaymentInfo[]>
+    public class ProductPathFlowCalculator 
+        : IPathFlowCalculator<PathFlows<double, PaymentInfo>, PaymentInfo[]>
     {
         #region private fields
-        private readonly IMcPathFlowCalculator<PathFlows<double[], IFixing[]>, IFixing[][]> fixingPathCalculator;
-        private readonly IMcPathFlowCalculator<PathFlows<double[], PaymentInfo[]>, PaymentInfo[][]> numerairePathCalc;
+        private readonly IPathFlowCalculator<PathFlows<double[], IFixing[]>, IFixing[][]> fixingPathCalculator;
+        private readonly IPathFlowCalculator<PathFlows<double[], PaymentInfo[]>, PaymentInfo[][]> numerairePathCalc;
         private readonly IProductPathFlow productPathFlowInstrument;
         #endregion
-        public McProductPathFlowCalculator(IMcPathFlowCalculator<PathFlows<double[], IFixing[]>, IFixing[][]> fixingPathCalculator,
-                                           IMcPathFlowCalculator<PathFlows<double[], PaymentInfo[]>, PaymentInfo[][]> numerairePathCalc,
+        public ProductPathFlowCalculator(IPathFlowCalculator<PathFlows<double[], IFixing[]>, IFixing[][]> fixingPathCalculator,
+                                           IPathFlowCalculator<PathFlows<double[], PaymentInfo[]>, PaymentInfo[][]> numerairePathCalc,
                                            IProductPathFlow productPathFlowInstrument)
         {
             this.fixingPathCalculator = fixingPathCalculator;

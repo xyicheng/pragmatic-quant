@@ -5,7 +5,7 @@ using pragmatic_quant_model.Maths.Stochastic;
 namespace pragmatic_quant_model.MonteCarlo
 {
     public class ArrayPathCalculator<TLabel>
-        : IMcPathFlowCalculator<PathFlows<double[], TLabel[]>, TLabel[][]>
+        : IPathFlowCalculator<PathFlows<double[], TLabel[]>, TLabel[][]>
     {
         #region private fields
         private readonly int[] datesIndexes;

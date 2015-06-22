@@ -6,7 +6,7 @@ using pragmatic_quant_model.Product;
 
 namespace pragmatic_quant_model.MonteCarlo.Product
 {
-    public class McProductPathFlowFactory
+    public class ProductPathFlowFactory
     {
         #region private fields
         private static Func<double[], double> FlowRebasement(PaymentInfo payment, McModel model)
@@ -48,7 +48,7 @@ namespace pragmatic_quant_model.MonteCarlo.Product
             return new ArrayPathCalculator<IFixing>(datesIndexes, fixingsByDate, funcsByDate);
         }
         #endregion
-        public static McProductPathFlowCalculator Build(IProduct product, McModel model)
+        public static ProductPathFlowCalculator Build(IProduct product, McModel model)
         {
             IFixing[] fixings = product.RetrieveFixings();
             Func<double[], double>[] fixingsFunc = fixings.Map(f => model.FactorRepresentation[f]);
@@ -56,14 +56,14 @@ namespace pragmatic_quant_model.MonteCarlo.Product
 
             ArrayPathCalculator<PaymentInfo> numerairePathCalc = NumerairePathCalc(product.RetrievePaymentInfos(), model);
 
-            var pathFlowFactory = new ProductPathFlowFactory(fixingPathCalc.Labels, numerairePathCalc.Labels);
-            IProductPathFlow productPathFlow = product.Accept(pathFlowFactory);
+            var pathFlowVisitor = new ProductPathFlowVisitor(fixingPathCalc.Labels, numerairePathCalc.Labels);
+            IProductPathFlow productPathFlow = product.Accept(pathFlowVisitor);
 
-            return new McProductPathFlowCalculator(fixingPathCalc, numerairePathCalc, productPathFlow);
+            return new ProductPathFlowCalculator(fixingPathCalc, numerairePathCalc, productPathFlow);
         }
     }
 
-    internal class ProductPathFlowFactory : IProductVisitor<IProductPathFlow>
+    internal class ProductPathFlowVisitor : IProductVisitor<IProductPathFlow>
     {
         #region private fields
         private readonly IFixing[][] simulatedFixings;
@@ -91,7 +91,7 @@ namespace pragmatic_quant_model.MonteCarlo.Product
             return new CouponArrayPathFlow(fixingIndexes, paymentIndexes, coupons);
         }
         #endregion
-        public ProductPathFlowFactory(IFixing[][] simulatedFixings, PaymentInfo[][] simulatedRebasement)
+        public ProductPathFlowVisitor(IFixing[][] simulatedFixings, PaymentInfo[][] simulatedRebasement)
         {
             this.simulatedFixings = simulatedFixings;
             this.simulatedRebasement = simulatedRebasement;

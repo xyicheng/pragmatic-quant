@@ -191,7 +191,7 @@
     <Compile Include="MonteCarlo\IPathResultAgregator.cs" />
     <Compile Include="MonteCarlo\McModel.cs" />
     <Compile Include="MonteCarlo\McModelFactory.cs" />
-    <Compile Include="MonteCarlo\McModelPathFlowGenerator.cs" />
+    <Compile Include="MonteCarlo\ProcessPathFlowGenerator.cs" />
     <Compile Include="MonteCarlo\ArrayPathCalculator.cs" />
     <Compile Include="MonteCarlo\Product\PriceFlowsAggregator.cs" />
     <Compile Include="Pricing\FormulaePricer.cs" />
@@ -200,7 +200,7 @@
     <Compile Include="Pricing\PriceConverter.cs" />
     <Compile Include="Product\PaymentInfo.cs" />
     <Compile Include="MonteCarlo\Product\IProductPathFlow.cs" />
-    <Compile Include="MonteCarlo\Product\McProductPathFlowCalculator.cs" />
+    <Compile Include="MonteCarlo\Product\ProductPathFlowCalculator.cs" />
     <Compile Include="MonteCarlo\Product\McProductPathFlowFactory.cs" />
     <Compile Include="MonteCarlo\McEngine.cs" />
     <Compile Include="MonteCarlo\PathFlows.cs" />

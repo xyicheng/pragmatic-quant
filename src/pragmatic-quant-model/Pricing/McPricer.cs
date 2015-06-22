@@ -20,11 +20,11 @@ namespace pragmatic_quant_model.Pricing
         #region private methods
         private McEngine<PathFlows<double, PaymentInfo>, PathFlows<double, PaymentInfo>> McEngine(IProduct product, McModel mcModel)
         {
-            var productPathFlowCalculator = McProductPathFlowFactory.Build(product, mcModel);
-            var mcModelPathFlowGen = new McModelPathFlowGenerator<PathFlows<double, PaymentInfo>, PaymentInfo[]>
+            var productPathFlowCalculator = ProductPathFlowFactory.Build(product, mcModel);
+            var processPathFlowGen = new ProcessPathFlowGenerator<PathFlows<double, PaymentInfo>, PaymentInfo[]>
                 (mcModel.ProcessPathGen, productPathFlowCalculator);
-            return  new McEngine<PathFlows<double, PaymentInfo>, PathFlows<double, PaymentInfo>>
-                (mcModel.RandomGenerator, mcModelPathFlowGen, PriceFlowsAggregator.Value);
+            return new McEngine<PathFlows<double, PaymentInfo>, PathFlows<double, PaymentInfo>>
+                (mcModel.RandomGenerator, processPathFlowGen, PriceFlowsAggregator.Value);
         }
         #endregion
         public McPricer(IModel model, McModelFactory mcModelFactory, MonteCarloConfig mcConfig)
@@ -48,7 +48,8 @@ namespace pragmatic_quant_model.Pricing
 
             time.Stop();
             var mcTime = time.Elapsed;
-            Console.WriteLine(string.Format("Monte-Carlo done in {0} min {1} s {2} ms", mcTime.Minutes, mcTime.Seconds, mcTime.Milliseconds));
+            Console.WriteLine("Monte-Carlo done in {0} min {1} s {2} ms", 
+                                mcTime.Minutes, mcTime.Seconds, mcTime.Milliseconds);
 
             var refCurrency = product.Financing.Currency;
             var priceDetails = new Dictionary<PaymentInfo, Price>();
