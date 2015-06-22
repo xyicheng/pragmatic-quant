@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using pragmatic_quant_model.Basic;
+using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Maths.Function;
 
 namespace pragmatic_quant_model.MarketDatas
@@ -51,12 +52,15 @@ namespace pragmatic_quant_model.MarketDatas
             get { return repoCurve; }
         }
 
+        public DiscountCurve AssetFinancingCurve(DiscountCurve cashFinancingCurve)
+        {
+            return DiscountCurve.Product(repoCurve, cashFinancingCurve, FinancingId.AssetCollat(asset));
+        }
         public AssetForwardCurve Forward(DiscountCurve cashFinancingCurve)
         {
-            var assetFinancingCurve = DiscountCurve.Product(repoCurve, cashFinancingCurve, FinancingId.AssetCollat(asset));
+            var assetFinancingCurve = AssetFinancingCurve(cashFinancingCurve);
             return new AssetForwardCurve(spot, dividends, assetFinancingCurve, time);
         }
-
     }
 
     public class DividendQuote

@@ -112,7 +112,10 @@ namespace pragmatic_quant_com
             }
             else
             {
-                marketByIds.Add(formatedId, market);
+                lock (this)
+                {
+                    marketByIds.Add(formatedId, market);
+                }
             }
         }
         public bool HasMarket(string mktId)

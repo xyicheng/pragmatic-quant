@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using pragmatic_quant_model.Basic;
 
 namespace pragmatic_quant_model.Maths
 {
@@ -30,6 +31,10 @@ namespace pragmatic_quant_model.Maths
         {
             return new ConstantRnRFunction(dim, value);
         }
+        public static RnRFunction Affine(double add, double[] mults)
+        {
+            return new AffineRnRFunction(add, mults);
+        }
         public static RnRFunction ExpAffine(double weight, double[] mults)
         {
             return new ExpAffineRnRFunction(weight, mults);
@@ -47,6 +52,37 @@ namespace pragmatic_quant_model.Maths
             return Value;
         }
         public double Value { get; private set; }
+    }
+
+    public class AffineRnRFunction : RnRFunction
+    {
+        #region private fields
+        private readonly double add;
+        private readonly double[] mults;
+        #endregion
+        public AffineRnRFunction(double add, double[] mults)
+            : base(mults.Length)
+        {
+            this.add = add;
+            this.mults = mults;
+        }
+        public override double Eval(double[] x)
+        {
+            return add + mults.DotProduct(x);
+        }
+        public override RnRFunction Mult(RnRFunction right)
+        {
+            var cst = right as ConstantRnRFunction;
+            if (cst != null)
+            {
+                if (DoubleUtils.EqualZero(cst.Value))
+                    return RnRFunctions.Constant(0.0, cst.Dim);
+
+                return new ExpAffineRnRFunction(cst.Value * add, mults.Map(m => m * cst.Value));
+            }
+
+            return base.Mult(right);
+        }
     }
 
     public class ExpAffineRnRFunction : RnRFunction

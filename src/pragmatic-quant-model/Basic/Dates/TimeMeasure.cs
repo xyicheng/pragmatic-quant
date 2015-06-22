@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace pragmatic_quant_model.Basic
+namespace pragmatic_quant_model.Basic.Dates
 {
     public interface ITimeMeasure
     {

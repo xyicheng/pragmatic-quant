@@ -1,4 +1,4 @@
-﻿using pragmatic_quant_model.Basic;
+﻿using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.MarketDatas;
 
 namespace pragmatic_quant_model.Model

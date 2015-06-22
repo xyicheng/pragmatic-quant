@@ -35,13 +35,13 @@ namespace pragmatic_quant_model.MonteCarlo
         public McModel Build(IModel model, Market market, DateTime[] simulatedDates)
         {
             PaymentInfo probaMeasure = ProbaMeasure(simulatedDates, model);
-            double numeraire0 = market.DiscountCurve(probaMeasure.Financing).Zc(probaMeasure.Date);
             
-            IFactorModelRepresentation factorRepresentation = factorRepresentationFactory.Build(model, market);
-            IProcessPathGenerator processPathGenerator = modelPathGenFactory.Build(model, probaMeasure, simulatedDates);
+            IFactorModelRepresentation factorRepresentation = factorRepresentationFactory.Build(model, market, probaMeasure);
+            IProcessPathGenerator processPathGenerator = modelPathGenFactory.Build(model, market, probaMeasure, simulatedDates);
             
             IRandomGenerator randomGenerator = randGeneratorFactory.Build(processPathGenerator.RandomDim);
-
+            double numeraire0 = market.DiscountCurve(probaMeasure.Financing).Zc(probaMeasure.Date);
+            
             return new McModel(factorRepresentation,
                 simulatedDates, randomGenerator, processPathGenerator,
                 probaMeasure, numeraire0);

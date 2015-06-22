@@ -134,9 +134,10 @@
     <Compile Include="Basic\Dates\DateOrDuration.cs" />
     <Compile Include="Basic\Dates\Duration.cs" />
     <Compile Include="Basic\Price.cs" />
+    <Compile Include="Basic\RealInterval.cs" />
     <Compile Include="Basic\Structure\LabelledMatrix.cs" />
     <Compile Include="Basic\Structure\TimeMatrixData.cs" />
-    <Compile Include="Basic\TimeMeasure.cs" />
+    <Compile Include="Basic\Dates\TimeMeasure.cs" />
     <Compile Include="MarketDatas\AssetId.cs" />
     <Compile Include="MarketDatas\AssetMarket.cs" />
     <Compile Include="MarketDatas\Currency.cs" />
@@ -168,11 +169,14 @@
     <Compile Include="Maths\Sobol\sobolrsg2.cs" />
     <Compile Include="Maths\Sobol\StdDirections.cs" />
     <Compile Include="Basic\Dates\CouponSchedule.cs" />
+    <Compile Include="Model\BlackScholes\BlackScholesEqtyPathGeneratorFactory.cs" />
+    <Compile Include="Model\BlackScholes\BlackScholesEquitySpotRepresentation.cs" />
+    <Compile Include="Model\BlackScholes\BlackScholesModel.cs" />
     <Compile Include="Model\HullWhite\Hw1Model.cs" />
-    <Compile Include="Model\HullWhite\Hw1ModelPathGeneratorFactory.cs" />
     <Compile Include="Model\HullWhite\Hw1ModelZcRepresentation.cs" />
     <Compile Include="Maths\Stochastic\OrnsteinUhlenbeck.cs" />
     <Compile Include="Maths\Stochastic\OrnsteinUhlenbeck1DGenerator.cs" />
+    <Compile Include="Model\HullWhite\Hw1ModelPathGeneratorFactory.cs" />
     <Compile Include="Model\IFactorModelRepresentation.cs" />
     <Compile Include="Model\IModel.cs" />
     <Compile Include="Model\IModelDescription.cs" />

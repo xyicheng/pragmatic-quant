@@ -24,6 +24,14 @@ namespace pragmatic_quant_model.Basic
                 result[i] = value;
             return result;
         }
+        public static T[] For<T>(int startIndex, int count, Func<int, T> func)
+        {
+            return Enumerable.Range(startIndex, count).Select(func).ToArray();
+        }
+        public static T[] Append<T>(IEnumerable<IEnumerable<T>> lists)
+        {
+            return lists.Aggregate(new T[0], (result, current) => result.Concat(current).ToArray());
+        }
     }
 
     public static class FuncUtils

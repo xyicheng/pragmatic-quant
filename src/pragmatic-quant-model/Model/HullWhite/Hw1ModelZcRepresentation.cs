@@ -1,8 +1,9 @@
 using System;
 using System.Diagnostics.Contracts;
-using pragmatic_quant_model.Basic;
+using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Maths;
+using pragmatic_quant_model.Product;
 
 namespace pragmatic_quant_model.Model.HullWhite
 {
@@ -31,8 +32,8 @@ namespace pragmatic_quant_model.Model.HullWhite
 
     public class Hw1FactorRepresentationFactory : FactorRepresentationFactory<Hw1Model>
     {
-        public static FactorRepresentationFactory<Hw1Model> Value = new Hw1FactorRepresentationFactory();
-        protected override IFactorModelRepresentation Build(Hw1Model model, Market market)
+        public static readonly FactorRepresentationFactory<Hw1Model> Value = new Hw1FactorRepresentationFactory();
+        protected override IFactorModelRepresentation Build(Hw1Model model, Market market, PaymentInfo probaMeasure)
         {
             var zcRepresentation = new Hw1ModelZcRepresentation(model);
             return new FactorRepresentation(market, zcRepresentation);

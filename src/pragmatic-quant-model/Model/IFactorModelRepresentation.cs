@@ -82,8 +82,7 @@ namespace pragmatic_quant_model.Model
         #region private fields
         private readonly int dimension;
         #endregion
-        public DeterministicZcRepresentation(Currency currency, int dimension)
-            : base(currency)
+        public DeterministicZcRepresentation(Currency currency, int dimension) : base(currency)
         {
             this.dimension = dimension;
         }

@@ -24,6 +24,10 @@ namespace pragmatic_quant_model.MarketDatas
                 throw new Exception("AssetMarket : many curve refDate's !");
         }
 
+        public DiscountCurve RiskFreeDiscountCurve(Currency currency)
+        {
+            return DiscountCurve(FinancingId.RiskFree(currency));
+        }
         public DiscountCurve DiscountCurve(FinancingId financingId)
         {
             DiscountCurve curve;

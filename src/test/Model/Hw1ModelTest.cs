@@ -49,7 +49,7 @@ namespace test.Model
             var probaMeasure = new PaymentInfo(hw1.Currency, refDate + probaMaturity, FinancingId.RiskFree(hw1.Currency));
             var t = refDate + simulationMaturity;
 
-            var hw1PathGen = new Hw1ModelPathGeneratorFactory().Build(hw1, probaMeasure, new[] {t});
+            var hw1PathGen = new Hw1ModelPathGeneratorFactory().Build(hw1, null, probaMeasure, new[] {t});
             var hw1Zc = new Hw1ModelZcRepresentation(hw1);
             var numeraireZc = hw1Zc.Zc(t, probaMeasure.Date, 1.0);
 
