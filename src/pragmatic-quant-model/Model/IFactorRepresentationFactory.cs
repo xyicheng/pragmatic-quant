@@ -17,8 +17,9 @@ namespace pragmatic_quant_model.Model
         {
             var modelImplem = model as TModel;
             if (modelImplem == null)
-                throw new Exception(string.Format("FactorRepresentationFactory : {0} expected but was {1}", typeof (TModel), model.GetType()));
-            return Build((TModel) model, market, probaMeasure);
+                throw new Exception(string.Format("FactorRepresentationFactory : {0} expected but was {1}", 
+                                                                                typeof (TModel), model.GetType()));
+            return Build(modelImplem, market, probaMeasure);
         }
     }
 }

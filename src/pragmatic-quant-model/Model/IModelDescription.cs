@@ -1,21 +1,51 @@
 using System;
+using System.Linq;
+using pragmatic_quant_model.Basic;
+using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.MarketDatas;
+using pragmatic_quant_model.Maths;
+using pragmatic_quant_model.Maths.Function;
+using pragmatic_quant_model.Model.BlackScholes;
 
 namespace pragmatic_quant_model.Model
 {
     public interface IModelDescription { }
 
-    public class Hw1ModelDescription : IModelDescription
+    public interface IModelFactory
     {
-        public Hw1ModelDescription(Currency currency, double meanReversion, MapRawDatas<DateTime, double> sigma)
-        {
-            Sigma = sigma;
-            MeanReversion = meanReversion;
-            Currency = currency;
-        }
-        public Currency Currency { get; private set; }
-        public double MeanReversion { get; private set; }
-        public MapRawDatas<DateTime, double> Sigma { get; private set; }
+        IModel Build(IModelDescription modelDescription, Market market);
     }
+
+    public abstract class ModelFactory<TModelDesc> : IModelFactory
+        where TModelDesc : class, IModelDescription
+    {
+        public abstract IModel Build(TModelDesc model, Market market);
+        public IModel Build(IModelDescription modelDescription, Market market)
+        {
+            var modelDescImplem = modelDescription as TModelDesc;
+            if (modelDescImplem == null)
+                throw new Exception(string.Format("ModelFactory : {0} expected but was {1}",
+                    typeof (TModelDesc), modelDescription.GetType()));
+            return Build(modelDescImplem, market);
+        }
+    }
+
+    public static class ModelFactoryUtils
+    {
+        public static ITimeMeasure DefaultTime(DateTime refDate)
+        {
+            return TimeMeasure.Act365(refDate);
+        }
+        public static RrFunction ToFunction(this MapRawDatas<DateOrDuration, double> rawDatasFunc, ITimeMeasure time)
+        {
+            var abscissae = rawDatasFunc.Pillars.Map(d => time[d.ToDate(time.RefDate)]);
+            return new StepFunction(abscissae, rawDatasFunc.Values, rawDatasFunc.Values.First());
+        }
+        public static DiscreteLocalDividend DivModel(this DividendQuote divQuote)
+        {
+            return DiscreteLocalDividend.AffineDividend(divQuote.Date, divQuote.Cash, divQuote.Yield);
+        }
+    }
+
 }

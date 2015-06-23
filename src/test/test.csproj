@@ -67,6 +67,7 @@
     <Compile Include="Maths\BachelierOption_Test.cs" />
     <Compile Include="Maths\SobolTest.cs" />
     <Compile Include="Maths\BrownianBridge_Test.cs" />
+    <Compile Include="Model\BsDivModelTest.cs" />
     <Compile Include="Model\Hw1ModelTest.cs" />
     <Compile Include="MonteCarlo\Hw1FixedLegTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

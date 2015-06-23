@@ -201,7 +201,7 @@
     <Compile Include="Product\PaymentInfo.cs" />
     <Compile Include="MonteCarlo\Product\IProductPathFlow.cs" />
     <Compile Include="MonteCarlo\Product\ProductPathFlowCalculator.cs" />
-    <Compile Include="MonteCarlo\Product\McProductPathFlowFactory.cs" />
+    <Compile Include="MonteCarlo\Product\ProductPathFlowFactory.cs" />
     <Compile Include="MonteCarlo\McEngine.cs" />
     <Compile Include="MonteCarlo\PathFlows.cs" />
     <Compile Include="Product\Coupon.cs" />
