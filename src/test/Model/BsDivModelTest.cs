@@ -24,6 +24,7 @@ namespace test.Model
             var divs = divDates.Map(d => DiscreteLocalDividend.AffineDividend(d, 0.03, 0.02));
 
             var bsModel = new BlackScholesModel(TimeMeasure.Act365(refDate), asset, sigma, divs);
+            
         }
     }
 
@@ -31,7 +32,7 @@ namespace test.Model
     {
         public IEnumerable CheckForward
         {
-            get { yield return new object[] {}; }
+            get { yield return new object[] {null}; }
         }
     }
 

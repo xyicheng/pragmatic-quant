@@ -18,7 +18,7 @@ namespace pragmatic_quant_model.Model.BlackScholes
         public bool WithDivs { get; private set; }
     }
 
-    public class BlackScholesModelFactory : ModelFactory<BlackScholesModelDescription>
+    internal class BlackScholesModelFactory : ModelFactory<BlackScholesModelDescription>
     {
         public static readonly BlackScholesModelFactory Instance = new BlackScholesModelFactory();
         public override IModel Build(BlackScholesModelDescription bs, Market market)

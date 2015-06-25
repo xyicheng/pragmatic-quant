@@ -26,7 +26,7 @@ namespace pragmatic_quant_model.Model.HullWhite
             return drift;
         }
         #endregion
-        public static ModelPathGenereratorFactory<Hw1Model> Value = new Hw1ModelPathGeneratorFactory();
+        public static readonly ModelPathGenereratorFactory<Hw1Model> Instance = new Hw1ModelPathGeneratorFactory();
 
         protected override IProcessPathGenerator Build(Hw1Model model, Market market, PaymentInfo probaMeasure, DateTime[] simulatedDates)
         {

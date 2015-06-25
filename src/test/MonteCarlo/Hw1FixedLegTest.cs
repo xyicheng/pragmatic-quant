@@ -55,8 +55,8 @@ namespace test.MonteCarlo
             var mcConfig = new MonteCarloConfig(20000, SobolDirection.JoeKuoD5);
 
             var mcModelFactory = new McModelFactory(
-                Hw1FactorRepresentationFactory.Value,
-                Hw1ModelPathGeneratorFactory.Value,
+                Hw1FactorRepresentationFactory.Instance,
+                Hw1ModelPathGeneratorFactory.Instance,
                 RandomGenerators.GaussianSobol(mcConfig.SobolDirection));
             var mcPricer = new McPricer(hw1, mcModelFactory, mcConfig);
 

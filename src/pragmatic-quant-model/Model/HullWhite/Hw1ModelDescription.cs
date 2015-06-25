@@ -17,7 +17,7 @@ namespace pragmatic_quant_model.Model.HullWhite
         public MapRawDatas<DateOrDuration, double> Sigma { get; private set; }
     }
 
-    public class Hw1ModelFactory : ModelFactory<Hw1ModelDescription>
+    internal class Hw1ModelFactory : ModelFactory<Hw1ModelDescription>
     {
         public static readonly Hw1ModelFactory Instance = new Hw1ModelFactory();
         public override IModel Build(Hw1ModelDescription model, Market market)

@@ -26,7 +26,7 @@ namespace pragmatic_quant_model.Model.BlackScholes
 
     public class BlackScholesFactorRepresentationFactory : FactorRepresentationFactory<BlackScholesModel>
     {
-        public static readonly BlackScholesFactorRepresentationFactory Value = new BlackScholesFactorRepresentationFactory();
+        public static readonly BlackScholesFactorRepresentationFactory Instance = new BlackScholesFactorRepresentationFactory();
         protected override IFactorModelRepresentation Build(BlackScholesModel model, Market market, PaymentInfo probaMeasure)
         {
             var asset = model.Asset;

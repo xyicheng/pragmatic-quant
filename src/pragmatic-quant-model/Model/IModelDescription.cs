@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
@@ -7,6 +8,7 @@ using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Function;
 using pragmatic_quant_model.Model.BlackScholes;
+using pragmatic_quant_model.Model.HullWhite;
 
 namespace pragmatic_quant_model.Model
 {
@@ -17,7 +19,33 @@ namespace pragmatic_quant_model.Model
         IModel Build(IModelDescription modelDescription, Market market);
     }
 
-    public abstract class ModelFactory<TModelDesc> : IModelFactory
+    public static class ModelFactories
+    {
+        #region private fields
+        private static readonly IDictionary<Type, IModelFactory> Factories = GetFactories();
+        #endregion
+        #region private methods
+        private static IDictionary<Type, IModelFactory> GetFactories()
+        {
+            var result = new Dictionary<Type, IModelFactory>
+            {
+                {typeof (Hw1ModelDescription), Hw1ModelFactory.Instance},
+                {typeof (BlackScholesModelDescription), BlackScholesModelFactory.Instance}
+            };
+            return result;
+        }
+        #endregion
+
+        public static IModelFactory For(IModelDescription modelDescription)
+        {
+            IModelFactory modelfactory;
+            if (Factories.TryGetValue(modelDescription.GetType(), out modelfactory))
+                return modelfactory;
+            throw new ArgumentException(string.Format("Missing Model Factory for {0}", modelDescription));
+        }
+    }
+
+    internal abstract class ModelFactory<TModelDesc> : IModelFactory
         where TModelDesc : class, IModelDescription
     {
         public abstract IModel Build(TModelDesc model, Market market);
@@ -30,8 +58,8 @@ namespace pragmatic_quant_model.Model
             return Build(modelDescImplem, market);
         }
     }
-
-    public static class ModelFactoryUtils
+    
+    internal static class ModelFactoryUtils
     {
         public static ITimeMeasure DefaultTime(DateTime refDate)
         {

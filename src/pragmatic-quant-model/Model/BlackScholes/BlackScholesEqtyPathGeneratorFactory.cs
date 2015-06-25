@@ -8,6 +8,7 @@ using pragmatic_quant_model.Product;
 
 namespace pragmatic_quant_model.Model.BlackScholes
 {
+
     public class BlackScholesEqtyPathGeneratorFactory : ModelPathGenereratorFactory<BlackScholesModel>
     {
         #region private methods
@@ -45,7 +46,7 @@ namespace pragmatic_quant_model.Model.BlackScholes
             return new BsEqtySimulatorStepDatas(step, dates, stepDividends, discounts, stepVols, stepVarDrifts);
         }
         #endregion
-        public static readonly BlackScholesEqtyPathGeneratorFactory Value = new BlackScholesEqtyPathGeneratorFactory();
+        public static readonly BlackScholesEqtyPathGeneratorFactory Instance = new BlackScholesEqtyPathGeneratorFactory();
         protected override IProcessPathGenerator Build(BlackScholesModel model, Market market, PaymentInfo probaMeasure, DateTime[] simulatedDates)
         {
             var asset = model.Asset;
@@ -145,4 +146,5 @@ namespace pragmatic_quant_model.Model.BlackScholes
         public int ProcessDim { get { return 1; } }
         public int RandomDim { get; private set; }
     }
+
 }

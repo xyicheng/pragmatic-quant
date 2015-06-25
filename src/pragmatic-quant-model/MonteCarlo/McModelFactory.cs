@@ -23,6 +23,7 @@ namespace pragmatic_quant_model.MonteCarlo
             return new PaymentInfo(model.PivotCurrency, horizon, FinancingId.RiskFree(model.PivotCurrency));
         }
         #endregion
+
         public McModelFactory(IFactorRepresentationFactory factorRepresentationFactory, 
             IModelPathGenereratorFactory modelPathGenFactory, 
             IRandomGeneratorFactory randGeneratorFactory)
@@ -47,4 +48,5 @@ namespace pragmatic_quant_model.MonteCarlo
                 probaMeasure, numeraire0);
         }
     }
+
 }
