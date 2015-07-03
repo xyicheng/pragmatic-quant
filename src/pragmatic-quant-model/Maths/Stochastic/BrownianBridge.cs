@@ -19,7 +19,7 @@ namespace pragmatic_quant_model.Maths.Stochastic
         #endregion
         #region private methods
         private BrownianBridge(double[] dates, int[] simulationIndexes, double[] simulationStdDevs,
-                               int[] leftIndexes, int[] rightIndexes)
+            int[] leftIndexes, int[] rightIndexes)
         {
             this.dates = dates;
             this.simulationIndexes = simulationIndexes;
@@ -37,16 +37,9 @@ namespace pragmatic_quant_model.Maths.Stochastic
 
                 if (rightIndex != dates.Length)
                 {
-                    if (leftIndex == -1)
-                    {
-                        leftWeigths[i] = (dates[rightIndex] - dates[currentIndex]) / (dates[rightIndex] - 0.0);
-                        rightWeigths[i] = (dates[currentIndex] - 0.0) / (dates[rightIndex] - 0.0);
-                    }
-                    else
-                    {
-                        leftWeigths[i] = (dates[rightIndex] - dates[currentIndex]) / (dates[rightIndex] - dates[leftIndex]);
-                        rightWeigths[i] = (dates[currentIndex] - dates[leftIndex]) / (dates[rightIndex] - dates[leftIndex]);
-                    }
+                    double leftDate = (leftIndex == -1) ? 0.0 : dates[leftIndex];
+                    leftWeigths[i] = (dates[rightIndex] - dates[currentIndex]) / (dates[rightIndex] - leftDate);
+                    rightWeigths[i] = (dates[currentIndex] - leftDate) / (dates[rightIndex] - leftDate);
                 }
             }
         }
@@ -154,17 +147,21 @@ namespace pragmatic_quant_model.Maths.Stochastic
             for (int i = 0; i < simulationIndexes.Length; ++i)
             {
                 int currentIndex = simulationIndexes[i];
-                
+                double currentStdDev = simulationStdDevs[i];
+
                 int leftIndex = leftIndexes[currentIndex];
                 var leftVal = (leftIndex == -1) ? new double[dimension] : path[leftIndex];
-                
+                var lefWeight = leftWeigths[i];
+
                 int rightIndex = rightIndexes[currentIndex];
                 var rightVal = (rightIndex == dates.Length) ? new double[dimension] : path[rightIndex];
+                var rightWeight = rightWeigths[i];
 
                 var currentVal = new double[dimension];
-                for (int k = 0; k < dimension; k++)
+                for (int k = 0; k < currentVal.Length; k++)
                 {
-                    currentVal[k] = leftVal[k] * leftWeigths[i] + rightVal[k] * rightWeigths[i] + gaussians[gaussIndex++] * simulationStdDevs[i];
+                    currentVal[k] = leftVal[k] * lefWeight + rightVal[k] * rightWeight
+                                    + gaussians[gaussIndex++] * currentStdDev;
                 }
                 path[currentIndex] = currentVal;
             }

@@ -50,7 +50,7 @@ namespace test.MonteCarlo
             var market = Market();
 
             const double lambda = 0.01;
-            var sigma = new StepFunction(new[] { 0.0, 1.0, 2.0 }, new[] { 0.007, 0.004, 0.0065 }, 0.0);
+            var sigma = new StepFunction(new[] {0.0, 1.0, 2.0}, new[] {0.007, 0.004, 0.0065}, 0.0);
             var hw1 = new Hw1Model(TimeMeasure.Act365(market.RefDate), Currency.Eur, lambda, sigma);
             var mcConfig = new MonteCarloConfig(20000, SobolDirection.JoeKuoD5);
 
@@ -58,10 +58,10 @@ namespace test.MonteCarlo
                 Hw1FactorRepresentationFactory.Instance,
                 Hw1ModelPathGeneratorFactory.Instance,
                 RandomGenerators.GaussianSobol(mcConfig.SobolDirection));
-            var mcPricer = new McPricer(hw1, mcModelFactory, mcConfig);
+            var mcPricer = new McPricer(mcModelFactory, mcConfig);
 
             var fixedLeg = Leg(market.RefDate);
-            var mcPriceResult = mcPricer.Price(fixedLeg, market);
+            var mcPriceResult = mcPricer.Price(fixedLeg, hw1, market);
 
             var mcCoupons = mcPriceResult.Details.Values.Map(p => p.Value);
             var refCoupons = mcPriceResult.Details.Keys.Map(pi => market.DiscountCurve(pi.Financing).Zc(pi.Date));

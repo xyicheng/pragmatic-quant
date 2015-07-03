@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.MarketDatas;
+using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Model;
 using pragmatic_quant_model.MonteCarlo;
 using pragmatic_quant_model.MonteCarlo.Product;
@@ -13,7 +14,6 @@ namespace pragmatic_quant_model.Pricing
     public class McPricer : IPricer
     {
         #region private fields
-        private readonly IModel model;
         private readonly McModelFactory mcModelFactory;
         private readonly MonteCarloConfig mcConfig;
         #endregion
@@ -27,14 +27,22 @@ namespace pragmatic_quant_model.Pricing
                 (mcModel.RandomGenerator, processPathFlowGen, PriceFlowsAggregator.Value);
         }
         #endregion
-        public McPricer(IModel model, McModelFactory mcModelFactory, MonteCarloConfig mcConfig)
+        public McPricer(McModelFactory mcModelFactory, MonteCarloConfig mcConfig)
         {
-            this.model = model;
             this.mcModelFactory = mcModelFactory;
             this.mcConfig = mcConfig;
         }
-        
-        public PriceResult Price(IProduct product, Market market)
+
+        public static McPricer For(IModelDescription modelDescription, MonteCarloConfig mcConfig)
+        {
+            var mcModelFactory = new McModelFactory(
+                FactorRepresentationFactories.For(modelDescription),
+                ModelPathGeneratorFactories.For(modelDescription),
+                RandomGenerators.GaussianSobol(mcConfig.SobolDirection));
+            return new McPricer(mcModelFactory, mcConfig);
+        }
+
+        public PriceResult Price(IProduct product, IModel model, Market market)
         {
             var simulatedDates = product.RetrieveEventDates();
             McModel mcModel = mcModelFactory.Build(model, market, simulatedDates);

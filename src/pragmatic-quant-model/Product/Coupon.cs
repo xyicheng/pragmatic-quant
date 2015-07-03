@@ -6,16 +6,14 @@ namespace pragmatic_quant_model.Product
 {
     public abstract class Coupon : IProduct
     {
-        protected Coupon(PaymentInfo paymentInfo, double nominal)
+        protected Coupon(PaymentInfo paymentInfo)
         {
             PaymentInfo = paymentInfo;
-            Nominal = nominal;
         }
 
+        public PaymentInfo PaymentInfo { get; private set; }
         public abstract IFixing[] Fixings { get; }
         public abstract double Payoff(double[] fixings);
-        public double Nominal { get; private set; }
-        public PaymentInfo PaymentInfo { get; private set; }
 
         public FinancingId Financing { get { return PaymentInfo.Financing; } }
         public abstract TResult Accept<TResult>(IProductVisitor<TResult> visitor);
@@ -24,7 +22,7 @@ namespace pragmatic_quant_model.Product
     public abstract class RateCoupon : Coupon
     {
         protected RateCoupon(FinancingId financing, Currency payCurrency, double nominal, CouponSchedule schedule, DayCountFrac basis)
-            : base(new PaymentInfo(payCurrency, schedule.Pay, financing), nominal)
+            : base(new PaymentInfo(payCurrency, schedule.Pay, financing))
         {
             Basis = basis;
             Schedule = schedule;
@@ -80,10 +78,10 @@ namespace pragmatic_quant_model.Product
 
     public class FixedCoupon : Coupon
     {
+        public FixedCoupon(PaymentInfo paymentInfo, double nominal, double rateCoupon)
+            : this(paymentInfo, nominal * rateCoupon) { }
         public FixedCoupon(PaymentInfo paymentInfo, double coupon)
-            : this(paymentInfo, 1.0, coupon) { }
-        public FixedCoupon(PaymentInfo paymentInfo, double nominal, double coupon)
-            : base(paymentInfo, nominal)
+            : base(paymentInfo)
         {
             Coupon = coupon;
         }

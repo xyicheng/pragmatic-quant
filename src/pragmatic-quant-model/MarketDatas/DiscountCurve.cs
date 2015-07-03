@@ -56,6 +56,12 @@ namespace pragmatic_quant_model.MarketDatas
         {
             return new ProductDiscount(discount1, discount2, financing);
         }
+        public static DiscountCurve Flat(FinancingId financing, DateTime refDate, double zcRate)
+        {
+            var time = TimeMeasure.Act365(refDate);
+            var zc1Y = Math.Exp(-zcRate * time[refDate + Duration.Year]);
+            return LinearRateInterpol(financing, new[] { refDate + Duration.Year }, new[] { zc1Y }, time);
+        }
     }
 
 
@@ -78,68 +84,6 @@ namespace pragmatic_quant_model.MarketDatas
         }
     }
     
-    /*
-    public class LinearZcRateInterpolation : DiscountCurve
-    {
-        #region private fields
-        private readonly ITimeMeasure time;
-        private readonly StepSearcher stepSearcher;
-        private readonly double[] dates;
-        private readonly double[] zcRates;
-        #endregion
-        #region private fields
-        private double ZcRate(double t)
-        {
-            var leftIndex = stepSearcher.LocateLeftIndex(t);
-
-            if (leftIndex <= -1)
-            {
-                return zcRates[0];
-            }
-
-            if (leftIndex >= dates.Length - 1)
-            {
-                return zcRates[zcRates.Length - 1];
-            }
-
-            var w = (t - dates[leftIndex]) / (dates[leftIndex + 1] - dates[leftIndex]);
-            return (1.0 - w) * zcRates[leftIndex] + w * zcRates[leftIndex + 1];
-        }
-        #endregion
-        public LinearZcRateInterpolation(FinancingId financing, DateTime[] pillars, double[] zcs, ITimeMeasure time)
-            : base(time.RefDate, financing)
-        {
-            if (pillars.Length != zcs.Length)
-                throw new Exception("LinearRateDiscountProvider : Incompatible size");
-            this.time = time;
-            dates = time[pillars];
-            stepSearcher = new StepSearcher(dates);
-            zcRates = new double[pillars.Length];
-
-            if (pillars[0] == RefDate)
-            {
-                if (!DoubleUtils.MachineEquality(1.0, zcs[0]))
-                    throw new Exception("LinearRateDiscountProvider : Discount for refDate must equal to 1.0 ");
-                zcRates[0] = 0.0;
-            }
-            else
-            {
-                zcRates[0] = -Math.Log(zcs[0]) / dates[0];
-            }
-            for (int i = 1; i < zcs.Length; i++)
-            {
-                zcRates[i] = -Math.Log(zcs[i]) / dates[i];
-            }
-        }
-
-        public override double Zc(DateTime d)
-        {
-            double t = time[d];
-            return Math.Exp(-ZcRate(t) * t);
-        }
-    }
-    */
-
     public class ProductDiscount : DiscountCurve
     {
         #region private fields
@@ -160,4 +104,5 @@ namespace pragmatic_quant_model.MarketDatas
             return discount1.Zc(d) * discount2.Zc(d);
         }
     }
+
 }
