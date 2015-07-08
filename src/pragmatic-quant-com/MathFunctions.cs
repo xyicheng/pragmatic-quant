@@ -1,7 +1,6 @@
 ﻿using System;
 using ExcelDna.Integration;
 using pragmatic_quant_model.Basic;
-using pragmatic_quant_model.Maths.Function;
 using pragmatic_quant_model.Maths.Interpolation;
 using pragmatic_quant_model.Maths.Sobol;
 

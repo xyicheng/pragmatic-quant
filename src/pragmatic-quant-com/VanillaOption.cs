@@ -1,6 +1,7 @@
 ﻿using System;
 using ExcelDna.Integration;
 using pragmatic_quant_model.Maths;
+using Bachelier = pragmatic_quant_model.Maths.BachelierOption;
 
 namespace pragmatic_quant_com
 {
@@ -23,7 +24,7 @@ namespace pragmatic_quant_com
                     default:
                         throw new Exception(string.Format("Unknow option type : {0}", optionType));
                 }
-                return pragmatic_quant_model.Maths.BachelierOption.Price(forward, strike, vol, maturity, q);
+                return Bachelier.Price(forward, strike, vol, maturity, q);
             }
             catch (Exception e)
             {
@@ -48,7 +49,7 @@ namespace pragmatic_quant_com
                     default:
                         throw new Exception(string.Format("Unknow option type : {0}", optionType));
                 }
-                return pragmatic_quant_model.Maths.BachelierOption.ImpliedVol(price, forward, strike, maturity, q);
+                return Bachelier.ImpliedVol(price, forward, strike, maturity, q);
             }
             catch (Exception e)
             {
@@ -62,7 +63,7 @@ namespace pragmatic_quant_com
             try
             {
                 double gamma, theta, vega, vanna, vomma;
-                pragmatic_quant_model.Maths.BachelierOption.Greeks(fwd, strike, maturity, vol,
+                Bachelier.Greeks(fwd, strike, maturity, vol,
                     out gamma, out theta, out vega, out vanna, out vomma);
                 switch (request.Trim().ToLower())
                 {

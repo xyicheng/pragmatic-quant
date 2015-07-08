@@ -52,7 +52,7 @@ namespace pragmatic_quant_model.Maths.Interpolation
             maxLinearPillarIndex = linearPillars.Length - 1;
 
             cubicSplineElements = Enumerable.Range(0, values.GetLength(0))
-                                    .Select(i => CubicSplineInterpolation.BuildSpline(splinePillars, values.Row(i)))
+                                    .Select(i => CubicSplineUtils.BuildSpline(splinePillars, values.Row(i)))
                                     .ToArray();
         }
         

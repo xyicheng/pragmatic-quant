@@ -18,7 +18,7 @@ namespace pragmatic_quant_model.Maths.Interpolation
         {
             this.abscissae = abscissae;
             
-            var cubicElements = CubicSplineInterpolation.BuildSpline(abscissae, values, leftDerivative, rightDerivative);
+            var cubicElements = CubicSplineUtils.BuildSpline(abscissae, values, leftDerivative, rightDerivative);
             var rightExtrapol = cubicElements.Last();
             var leftExtrapol = cubicElements.First();
 
@@ -36,7 +36,7 @@ namespace pragmatic_quant_model.Maths.Interpolation
 
     }
 
-    public static class CubicSplineInterpolation
+    public static class CubicSplineUtils
     {
         
         /// <summary>
@@ -104,10 +104,24 @@ namespace pragmatic_quant_model.Maths.Interpolation
 
             return Enumerable.Range(0, abscissae.Length - 1)
                 .Select(i =>
-                    new CubicSplineElement(abscissae[i + 1] - abscissae[i], values[i], values[i + 1], secondDerivatives[i], secondDerivatives[i + 1])
+                   StepInterpoler(abscissae[i + 1] - abscissae[i], values[i], values[i + 1], secondDerivatives[i], secondDerivatives[i + 1])
                 ).ToArray();
         }
 
+        public static CubicSplineElement StepInterpoler(double step, double leftVal, double rightVal,
+                                                        double leftSecondDeriv, double rightSecondDeriv)
+        {
+            double a = leftVal;
+            double b = (rightVal - leftVal) / step - step * leftSecondDeriv / 3.0 - step * rightSecondDeriv / 6.0;
+            double c = leftSecondDeriv / 6.0 + leftSecondDeriv / 3.0;
+            double d = (rightSecondDeriv - leftSecondDeriv) / step / 6.0;
+            return new CubicSplineElement(a, b, c, d);
+        }
+
+        public static CubicSplineElement Derivative(this CubicSplineElement cubic)
+        {
+            return new CubicSplineElement(cubic.B, 2.0 * cubic.C, 3.0 * cubic.D, 0.0);
+        }
     }
 
     /// <summary>
@@ -117,21 +131,17 @@ namespace pragmatic_quant_model.Maths.Interpolation
     [DebuggerDisplay("{A} + {B}*x + {C}*x^2 + {D}*x^3")]
     public struct CubicSplineElement
     {
-
-        public CubicSplineElement(double step,
-            double leftVal, double rightVal,
-            double leftSecondDeriv, double rightSecondDeriv)
+        public CubicSplineElement(double a, double b, double c, double d)
         {
-            A = leftVal;
-            B = (rightVal - leftVal) / step - step * leftSecondDeriv / 3.0 - step * rightSecondDeriv / 6.0;
-            C = leftSecondDeriv / 6.0 + leftSecondDeriv / 3.0;
-            D = (rightSecondDeriv - leftSecondDeriv) / step / 6.0;
+            A = a;
+            B = b;
+            C = c;
+            D = d;
         }
-
         public readonly double A;
         public readonly double B;
         public readonly double C;
         public readonly double D;
-
     }
+
 }

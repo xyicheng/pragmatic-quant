@@ -120,36 +120,21 @@ namespace pragmatic_quant_model.Maths
         /// </summary>
         public static double FastCumulativeInverse(double p)
         {
-            if (p <= 0)
-                return Math.Log(p);
-            if (p >= 1)
-                return Math.Log(1 - p);
-
-            double result;
-            double q = p - 0.5;
-
-            if (Math.Abs(q) < 0.42)
+            if (p < 0.92 && p > 0.08)
             {
                 // Beasley and Springer, 1977
-                result = q * q;
-                result = q * (((-25.44106049637 * result + 41.39119773534) * result + -18.61500062529) * result + 2.50662823884) 
-                    / ((((3.13082909833 * result + -21.06224101826) * result + 23.08336743743) * result + -8.47351093090) * result + 1.0);
-            }
-            else
-            {
-                // improved approximation for the tail (Moro 1995)
-                if (p < 0.5)
-                    result = p;
-                else
-                    result = 1.0 - p;
-                result = Math.Log(-Math.Log(result));
-                result = 0.3374754822726147 + result * (0.9761690190917186 + result * (0.1607979714918209 + result * (0.0276438810333863
-                        + result * (0.0038405729373609 + result * (0.0003951896511919 + result * (0.0000321767881768 + result * (0.0000002888167364 + result * 0.0000003960315187)))))));
-                if (p < 0.5)
-                    result = -result;
+                double q = p - 0.5;
+                var qSquare = q * q;
+                return q * (((-25.44106049637 * qSquare + 41.39119773534) * qSquare + -18.61500062529) * qSquare + 2.50662823884)
+                       / ((((3.13082909833 * qSquare + -21.06224101826) * qSquare + 23.08336743743) * qSquare + -8.47351093090) * qSquare + 1.0);
             }
 
-            return result;
+            // improved approximation for the tail (Moro 1995)
+            double z = Math.Log(-Math.Log(p < 0.5 ? p : 1.0 - p));
+            z = 0.3374754822726147 + z * (0.9761690190917186 + z * (0.1607979714918209 + z * (0.0276438810333863
+                    + z * (0.0038405729373609 + z * (0.0003951896511919 + z * (0.0000321767881768 + z * (0.0000002888167364 + z * 0.0000003960315187)))))));
+            return p < 0.5 ? -z : z;
         }
+
     }
 }
