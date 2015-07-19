@@ -59,9 +59,10 @@ namespace pragmatic_quant_model.MarketDatas
         public static AssetMarket AssetMarketFromName(this Market mkt, string assetName)
         {
             var ids = mkt.AssetIds.Where(id => id.Name.Equals(assetName)).ToArray();
+
             if (ids.Length == 0)
                 throw new Exception(string.Format("Missing market asset : {0}", assetName));
-            if (ids.Length >1)
+            if (ids.Length > 1)
                 throw new Exception(string.Format("Ambiguous asset name : {0}", assetName));
 
             return mkt.AssetMarket(ids.First());

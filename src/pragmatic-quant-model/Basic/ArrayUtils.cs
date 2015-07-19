@@ -55,6 +55,14 @@ namespace pragmatic_quant_model.Basic
                     result[i, j] = map(array[i, j]);
             return result;
         }
+        public static TResult[,] CartesianProd<TA, TB, TResult>(TA[] a, TB[] b, Func<TA, TB, TResult> func)
+        {
+            var result = new TResult[a.Count(), b.Count()];
+            for(int i=0; i<a.Count(); i++)
+                for (int j = 0; j < b.Count(); j++)
+                    result[i, j] = func(a[i], b[j]);
+            return result;
+        }
 
         public static void SetCol<T>(ref T[,] array, int colIndex, T[] col)
         {

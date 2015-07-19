@@ -3,15 +3,15 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
+using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Function;
+using pragmatic_quant_model.Maths.Interpolation;
 
 namespace pragmatic_quant_model.MarketDatas
 {
     public class AssetMarket
     {
         #region private fields
-        private readonly DateTime refDate;
-        private readonly AssetId asset;
         private readonly ITimeMeasure time;
         private readonly double spot;
         private readonly DiscountCurve repoCurve;
@@ -19,26 +19,22 @@ namespace pragmatic_quant_model.MarketDatas
         #endregion
         
         public AssetMarket(AssetId asset, DateTime refDate, ITimeMeasure time,
-            double spot, DiscountCurve repoCurve, DividendQuote[] dividends)
+            double spot, DiscountCurve repoCurve, DividendQuote[] dividends, VolatilityMatrix volMatrix)
         {
-            this.asset = asset;
-            this.refDate = refDate;
             this.time = time;
             this.spot = spot;
             this.repoCurve = repoCurve;
             this.dividends = dividends;
+            VolMatrix = volMatrix;
+            RefDate = refDate;
+            Asset = asset;
+            
             if (refDate != repoCurve.RefDate || refDate != time.RefDate)
                 throw new Exception("AssetMarket : incompatible ref date !");
         }
 
-        public DateTime RefDate
-        {
-            get { return refDate; }
-        }
-        public AssetId Asset
-        {
-            get { return asset; }
-        }
+        public DateTime RefDate { get; private set; }
+        public AssetId Asset { get; private set; }
         public double Spot
         {
             get { return spot; }
@@ -51,10 +47,11 @@ namespace pragmatic_quant_model.MarketDatas
         {
             get { return repoCurve; }
         }
+        public VolatilityMatrix VolMatrix { get; private set; }
 
         public DiscountCurve AssetFinancingCurve(DiscountCurve cashFinancingCurve)
         {
-            return DiscountCurve.Product(repoCurve, cashFinancingCurve, FinancingId.AssetCollat(asset));
+            return DiscountCurve.Product(repoCurve, cashFinancingCurve, FinancingId.AssetCollat(Asset));
         }
         public AssetForwardCurve Forward(DiscountCurve cashFinancingCurve)
         {
@@ -65,7 +62,6 @@ namespace pragmatic_quant_model.MarketDatas
 
     public class DividendQuote
     {
-
         public DividendQuote(DateTime date, double cash, double yield)
         {
             Date = date;
@@ -77,16 +73,10 @@ namespace pragmatic_quant_model.MarketDatas
         public double Cash { get; private set; }
         public double Yield { get; private set; }
     }
-
-    public class VolatilityQuote
-    {
-        
-    }
-
+    
     public class AssetForwardCurve
     {
         #region private fields
-        private readonly double spot;
         private readonly ITimeMeasure time;
         private readonly DiscountCurve assetFinancingCurve;
 
@@ -99,7 +89,7 @@ namespace pragmatic_quant_model.MarketDatas
         {
             Contract.Requires(EnumerableUtils.IsSorted(dividends.Select(div => div.Date)));
 
-            this.spot = spot;
+            Spot = spot;
             this.assetFinancingCurve = assetFinancingCurve;
             this.time = time;
 
@@ -117,9 +107,10 @@ namespace pragmatic_quant_model.MarketDatas
         {
             get { return time.RefDate; }
         }
+        public double Spot { get; private set; }
         public double Fwd(DateTime d)
         {
-            return (spot - CumulatedDividends(d)) * AssetGrowth(d);
+            return (Spot - CumulatedDividends(d)) * AssetGrowth(d);
         }
         public double AssetGrowth(DateTime date)
         {
@@ -129,6 +120,65 @@ namespace pragmatic_quant_model.MarketDatas
         {
             return cumulatedDividendFunc.Eval(time[d]);
         }
-
     }
+
+    public class VolatilityMatrix
+    {
+        public VolatilityMatrix(ITimeMeasure time, DateTime[] pillars, double[] strikes, double[,] vols)
+        {
+            Pillars = pillars;
+            Strikes = strikes;
+            Vols = vols;
+            Time = time;
+        }
+
+        public ITimeMeasure Time { get; private set; }
+        public DateTime[] Pillars { get; private set; }
+        public double[] Strikes { get; private set; }
+        public double[,] Vols { get; private set; }
+    }
+
+    public class VolatilitySurface
+    {
+        #region private fields
+        private readonly Func<double, double> moneyness; 
+        private readonly Interpoler2D variance;
+        #endregion
+        protected VolatilitySurface(ITimeMeasure time, Interpoler2D variance, Func<double, double> moneyness)
+        {
+            Time = time;
+            this.variance = variance;
+            this.moneyness = moneyness;
+        }
+
+        public static VolatilitySurface BuildInterpol(VolatilityMatrix volMatrix, AssetForwardCurve assetFwd)
+        {
+            Func<double, double> moneyness = k => Math.Log(k / assetFwd.Spot);
+            double[] timePillars = volMatrix.Time[volMatrix.Pillars];
+            double[] moneynessPillars = volMatrix.Strikes.Map(moneyness);
+            
+            double[,] variance = volMatrix.Vols.Map(v => v * v);
+            for (int i = 0; i < variance.GetLength(0); i++)
+                MatrixUtils.MultRow(ref variance, i, timePillars[i]);
+
+            var varianceInterpol = MixedLinearSplineInterpoler.Build(timePillars, moneynessPillars, variance);
+
+            return new VolatilitySurface(volMatrix.Time, varianceInterpol, moneyness);
+        }
+
+        public double Variance(double maturity, double strike)
+        {
+            return variance.Eval(maturity, moneyness(strike));
+        }
+        public double Volatility(double maturity, double strike)
+        {
+            return Math.Sqrt(Variance(maturity, strike) / maturity);
+        }
+        public double Volatility(DateTime maturity, double strike)
+        {
+            return Volatility(Time[maturity], strike);
+        }
+        public ITimeMeasure Time { get; private set; }
+    }
+    
 }

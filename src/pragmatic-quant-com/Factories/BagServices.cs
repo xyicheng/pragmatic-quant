@@ -6,6 +6,9 @@ using pragmatic_quant_model.Basic.Structure;
 
 namespace pragmatic_quant_com.Factories
 {
+    using TimeMatrixDatas = LabelledMatrix<DateOrDuration, string, double>;
+    using EqtyVolMatrix = LabelledMatrix<DateOrDuration, double, double>; 
+
     public class BagServices
     {
         #region private methods
@@ -14,7 +17,7 @@ namespace pragmatic_quant_com.Factories
             if (cellValue == null)
                 return true;
 
-            if ((cellValue is string) && ((string)cellValue).Trim() == "")
+            if ((cellValue is string) && ((string) cellValue).Trim() == "")
                 return true;
 
             if (cellValue is ExcelDna.Integration.ExcelEmpty
@@ -30,7 +33,7 @@ namespace pragmatic_quant_com.Factories
         private static string MissingValueMsg(string name)
         {
             return String.Format("Missing parameter value for {0} !", name);
-        } 
+        }
         private static Func<object, double> DoubleValueConverter(string name)
         {
             Func<object, double> doubleConverter = o =>
@@ -52,7 +55,7 @@ namespace pragmatic_quant_com.Factories
             return converter;
         }
         #endregion
-        
+
         public static bool Has(object[,] bag, string name, out int row, out int col)
         {
             var loweredName = name.ToLowerInvariant().Trim();
@@ -157,7 +160,7 @@ namespace pragmatic_quant_com.Factories
                 throw new Exception(missingException);
 
             int nbRows = 0, nbCols = 0;
-            
+
             for (int row = baseRow; row <= bag.GetUpperBound(0); row++)
             {
                 var value = bag[row, baseCol];
@@ -201,8 +204,8 @@ namespace pragmatic_quant_com.Factories
             return ProcessMatrix(bag, name, o => o.ToString());
         }
 
-        public static LabelledMatrix<TRow, TCol, TVal> ProcessLabelledMatrix<TRow, TCol, TVal>(object[,] bag, string name, 
-            Func<object, TRow> rowLabelMap,Func<object, TCol> colLabelMap, Func<object, TVal> valueMap)
+        public static LabelledMatrix<TRow, TCol, TVal> ProcessLabelledMatrix<TRow, TCol, TVal>(object[,] bag, string name,
+            Func<object, TRow> rowLabelMap, Func<object, TCol> colLabelMap, Func<object, TVal> valueMap)
         {
             int row, col;
             if (Has(bag, name, out row, out col))
@@ -230,8 +233,11 @@ namespace pragmatic_quant_com.Factories
         }
         public static TimeMatrixDatas ProcessTimeMatrixDatas(object[,] bag, string name)
         {
-            var matrix  = ProcessLabelledMatrix(bag, name, DateOrDurationValueConverter(name), o => o.ToString(), DoubleValueConverter(name));
-            return new TimeMatrixDatas(matrix);
+            return ProcessLabelledMatrix(bag, name, DateOrDurationValueConverter(name), o => o.ToString(), DoubleValueConverter(name));
         }
-    } 
+        public static EqtyVolMatrix ProcessEqtyVolMatrix(object[,] bag, string name)
+        {
+            return ProcessLabelledMatrix(bag, name, DateOrDurationValueConverter(name), DoubleValueConverter(name), DoubleValueConverter(name));
+        }
+    }
 }

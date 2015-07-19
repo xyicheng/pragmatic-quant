@@ -136,6 +136,7 @@
     <Compile Include="Basic\Price.cs" />
     <Compile Include="Basic\RealInterval.cs" />
     <Compile Include="Basic\Structure\LabelledMatrix.cs" />
+    <Compile Include="Basic\Structure\Singleton.cs" />
     <Compile Include="Basic\Structure\TimeMatrixData.cs" />
     <Compile Include="Basic\Dates\TimeMeasure.cs" />
     <Compile Include="MarketDatas\AssetId.cs" />
@@ -147,6 +148,7 @@
     <Compile Include="Maths\BachelierOption.cs" />
     <Compile Include="Maths\BlackScholesOption.cs" />
     <Compile Include="Maths\FiniteDifferenceUtils.cs" />
+    <Compile Include="Maths\Interpolation\Polynomial.cs" />
     <Compile Include="Maths\Stochastic\BrownianBridge.cs" />
     <Compile Include="Maths\Cholesky.cs" />
     <Compile Include="Maths\ErrorFunctions.cs" />

@@ -58,5 +58,12 @@ namespace pragmatic_quant_model.Basic.Dates
             if (isDate && date != null) return date.Value;
             return refDate + duration;
         }
+
+        public override string ToString()
+        {
+            if (isDate)
+                return date.ToString();
+            return duration.ToString();
+        }
     }
 }

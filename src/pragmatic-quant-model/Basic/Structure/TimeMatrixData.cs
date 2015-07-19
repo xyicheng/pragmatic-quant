@@ -1,8 +1,8 @@
 using System.Diagnostics.Contracts;
-using pragmatic_quant_model.Basic.Dates;
 
 namespace pragmatic_quant_model.Basic.Structure
 {
+    /*
     public class TimeMatrixDatas : LabelledMatrix<DateOrDuration, string, double>
     {
         public TimeMatrixDatas(DateOrDuration[] rowLabels, string[] colLabels, double[,] values)
@@ -14,6 +14,7 @@ namespace pragmatic_quant_model.Basic.Structure
         {
         }
     }
+    */
 
 
     public class MapRawDatas<TP, TV>

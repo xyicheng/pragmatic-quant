@@ -8,6 +8,8 @@ using pragmatic_quant_model.Basic.Structure;
 
 namespace test
 {
+    using TimeMatrixDatas = LabelledMatrix<DateOrDuration, string, double>;
+
     [TestFixture]
     public class BagServices_Test
     {

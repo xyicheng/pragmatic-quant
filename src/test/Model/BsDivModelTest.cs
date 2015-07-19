@@ -49,7 +49,7 @@ namespace test.Model
                 var divDates = EnumerableUtils.For(1, 12, i => refDate + i * Duration.Month);
                 var divQuotes = divDates.Map(d => new DividendQuote(d, 0.03, 0.02));
 
-                var assetMarket = new AssetMarket(asset, refDate, time, 1.0, repo, divQuotes);
+                var assetMarket = new AssetMarket(asset, refDate, time, 1.0, repo, divQuotes, null);
                 yield return new object[] { assetMarket };
             }
         }

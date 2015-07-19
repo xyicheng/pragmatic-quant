@@ -32,6 +32,7 @@ namespace pragmatic_quant_model.Maths
                 }
             }
         }
+        
         /// <summary>
         /// Multiply matrix result by  w  : result = w * result
         /// </summary>
@@ -45,6 +46,20 @@ namespace pragmatic_quant_model.Maths
                 }
             }
         }
+
+        /// <summary>
+        /// Multiply matrix row with index rowIndex by  w
+        /// </summary>
+        public static void MultRow(ref double[,] result, int rowIndex, double w)
+        {
+            if (rowIndex < result.GetLowerBound(0) || rowIndex > result.GetUpperBound(0))
+                throw new IndexOutOfRangeException();
+            for (int j = 0; j < result.GetLength(1); j++)
+            {
+                result[rowIndex, j] *= w;
+            }
+        }
+
         /// <summary>
         /// Compute the matrix transposition of a, stored in result
         /// </summary>

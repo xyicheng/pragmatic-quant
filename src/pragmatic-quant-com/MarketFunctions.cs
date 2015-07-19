@@ -4,6 +4,7 @@ using ExcelDna.Integration;
 using pragmatic_quant_com.Factories;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
+using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.MarketDatas;
 
 namespace pragmatic_quant_com
@@ -16,7 +17,7 @@ namespace pragmatic_quant_com
         {
             try
             {
-                MarketManager.Value.SetMarket(mktId, (object[,])range);
+                MarketManager.Instance.SetMarket(mktId, (object[,])range);
                 return true;
             }
             catch (Exception)
@@ -31,7 +32,7 @@ namespace pragmatic_quant_com
         {
             try
             {
-                var market = MarketManager.Value.GetMarket(mktObj);
+                var market = MarketManager.Instance.GetMarket(mktObj);
                 var finCurveId = FinancingId.Parse(curveId);
                 DiscountCurve curve = market.DiscountCurve(finCurveId);
 
@@ -58,13 +59,12 @@ namespace pragmatic_quant_com
         {
             try
             {
-                var market = MarketManager.Value.GetMarket(mktObj);
+                var market = MarketManager.Instance.GetMarket(mktObj);
                 var assetMarket = market.AssetMarketFromName(assetName);
 
-                Currency assetCurrency = assetMarket.Asset.Currency;
-                DiscountCurve cashCurve = market.DiscountCurve(FinancingId.RiskFree(assetCurrency));
+                DiscountCurve cashCurve = market.RiskFreeDiscountCurve(assetMarket.Asset.Currency);
                 AssetForwardCurve assetForward = assetMarket.Forward(cashCurve);
-
+                
                 var result = dates.Map(o =>
                 {
                     var dateOrDuration = DateAndDurationConverter.ConvertDateOrDuration(o);
@@ -81,9 +81,38 @@ namespace pragmatic_quant_com
                 return error;
             }
         }
+
+        [ExcelFunction(Description = "Equity Asset vol function",
+                       Category = "PragmaticQuant_MarketFunctions")]
+        public static object VolSurface(object mktObj, object[] dates, double[] strikes, string assetName)
+        {
+            try
+            {
+                var market = MarketManager.Instance.GetMarket(mktObj);
+                var assetMarket = market.AssetMarketFromName(assetName);
+
+                DiscountCurve cashCurve = market.RiskFreeDiscountCurve(assetMarket.Asset.Currency);
+                AssetForwardCurve assetForward = assetMarket.Forward(cashCurve);
+                VolatilitySurface volSurface = VolatilitySurface.BuildInterpol(assetMarket.VolMatrix, assetForward);
+                
+                var maturities = dates.Map(o =>
+                {
+                    var dateOrDuration = DateAndDurationConverter.ConvertDateOrDuration(o);
+                    return dateOrDuration.ToDate(assetForward.RefDate);
+                });
+                
+                return ArrayUtils.CartesianProd(maturities, strikes, (m, k) => volSurface.Volatility(m, k));
+            }
+            catch (Exception e)
+            {
+                var error = new object[1, 1];
+                error[0, 0] = string.Format("ERROR, {0}", e.Message);
+                return error;
+            }
+        }
     }
 
-    public sealed class MarketManager
+    public sealed class MarketManager : Singleton<MarketManager>
     {
         #region private fields
         private readonly IDictionary<string, Market> marketByIds;
@@ -93,17 +122,15 @@ namespace pragmatic_quant_com
         {
             return id.Trim().ToLowerInvariant();
         }
-        private MarketManager()
+        public MarketManager()
         {
             marketByIds= new Dictionary<string, Market>();
         }
         #endregion
-
-        public static MarketManager Value = new MarketManager();
-
+        
         public void SetMarket(string mktId, object[,] marketBag)
         {
-            var market = MarketFactory.Value.Build(marketBag);
+            var market = MarketFactory.Instance.Build(marketBag);
 
             var formatedId = FormattedId(mktId);
             if (marketByIds.ContainsKey(formatedId))
@@ -126,7 +153,7 @@ namespace pragmatic_quant_com
         {
             var mktBag = mktObj as object[,];
             if (mktBag != null)
-                return MarketFactory.Value.Build(mktBag);
+                return MarketFactory.Instance.Build(mktBag);
 
             if (!(mktObj is string))
                 throw new ApplicationException(string.Format("Unable to build market from : {0}", mktObj));
