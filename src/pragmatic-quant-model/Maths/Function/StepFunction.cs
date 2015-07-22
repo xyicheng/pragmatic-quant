@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System;
 using System.Linq;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Maths.Interpolation;
@@ -31,6 +31,10 @@ namespace pragmatic_quant_model.Maths.Function
                 .Scan(0.0, (sum, current) => sum + current);
             var zeroBasedIntegral = new LinearInterpolation(abscissae, zeroBaseIntegrals, leftValue, values[values.Length - 1]);
             return zeroBasedIntegral - zeroBasedIntegral.Eval(basePoint);
+        }
+        public override RrFunction Derivative()
+        {
+            throw new Exception("StepFunction derivative is not a function ");
         }
         public override RrFunction Add(RrFunction other)
         {
@@ -84,38 +88,7 @@ namespace pragmatic_quant_model.Maths.Function
             return new StepFunction(mergedAbscissae, multValues, multLeftValue);
         }
     }
-
-    public class StepFunction<T>
-    {
-        #region private fields
-        private readonly StepSearcher stepSearcher;
-        private readonly T[] values;
-        private readonly T leftValue;
-        #endregion
-        public StepFunction(double[] pillars, T[] values, T leftValue)
-        {
-            Contract.Requires(pillars.Length == values.Length);
-            this.values = values;
-            this.leftValue = leftValue;
-            stepSearcher = new StepSearcher(pillars);
-        }
-        
-        public T Eval(double x)
-        {
-            int stepIndex;
-            return Eval(x, out stepIndex);
-        }
-        public T Eval(double x, out int stepIndex)
-        {
-            stepIndex = stepSearcher.LocateLeftIndex(x);
-
-            if (stepIndex <= -1)
-                return leftValue;
-
-            return values[stepIndex];
-        }
-    }
-
+    
     public class WeightedStepFunction : RrFunction  
     {
         #region private fields
@@ -156,6 +129,10 @@ namespace pragmatic_quant_model.Maths.Function
 
             var unbasedResult = new WeightedStepFunction(weightIntegral, abscissae, values, leftValue) + stepPart ;
             return unbasedResult - unbasedResult.Eval(basePoint);
+        }
+        public override RrFunction Derivative()
+        {
+            throw new Exception("WeightedStepFunction derivative is not a function ");
         }
         public override RrFunction Mult(RrFunction other)
         {

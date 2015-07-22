@@ -3,36 +3,74 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using pragmatic_quant_model.Basic;
-using pragmatic_quant_model.Maths.Function;
 
 namespace pragmatic_quant_model.Maths.Interpolation
 {
     public class CubicSplineInterpoler : RrFunction
     {
         #region private fields
-        private readonly StepFunction<CubicSplineElement> stepCubic;
-        private readonly double[] abscissae;
+        private readonly StepFunction<CubicSplineElement> stepCubics;
+        private readonly double[] pillars;
         #endregion
-
+        #region private methods
+        private CubicSplineInterpoler(StepFunction<CubicSplineElement> stepCubics)
+        {
+            this.stepCubics = stepCubics;
+            pillars = stepCubics.Pillars;
+        }
+        #endregion
         public CubicSplineInterpoler(double[] abscissae, double[] values,
             double leftDerivative = double.NaN, double rightDerivative = double.NaN)
         {
-            this.abscissae = abscissae;
-
-            var cubics = CubicSplineUtils.BuildSpline(abscissae, values, leftDerivative, rightDerivative);
-            var rightExtrapol = cubics.Last();
-            var leftExtrapol = cubics.First();
-            cubics = cubics.Concat(new[] { rightExtrapol }).ToArray();
-
-            stepCubic = new StepFunction<CubicSplineElement>(abscissae, cubics.Map(CubicSplineUtils.AsCubic), leftExtrapol.AsCubic());
+            pillars = abscissae;
+            stepCubics = CubicSplineUtils.BuildSpline(abscissae, values, leftDerivative, rightDerivative)
+                                        .Map(CubicSplineUtils.AsCubic);
         }
 
         public override double Eval(double x)
         {
             int leftIndex;
-            var cubic = stepCubic.Eval(x, out leftIndex);
-            var h = x - abscissae[Math.Max(0, leftIndex)];
+            var cubic = stepCubics.Eval(x, out leftIndex);
+            var h = x - pillars[Math.Max(0, leftIndex)];
             return cubic.A + h * (cubic.B + h * (cubic.C + h * cubic.D));
+        }
+        public override RrFunction Derivative()
+        {
+            return new CubicSplineInterpoler(stepCubics.Map(c => c.Derivative()));
+        }
+    }
+
+    public class RationalSplineInterpoler : RrFunction
+    {
+        #region private fields
+        private readonly StepFunction<RationalFraction> stepSplines;
+        private readonly double[] pillars;
+        #endregion
+        #region private methods
+        private RationalSplineInterpoler(StepFunction<RationalFraction> stepSplines)
+        {
+            this.stepSplines = stepSplines;
+            pillars = stepSplines.Pillars;
+        }
+        #endregion
+        public RationalSplineInterpoler(double[] abscissae, double[] values,
+            double leftDerivative = double.NaN, double rightDerivative = double.NaN)
+        {
+            pillars = abscissae;
+            stepSplines = CubicSplineUtils.BuildSpline(abscissae, values, leftDerivative, rightDerivative)
+                                          .Map(p => (RationalFraction) p);
+        }
+
+        public override double Eval(double x)
+        {
+            int leftIndex;
+            var spline = stepSplines.Eval(x, out leftIndex);
+            var h = x - pillars[Math.Max(0, leftIndex)];
+            return spline.Eval(h);
+        }
+        public override RrFunction Derivative()
+        {
+            return new RationalSplineInterpoler(stepSplines.Map(r => r.Derivative()));
         }
     }
 
@@ -55,7 +93,7 @@ namespace pragmatic_quant_model.Maths.Interpolation
         /// <param name="leftDerivative">Left boundary condition, default is "natural" : zero second derivative </param>
         /// <param name="rightDerivative">Right boundary condition, default is "natural" : zero second derivative </param>
         /// <returns></returns>
-        public static Polynomial[] BuildSpline(double[] abscissae, double[] values,
+        public static Polynomial[] BuildSplineInterpol(double[] abscissae, double[] values,
             double leftDerivative = double.NaN, double rightDerivative = double.NaN)
         {
             Contract.Requires(abscissae.Length == values.Length);
@@ -102,10 +140,28 @@ namespace pragmatic_quant_model.Maths.Interpolation
                 secondDerivatives[k] = secondDerivatives[k] * secondDerivatives[k + 1] + u[k];
             }
 
-            return Enumerable.Range(0, abscissae.Length - 1)
-                .Select(i =>
-                    StepInterpoler(abscissae[i + 1] - abscissae[i], values[i], values[i + 1], secondDerivatives[i], secondDerivatives[i + 1])
-                ).ToArray();
+            return EnumerableUtils.For(0, abscissae.Length - 1, i =>
+            {
+                var step = abscissae[i + 1] - abscissae[i];
+                return StepInterpoler(step, values[i], values[i + 1], secondDerivatives[i], secondDerivatives[i + 1]);
+            });
+        }
+
+        public static StepFunction<Polynomial> BuildSpline(double[] abscissae, double[] values,
+            double leftDerivative = double.NaN, double rightDerivative = double.NaN)
+        {
+            var cubics = BuildSplineInterpol(abscissae, values, leftDerivative, rightDerivative);
+
+            var lastStep = abscissae[abscissae.Length - 1] - abscissae[abscissae.Length - 2];
+            var rightSlope = cubics.Last().Derivative().Eval(lastStep);
+            var rightExtrapol = new Polynomial(values.Last(), rightSlope);
+
+            var leftSlope = cubics.First().Derivative().Eval(0.0);
+            var leftExtrapol = new Polynomial(values.First(), leftSlope);
+
+            cubics = cubics.Concat(new[] { rightExtrapol }).ToArray();
+
+            return new StepFunction<Polynomial>(abscissae, cubics, leftExtrapol);
         }
 
         public static Polynomial StepInterpoler(double step, double leftVal, double rightVal,
@@ -123,7 +179,14 @@ namespace pragmatic_quant_model.Maths.Interpolation
         {
             if (polynom.Degree > 3)
                 throw new Exception("Not a cubic polynomial !");
-            return new CubicSplineElement(polynom.Coeffs[0], polynom.Coeffs[1], polynom.Coeffs[2], polynom.Coeffs[3]);
+            
+            var c = new double[4];
+            polynom.Coeffs.CopyTo(c, 0);
+            return new CubicSplineElement(c[0], c[1], c[2], c[3]);
+        }
+        public static CubicSplineElement Derivative(this CubicSplineElement cubic)
+        {
+            return new CubicSplineElement(cubic.B, 2.0 * cubic.C, 3.0 * cubic.D, 0.0);
         }
     }
 

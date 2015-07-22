@@ -67,6 +67,8 @@ namespace pragmatic_quant_model.Maths.Interpolation
         }
 
         public static readonly Polynomial X = new Polynomial(0.0, 1.0);
+        public static readonly Polynomial Zero = new Polynomial(0.0);
+
         public static implicit operator Polynomial(double a)
         {
             return new Polynomial(a);
@@ -135,6 +137,9 @@ namespace pragmatic_quant_model.Maths.Interpolation
         }
         public static Polynomial Derivative(this Polynomial p)
         {
+            if (p.Degree == 0)
+                return Polynomial.Zero;
+
             var c = p.Coeffs;
             var derivCoeffs = Enumerable.Range(0, c.Length - 1).Map(i => (i + 1) * c[i + 1]);
             return new Polynomial(derivCoeffs);

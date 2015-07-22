@@ -135,6 +135,7 @@
     <Compile Include="Basic\Dates\Duration.cs" />
     <Compile Include="Basic\Price.cs" />
     <Compile Include="Basic\RealInterval.cs" />
+    <Compile Include="Basic\StepFunction.cs" />
     <Compile Include="Basic\Structure\LabelledMatrix.cs" />
     <Compile Include="Basic\Structure\Singleton.cs" />
     <Compile Include="Basic\Structure\TimeMatrixData.cs" />

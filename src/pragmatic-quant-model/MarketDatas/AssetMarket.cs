@@ -141,13 +141,13 @@ namespace pragmatic_quant_model.MarketDatas
     public class VolatilitySurface
     {
         #region private fields
+        private readonly MixedLinearInterpolation2D varianceInterpoler; 
         private readonly Func<double, double> moneyness; 
-        private readonly Interpoler2D variance;
         #endregion
-        protected VolatilitySurface(ITimeMeasure time, Interpoler2D variance, Func<double, double> moneyness)
+        protected VolatilitySurface(ITimeMeasure time, MixedLinearInterpolation2D varianceInterpoler, Func<double, double> moneyness)
         {
             Time = time;
-            this.variance = variance;
+            this.varianceInterpoler = varianceInterpoler;
             this.moneyness = moneyness;
         }
 
@@ -156,19 +156,20 @@ namespace pragmatic_quant_model.MarketDatas
             Func<double, double> moneyness = k => Math.Log(k / assetFwd.Spot);
             double[] timePillars = volMatrix.Time[volMatrix.Pillars];
             double[] moneynessPillars = volMatrix.Strikes.Map(moneyness);
-            
-            double[,] variance = volMatrix.Vols.Map(v => v * v);
-            for (int i = 0; i < variance.GetLength(0); i++)
-                MatrixUtils.MultRow(ref variance, i, timePillars[i]);
 
-            var varianceInterpol = MixedLinearSplineInterpoler.Build(timePillars, moneynessPillars, variance);
+            var varianceSlices = EnumerableUtils.For(0, timePillars.Length, i =>
+            {
+                var varianceSlice = volMatrix.Vols.Row(i).Map(v => timePillars[i] * v * v);
+                return (RrFunction) new RationalSplineInterpoler(moneynessPillars, varianceSlice);
+            });
 
+            var varianceInterpol = new MixedLinearInterpolation2D(timePillars, varianceSlices, varianceSlices.First());
             return new VolatilitySurface(volMatrix.Time, varianceInterpol, moneyness);
         }
 
         public double Variance(double maturity, double strike)
         {
-            return variance.Eval(maturity, moneyness(strike));
+            return varianceInterpoler.Eval(maturity, moneyness(strike));
         }
         public double Volatility(double maturity, double strike)
         {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Maths.Interpolation;
@@ -24,11 +23,11 @@ namespace pragmatic_quant_model.Maths.Function
         {
             var cst = other as ConstantRrFunction;
             if (cst != null)
-                return new ConstantRrFunction(Value * cst.Value);
+                return ProductRrFunctions.Mult(this, cst);
 
             var exp = other as ExpRrFunction;
             if (exp != null)
-                return ExpRrFunction.Mult(exp, this);
+                return ProductRrFunctions.Mult(exp, this);
 
             var step = other as StepFunction;
             if (step != null)
@@ -36,7 +35,7 @@ namespace pragmatic_quant_model.Maths.Function
 
             var lc = other as LinearCombinationRrFunction;
             if (lc != null)
-                return LinearCombinationRrFunction.Mult(lc, this);
+                return ProductRrFunctions.Mult(lc, this);
 
             return base.Mult(other);
         }
@@ -44,9 +43,12 @@ namespace pragmatic_quant_model.Maths.Function
         {
             return new LinearInterpolation(new[] {basePoint}, new[] {0.0}, Value, Value);
         }
+        public override RrFunction Derivative()
+        {
+            return RrFunctions.Zero;
+        }
     }
-
-
+    
     public class ExpRrFunction : RrFunction
     {
         #region private fields
@@ -68,33 +70,32 @@ namespace pragmatic_quant_model.Maths.Function
 
             return new ExpRrFunction(weight, slope);
         }
-        
+
+        public double Weight
+        {
+            get { return weight; }
+        }
+        public double Slope
+        {
+            get { return slope; }
+        }
+
         public override double Eval(double x)
         {
             return weight * Math.Exp(slope * x);
         }
-        
         public override RrFunction Mult(RrFunction other)
         {
             var cst = other as ConstantRrFunction;
             if (cst != null)
-                return Mult(this, cst);
+                return ProductRrFunctions.Mult(this, cst);
 
             var exp = other as ExpRrFunction;
             if (exp != null)
-                return Mult(this, exp);
+                return ProductRrFunctions.Mult(this, exp);
 
             return base.Mult(other);
         }
-        public static RrFunction Mult(ExpRrFunction exp, ConstantRrFunction cst)
-        {
-            return Create(exp.weight * cst.Value, exp.slope);
-        }
-        public static RrFunction Mult(ExpRrFunction letfExp, ExpRrFunction rightExp)
-        {
-            return Create(letfExp.weight * rightExp.weight, letfExp.slope + rightExp.slope);
-        }
-        
         public override RrFunction Integral(double basePoint)
         {
             if (DoubleUtils.EqualZero(slope))
@@ -102,6 +103,10 @@ namespace pragmatic_quant_model.Maths.Function
 
             var zeroBaseIntegral = Create(weight / slope, slope);
             return zeroBaseIntegral - zeroBaseIntegral.Eval(basePoint);
+        }
+        public override RrFunction Derivative()
+        {
+            return Create(weight * slope, slope);
         }
     }
 
@@ -162,6 +167,15 @@ namespace pragmatic_quant_model.Maths.Function
             return new LinearCombinationRrFunction(ws.ToArray(), fs.ToArray());
         }
 
+        public double[] Weights
+        {
+            get { return weights; }
+        }
+        public RrFunction[] Functions
+        {
+            get { return functions; }
+        }
+
         public override double Eval(double x)
         {
             return weights.Select((w, i) => w * functions[i].Eval(x)).Sum();
@@ -171,21 +185,11 @@ namespace pragmatic_quant_model.Maths.Function
         {
             var cst = other as ConstantRrFunction;
             if (cst != null)
-                return Mult(this, cst);
+                return ProductRrFunctions.Mult(this, cst);
 
             return Create(weights, functions.Map(f => f.Mult(other)));
         }
-        public static RrFunction Mult(LinearCombinationRrFunction lc, ConstantRrFunction cst)
-        {
-            if (DoubleUtils.MachineEquality(1.0, cst.Value))
-                return lc;
-
-            if (DoubleUtils.EqualZero(cst.Value))
-                return RrFunctions.Zero;
-
-            return Create(lc.weights.Map(w => w * cst.Value), lc.functions);
-        }
-
+        
         public override RrFunction Add(RrFunction other)
         {
             var lc = other as LinearCombinationRrFunction;
@@ -210,6 +214,10 @@ namespace pragmatic_quant_model.Maths.Function
         {
             return Create(weights, functions.Map(f => f.Integral(basePoint)));
         }
+        public override RrFunction Derivative()
+        {
+            return Create(weights, functions.Map(f => f.Derivative()));
+        }
     }
 
     public class ProductRrFunction : RrFunction
@@ -228,4 +236,31 @@ namespace pragmatic_quant_model.Maths.Function
             return prods.Aggregate(weight, (current, t) => current * t.Eval(x));
         }
     }
+
+    public static class ProductRrFunctions
+    {
+        public static RrFunction Mult(ConstantRrFunction left, ConstantRrFunction right)
+        {
+            return RrFunctions.Constant(left.Value * right.Value);
+        }
+        public static RrFunction Mult(ExpRrFunction exp, ConstantRrFunction cst)
+        {
+            return ExpRrFunction.Create(exp.Weight * cst.Value, exp.Slope);
+        }
+        public static RrFunction Mult(ExpRrFunction letfExp, ExpRrFunction rightExp)
+        {
+            return ExpRrFunction.Create(letfExp.Weight * rightExp.Weight, letfExp.Slope + rightExp.Slope);
+        }
+        public static RrFunction Mult(LinearCombinationRrFunction lc, ConstantRrFunction cst)
+        {
+            if (DoubleUtils.MachineEquality(1.0, cst.Value))
+                return lc;
+
+            if (DoubleUtils.EqualZero(cst.Value))
+                return RrFunctions.Zero;
+
+            return LinearCombinationRrFunction.Create(lc.Weights.Map(w => w * cst.Value), lc.Functions);
+        }
+    }
+
 }

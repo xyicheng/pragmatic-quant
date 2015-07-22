@@ -10,6 +10,10 @@ namespace pragmatic_quant_model.Maths
     {
         public abstract double Eval(double x);
 
+        public virtual RrFunction Derivative()
+        {
+            throw new NotImplementedException("RrFunction.Derivative");
+        }
         public virtual RrFunction Integral(double basePoint)
         {
             throw new NotImplementedException("RrFunction.Integral");
@@ -26,36 +30,22 @@ namespace pragmatic_quant_model.Maths
 
             return RrFunctions.Product(this, other);
         }
-
+        
+        public static implicit operator RrFunction(double cst)
+        {
+            return RrFunctions.Constant(cst);
+        }
         public static RrFunction operator +(RrFunction f, RrFunction g)
         {
             return f.Add(g);
         }
-        public static RrFunction operator +(RrFunction f, double a)
+        public static RrFunction operator -(RrFunction f, RrFunction g)
         {
-            return f.Add(RrFunctions.Constant(a));
+            return f.Add(g.Mult(-1.0));
         }
-        public static RrFunction operator +(double a, RrFunction f)
-        {
-            return f.Add(RrFunctions.Constant(a));
-        }
-        
-        public static RrFunction operator -(RrFunction f, double a)
-        {
-            return f.Add(RrFunctions.Constant(-a));
-        }
-        
         public static RrFunction operator *(RrFunction f, RrFunction g)
         {
             return f.Mult(g);
-        }
-        public static RrFunction operator *(RrFunction f, double a)
-        {
-            return f.Mult(RrFunctions.Constant(a));
-        }
-        public static RrFunction operator *(double a, RrFunction f)
-        {
-            return f.Mult(RrFunctions.Constant(a));
         }
     }
 
@@ -64,6 +54,8 @@ namespace pragmatic_quant_model.Maths
         public static readonly RrFunction Zero = Constant(0.0);
         public static RrFunction Constant(double value)
         {
+            if (DoubleUtils.EqualZero(value))
+                return Zero;
             return new ConstantRrFunction(value);
         }
         public static RrFunction Exp(double slope)
