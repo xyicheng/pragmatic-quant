@@ -1,2 +1,2 @@
-pragmatic-quant-model
-=====================
+pragmatic-quant
+===============
