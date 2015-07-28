@@ -93,7 +93,8 @@ namespace pragmatic_quant_com
 
                 DiscountCurve cashCurve = market.RiskFreeDiscountCurve(assetMarket.Asset.Currency);
                 AssetForwardCurve assetForward = assetMarket.Forward(cashCurve);
-                VolatilitySurface volSurface = VolatilitySurface.BuildInterpol(assetMarket.VolMatrix, assetForward);
+                MoneynessProvider moneyness = MoneynessProvider.FromFwdCurve(assetForward);
+                VolatilitySurface volSurface = VolatilitySurface.BuildInterpol(assetMarket.VolMatrix, moneyness);
                 
                 var maturities = dates.Map(o =>
                 {
@@ -157,8 +158,7 @@ namespace pragmatic_quant_com
 
             if (!(mktObj is string))
                 throw new ApplicationException(string.Format("Unable to build market from : {0}", mktObj));
-
-            var mktId = mktObj as String;
+            var mktId = (String) mktObj;
 
             Market mkt;
             if (!marketByIds.TryGetValue(FormattedId(mktId), out mkt))

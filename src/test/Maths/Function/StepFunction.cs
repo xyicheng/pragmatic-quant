@@ -45,7 +45,7 @@ namespace test.Maths.Function
             var stepFunc = new StepFunction(pillars, vals, leftVal);
             var integral = stepFunc.Integral(pillars[0]);
 
-            Assert.IsTrue(integral is LinearInterpolation);
+            Assert.IsTrue(integral is SplineInterpoler);
             for (int i = 0; i < pillars.Length - 1; i++)
             {
                 var integralVal = integral.Eval(pillars[i]);

@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Linq;
 using pragmatic_quant_model.Basic;
 
-namespace pragmatic_quant_model.Maths.Interpolation
+namespace pragmatic_quant_model.Maths
 {
     [DebuggerDisplay("{ToString()}")]
     public class Polynomial
@@ -89,6 +89,10 @@ namespace pragmatic_quant_model.Maths.Interpolation
         {
             return PolynomialUtils.Mult(left, right);
         }
+        public static RationalFraction operator /(Polynomial num, Polynomial  denom )
+        {
+            return num / (RationalFraction) denom;
+        }
     }
 
     public static class PolynomialUtils
@@ -144,6 +148,23 @@ namespace pragmatic_quant_model.Maths.Interpolation
             var derivCoeffs = Enumerable.Range(0, c.Length - 1).Map(i => (i + 1) * c[i + 1]);
             return new Polynomial(derivCoeffs);
         }
+        public static Polynomial TaylorDev(this Polynomial p, double x)
+        {
+            var coeffs = new double[p.Degree + 1];
+            coeffs[0] = p.Eval(x);
+
+            Polynomial deriv = p;
+            double factorial = 1;
+            for (int i = 1; i < coeffs.Length; i++)
+            {
+                deriv = deriv.Derivative();
+                factorial *= i;
+
+                coeffs[i] = deriv.Eval(x) / factorial;
+            }
+            return new Polynomial(coeffs);
+        }
+
         public static bool IsZero(this Polynomial p)
         {
             return p.Coeffs.All(DoubleUtils.EqualZero);
@@ -169,6 +190,9 @@ namespace pragmatic_quant_model.Maths.Interpolation
         public readonly Polynomial Denom;
         public override string ToString()
         {
+            if (Denom.IsUnity())
+                return Num.ToString();
+
             return string.Format("({0})/({1})", Num, Denom);
         }
 
@@ -203,6 +227,12 @@ namespace pragmatic_quant_model.Maths.Interpolation
         public static RationalFraction Derivative(this RationalFraction f)
         {
             return (f.Num.Derivative() * f.Denom - f.Num * f.Denom.Derivative()) / (RationalFraction)(f.Denom * f.Denom);
+        }
+        public static Polynomial AsPolynomial(this RationalFraction f)
+        {
+            if (f.Denom.Degree > 0)
+                throw new Exception(String.Format("{0} cannot be converted to polynomial !", f));
+            return f.Num * (1.0 / f.Denom.Coeffs[0]);
         }
     }
 }

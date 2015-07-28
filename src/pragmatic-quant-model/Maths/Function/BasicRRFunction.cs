@@ -19,6 +19,22 @@ namespace pragmatic_quant_model.Maths.Function
         {
             return Value;
         }
+        public override RrFunction Add(RrFunction other)
+        {
+            var cst = other as ConstantRrFunction;
+            if (cst != null)
+                return RrFunctions.Constant(Value * cst.Value);
+
+            var step = other as StepFunction;
+            if (step != null)
+                return StepFunction.Add(step, this);
+
+            var spline = other as SplineInterpoler;
+            if (spline != null)
+                return SplineInterpoler.Add(spline, this);
+
+            return base.Add(other);
+        }
         public override RrFunction Mult(RrFunction other)
         {
             var cst = other as ConstantRrFunction;
@@ -33,6 +49,10 @@ namespace pragmatic_quant_model.Maths.Function
             if (step != null)
                 return StepFunction.Mult(step, this);
 
+            var spline = other as SplineInterpoler;
+            if (spline != null)
+                return SplineInterpoler.Mult(spline, this);
+
             var lc = other as LinearCombinationRrFunction;
             if (lc != null)
                 return ProductRrFunctions.Mult(lc, this);
@@ -41,11 +61,15 @@ namespace pragmatic_quant_model.Maths.Function
         }
         public override RrFunction Integral(double basePoint)
         {
-            return new LinearInterpolation(new[] {basePoint}, new[] {0.0}, Value, Value);
+            return RrFunctions.LinearInterpolation(new[] {basePoint}, new[] {0.0}, Value, Value);
         }
         public override RrFunction Derivative()
         {
             return RrFunctions.Zero;
+        }
+        public override RrFunction Inverse()
+        {
+            return RrFunctions.Constant(1.0 / Value);
         }
     }
     
@@ -107,6 +131,10 @@ namespace pragmatic_quant_model.Maths.Function
         public override RrFunction Derivative()
         {
             return Create(weight * slope, slope);
+        }
+        public override RrFunction Inverse()
+        {
+            return Create(1.0 / weight, -slope);
         }
     }
 

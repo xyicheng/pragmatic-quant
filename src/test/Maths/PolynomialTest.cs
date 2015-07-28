@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using pragmatic_quant_model.Basic;
+using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Interpolation;
 
 namespace test.Maths
@@ -78,6 +79,28 @@ namespace test.Maths
         }
 
         [Test]
+        public void Taylor()
+        {
+            var x = Polynomial.X;
+
+            var squareTaylor = (x * x).TaylorDev(1.0);
+            var squareTaylorRef = 1.0 + 2.0 * x + x * x;
+            Assert.IsTrue((squareTaylor - squareTaylorRef).IsZero());
+            
+            var p = 0.25 * x * x * x * x + x * x * x + 3.0 * x * x + 4.0 * x - 17.0;
+            var taylorZero = p.TaylorDev(0.0);
+            Assert.IsTrue((taylorZero - p).IsZero());
+
+            var taylorOne = p.TaylorDev(1.0);
+            var testVals = new[] {-1.0, -0.5, -0.01, 0.02, 1.0, 0.55};
+            foreach (var val in testVals)
+            {
+                var err = Math.Abs(p.Eval(val) - taylorOne.Eval(val - 1.0));
+                Assert.AreEqual(err, 0.0);
+            }
+        }
+
+        [Test]
         public void Eval()
         {
             var x = Polynomial.X;
@@ -85,8 +108,8 @@ namespace test.Maths
 
             const double y = Math.PI * 0.01;
             var p_y = p.Eval(y);
-            const double p_yRef = 1.5 + 2.0 * y - 0.01 * y * y + 0.5 * y * y * y;
-            var err = Math.Abs(p_y / p_yRef - 1.0);
+            const double p_yref = 1.5 + 2.0 * y - 0.01 * y * y + 0.5 * y * y * y;
+            var err = Math.Abs(p_y / p_yref - 1.0);
             Assert.LessOrEqual(err, DoubleUtils.MachineEpsilon);
         }
 

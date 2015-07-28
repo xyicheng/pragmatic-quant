@@ -2,7 +2,6 @@
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Maths;
-using pragmatic_quant_model.Maths.Interpolation;
 
 namespace pragmatic_quant_model.MarketDatas
 {
@@ -24,7 +23,8 @@ namespace pragmatic_quant_model.MarketDatas
             get { return refDate; }
         }
         public FinancingId Financing { get; private set; }
-        public abstract double Zc(DateTime d);
+        public abstract double Zc(DateTime date);
+        public abstract double Zc(double d);
 
         public static DiscountCurve LinearRateInterpol(FinancingId financing, DateTime[] pillars, double[] zcs, ITimeMeasure time)
         {
@@ -50,7 +50,7 @@ namespace pragmatic_quant_model.MarketDatas
                 zcRates[i] = -Math.Log(zcs[i]) / dates[i];
             }
 
-            return new DiscountCurveFromRate(financing, time, new LinearInterpolation(dates, zcRates, 0.0, 0.0));
+            return new DiscountCurveFromRate(financing, time, RrFunctions.LinearInterpolation(dates, zcRates));
         }
         public static DiscountCurve Product(DiscountCurve discount1, DiscountCurve discount2, FinancingId financing)
         {
@@ -77,10 +77,13 @@ namespace pragmatic_quant_model.MarketDatas
             this.time = time;
             this.zcRate = zcRate;
         }
-        public override double Zc(DateTime d)
+        public override double Zc(DateTime date)
         {
-            double t = time[d];
-            return Math.Exp(-zcRate.Eval(t) * t);
+            return Zc(time[date]);
+        }
+        public override double Zc(double d)
+        {
+            return Math.Exp(-zcRate.Eval(d) * d);
         }
     }
     
@@ -100,6 +103,10 @@ namespace pragmatic_quant_model.MarketDatas
             this.discount2 = discount2;
         }
         public override double Zc(DateTime d)
+        {
+            return discount1.Zc(d) * discount2.Zc(d);
+        }
+        public override double Zc(double d)
         {
             return discount1.Zc(d) * discount2.Zc(d);
         }

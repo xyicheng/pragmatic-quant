@@ -30,7 +30,11 @@ namespace pragmatic_quant_model.Maths
 
             return RrFunctions.Product(this, other);
         }
-        
+        public virtual RrFunction Inverse()
+        {
+            throw new NotImplementedException("RrFunction.Inverse");
+        }
+
         public static implicit operator RrFunction(double cst)
         {
             return RrFunctions.Constant(cst);
@@ -47,11 +51,15 @@ namespace pragmatic_quant_model.Maths
         {
             return f.Mult(g);
         }
+        public static RrFunction operator /(RrFunction f, RrFunction g)
+        {
+            return f * g.Inverse();
+        }
     }
 
     public static class RrFunctions
     {
-        public static readonly RrFunction Zero = Constant(0.0);
+        public static readonly RrFunction Zero = new ConstantRrFunction(0.0);
         public static RrFunction Constant(double value)
         {
             if (DoubleUtils.EqualZero(value))
@@ -86,9 +94,9 @@ namespace pragmatic_quant_model.Maths
         }
 
         public static RrFunction LinearInterpolation(double[] abscissae, double[] values,
-                                                    double leftExtrapolationSlope, double rightExtrapolationSlope)
+            double leftExtrapolationSlope = 0.0, double rightExtrapolationSlope = 0.0)
         {
-            return new LinearInterpolation(abscissae, values, leftExtrapolationSlope, rightExtrapolationSlope);
+            return SplineInterpoler.BuildLinearSpline(abscissae, values, leftExtrapolationSlope, rightExtrapolationSlope);
         }
     }
 }

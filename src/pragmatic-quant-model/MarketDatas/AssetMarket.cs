@@ -112,14 +112,24 @@ namespace pragmatic_quant_model.MarketDatas
         {
             return (Spot - CumulatedDividends(d)) * AssetGrowth(d);
         }
+
         public double AssetGrowth(DateTime date)
         {
-            return yieldGrowthFunc.Eval(time[date]) / assetFinancingCurve.Zc(date);
+            return AssetGrowth(time[date]);
         }
-        public double CumulatedDividends(DateTime d)
+        public double AssetGrowth(double d)
         {
-            return cumulatedDividendFunc.Eval(time[d]);
+            return yieldGrowthFunc.Eval(d) / assetFinancingCurve.Zc(d);
         }
+
+        public double CumulatedDividends(DateTime date)
+        {
+            return CumulatedDividends(time[date]);
+        }
+        public double CumulatedDividends(double d)
+        {
+            return cumulatedDividendFunc.Eval(d);
+        } 
     }
 
     public class VolatilityMatrix
@@ -141,26 +151,26 @@ namespace pragmatic_quant_model.MarketDatas
     public class VolatilitySurface
     {
         #region private fields
-        private readonly MixedLinearInterpolation2D varianceInterpoler; 
-        private readonly Func<double, double> moneyness; 
+        private readonly MixedLinearInterpolation2D varianceInterpoler;
+        private readonly MoneynessProvider moneyness; 
         #endregion
-        protected VolatilitySurface(ITimeMeasure time, MixedLinearInterpolation2D varianceInterpoler, Func<double, double> moneyness)
+        protected VolatilitySurface(ITimeMeasure time, MixedLinearInterpolation2D varianceInterpoler, MoneynessProvider moneyness)
         {
             Time = time;
             this.varianceInterpoler = varianceInterpoler;
             this.moneyness = moneyness;
         }
 
-        public static VolatilitySurface BuildInterpol(VolatilityMatrix volMatrix, AssetForwardCurve assetFwd)
+        public static VolatilitySurface BuildInterpol(VolatilityMatrix volMatrix, MoneynessProvider moneyness)
         {
-            Func<double, double> moneyness = k => Math.Log(k / assetFwd.Spot);
             double[] timePillars = volMatrix.Time[volMatrix.Pillars];
-            double[] moneynessPillars = volMatrix.Strikes.Map(moneyness);
-
+            
             var varianceSlices = EnumerableUtils.For(0, timePillars.Length, i =>
             {
-                var varianceSlice = volMatrix.Vols.Row(i).Map(v => timePillars[i] * v * v);
-                return (RrFunction) new RationalSplineInterpoler(moneynessPillars, varianceSlice);
+                double t = timePillars[i];
+                double[] moneynessPillars = volMatrix.Strikes.Map(k => moneyness.Moneyness(t, k));
+                var varianceSlice = volMatrix.Vols.Row(i).Map(v => t * v * v);
+                return (RrFunction) SplineInterpoler.BuildCubicSpline(moneynessPillars, varianceSlice);
             });
 
             var varianceInterpol = new MixedLinearInterpolation2D(timePillars, varianceSlices, varianceSlices.First());
@@ -169,7 +179,8 @@ namespace pragmatic_quant_model.MarketDatas
 
         public double Variance(double maturity, double strike)
         {
-            return varianceInterpoler.Eval(maturity, moneyness(strike));
+            var m = moneyness.Moneyness(maturity, strike);
+            return varianceInterpoler.Eval(maturity, m);
         }
         public double Volatility(double maturity, double strike)
         {
@@ -180,6 +191,36 @@ namespace pragmatic_quant_model.MarketDatas
             return Volatility(Time[maturity], strike);
         }
         public ITimeMeasure Time { get; private set; }
+    }
+
+    public abstract class MoneynessProvider
+    {
+        public abstract double Moneyness(double maturity, double strike);
+        public abstract double Strike(double maturity, double moneyness);
+
+        public static MoneynessProvider FromFwdCurve(AssetForwardCurve assetFwd)
+        {
+            return new ForwardMoneynessProvider(assetFwd);
+        }
+
+        #region private class
+        private class ForwardMoneynessProvider : MoneynessProvider
+        {
+            private readonly AssetForwardCurve assetFwd;
+            public ForwardMoneynessProvider(AssetForwardCurve assetFwd)
+            {
+                this.assetFwd = assetFwd;
+            }
+            public override double Moneyness(double maturity, double strike)
+            {
+                return Math.Log((strike / assetFwd.AssetGrowth(maturity) + assetFwd.CumulatedDividends(maturity)) / assetFwd.Spot);
+            }
+            public override double Strike(double maturity, double moneyness)
+            {
+                return (Math.Exp(moneyness) * assetFwd.Spot - assetFwd.CumulatedDividends(maturity)) * assetFwd.AssetGrowth(maturity);
+            }
+        }
+        #endregion
     }
     
 }

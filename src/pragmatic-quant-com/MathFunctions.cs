@@ -49,7 +49,7 @@ namespace pragmatic_quant_com
         {
             try
             {
-                var interpoler = new CubicSplineInterpoler(abscissae, values);
+                var interpoler = SplineInterpoler.BuildCubicSpline(abscissae, values);
 
                 var result = new double[points.Length, 1];
                 for (int i = 0; i < points.Length; i++)

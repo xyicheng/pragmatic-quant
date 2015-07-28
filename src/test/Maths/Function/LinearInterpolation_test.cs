@@ -1,5 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using NUnit.Framework;
+using pragmatic_quant_model.Basic;
+using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Interpolation;
 
 namespace test.Maths.Function
@@ -15,7 +18,7 @@ namespace test.Maths.Function
             const double leftSlope = 0.0;
             const double rightSlope = 0.98181;
 
-            var stepFunc = new LinearInterpolation(abs, vals, leftSlope, rightSlope);
+            var stepFunc = RrFunctions.LinearInterpolation(abs, vals, leftSlope, rightSlope);
 
             foreach (var i in Enumerable.Range(0, abs.Length))
             {
@@ -44,11 +47,61 @@ namespace test.Maths.Function
             var abs = new[] {0.0, 0.5, 0.99, 2.5};
             var vals = new[] {5.0, 5.4, 3.1, 1.0};
 
-            var stepFunc = new CubicSplineInterpoler(abs, vals, double.NaN, double.NaN);
+            var stepFunc = SplineInterpoler.BuildCubicSpline(abs, vals);
 
             foreach (var i in Enumerable.Range(0, abs.Length-1))
             {
                 Assert.AreEqual(stepFunc.Eval(abs[i]), vals[i]);
+            }
+        }
+
+        [Test]
+        public void Add()
+        {
+            var cubic1 = SplineInterpoler.BuildCubicSpline(new[] { 0.0, 1.0, 2.0, 3.0 }, new[] { 1.0, 0.22, -0.1, 0.1 });
+            var cubic2 = SplineInterpoler.BuildCubicSpline(new[] { -0.5, 1.1, 2.0, 5.0 }, new[] { 1.0, 0.22, -0.1, 0.1 });
+            var add = cubic1 + cubic2;
+
+            Assert.IsTrue(add is SplineInterpoler);
+
+            var testVals = new[] {-0.5, 0.0, 1.0, 1.1, 2.0, 3.0, 5.0};
+            foreach (var x in testVals)
+            {
+                var err = Math.Abs(add.Eval(x) - (cubic1.Eval(x) + cubic2.Eval(x)));
+                Assert.AreEqual(err, 0.0);
+            }
+
+            var rand = new Random(251);
+            for (int i = 0; i < 100; i++)
+            {
+                double x = -5.0 + 12.0 * rand.NextDouble();
+                var err = Math.Abs(add.Eval(x) - (cubic1.Eval(x) + cubic2.Eval(x)));
+                Assert.LessOrEqual(err, 9.0 * DoubleUtils.MachineEpsilon);
+            }
+        }
+
+        [Test]
+        public void Mult()
+        {
+            var cubic1 = SplineInterpoler.BuildCubicSpline(new[] { 0.0, 1.0, 2.0, 3.0 }, new[] { 1.0, 0.22, -0.1, 0.1 });
+            var cubic2 = SplineInterpoler.BuildCubicSpline(new[] { -0.5, 1.1, 2.0, 5.0 }, new[] { 1.0, 0.22, -0.1, 0.1 });
+            var mult = cubic1 * cubic2;
+
+            Assert.IsTrue(mult is SplineInterpoler);
+
+            var testVals = new[] { -0.5, 0.0, 1.0, 1.1, 2.0, 3.0, 5.0 };
+            foreach (var x in testVals)
+            {
+                var err = Math.Abs(mult.Eval(x) - (cubic1.Eval(x) * cubic2.Eval(x)));
+                Assert.AreEqual(err, 0.0);
+            }
+
+            var rand = new Random(251);
+            for (int i = 0; i < 100; i++)
+            {
+                double x = -5.0 + 12.0 * rand.NextDouble();
+                var err = Math.Abs(mult.Eval(x) - (cubic1.Eval(x) * cubic2.Eval(x)));
+                Assert.LessOrEqual(err, 18.0 * DoubleUtils.MachineEpsilon);
             }
         }
     }
