@@ -13,8 +13,7 @@ namespace pragmatic_quant_model.Product
 
     public interface IProductVisitor<out TResult>
     {
-        TResult Visit(FloatCoupon floatCoupon);
-        TResult Visit(FixedCoupon fixedCoupon);
+        TResult Visit(Coupon coupon);
         TResult Visit<TCoupon>(Leg<TCoupon> leg) where TCoupon : Coupon;
     }
 
@@ -36,13 +35,9 @@ namespace pragmatic_quant_model.Product
         #region private methods
         private class FixingProductVisitor : IProductVisitor<IFixing[]>
         {
-            public IFixing[] Visit(FloatCoupon floatCoupon)
+            public IFixing[] Visit(Coupon coupon)
             {
-                return floatCoupon.Fixings;
-            }
-            public IFixing[] Visit(FixedCoupon fixedCoupon)
-            {
-                return new IFixing[0];
+                return coupon.Fixings;
             }
             public IFixing[] Visit<TCoupon>(Leg<TCoupon> leg) where TCoupon : Coupon
             {
@@ -53,20 +48,10 @@ namespace pragmatic_quant_model.Product
 
         private class EventDateProductVisitor : IProductVisitor<DateTime[]>
         {
-            #region private methods
-            private static DateTime[] CouponEventDates(Coupon coupon)
+            public DateTime[] Visit(Coupon coupon)
             {
                 var fixingsDates = coupon.Fixings.Select(f => f.Date).Distinct();
                 return fixingsDates.Union(new[] {coupon.PaymentInfo.Date}).ToArray();
-            }
-            #endregion
-            public DateTime[] Visit(FloatCoupon floatCoupon)
-            {
-                return CouponEventDates(floatCoupon);
-            }
-            public DateTime[] Visit(FixedCoupon fixedCoupon)
-            {
-                return CouponEventDates(fixedCoupon);
             }
             public DateTime[] Visit<TCoupon>(Leg<TCoupon> leg) where TCoupon : Coupon
             {
@@ -77,19 +62,9 @@ namespace pragmatic_quant_model.Product
 
         private class PaymentProductVisitor : IProductVisitor<PaymentInfo[]>
         {
-            #region private fields
-            private PaymentInfo[] VisitCoupon(Coupon coupon)
+            public PaymentInfo[] Visit(Coupon coupon)
             {
                 return new[] {coupon.PaymentInfo};
-            }
-            #endregion
-            public PaymentInfo[] Visit(FloatCoupon floatCoupon)
-            {
-                return VisitCoupon(floatCoupon);
-            }
-            public PaymentInfo[] Visit(FixedCoupon fixedCoupon)
-            {
-                return VisitCoupon(fixedCoupon);
             }
             public PaymentInfo[] Visit<TCoupon>(Leg<TCoupon> leg) where TCoupon : Coupon
             {
@@ -99,5 +74,5 @@ namespace pragmatic_quant_model.Product
         }
         #endregion
     }
-    
+
 }

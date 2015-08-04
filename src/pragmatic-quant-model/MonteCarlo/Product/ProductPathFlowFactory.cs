@@ -97,13 +97,9 @@ namespace pragmatic_quant_model.MonteCarlo.Product
             this.simulatedRebasement = simulatedRebasement;
         }
 
-        public IProductPathFlow Visit(FloatCoupon floatCoupon)
+        public IProductPathFlow Visit(Coupon coupon)
         {
-            return BuildCouponPathFlow(simulatedFixings, simulatedRebasement, floatCoupon);
-        }
-        public IProductPathFlow Visit(FixedCoupon fixedCoupon)
-        {
-            return BuildCouponPathFlow(simulatedFixings, simulatedRebasement, fixedCoupon);
+            return BuildCouponPathFlow(simulatedFixings, simulatedRebasement, coupon);
         }
         public IProductPathFlow Visit<TCoupon>(Leg<TCoupon> leg) where TCoupon : Coupon
         {

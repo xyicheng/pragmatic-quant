@@ -118,6 +118,12 @@
     <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Irony">
+      <HintPath>..\..\libraries\Irony\Irony.dll</HintPath>
+    </Reference>
+    <Reference Include="Irony.Interpreter">
+      <HintPath>..\..\libraries\Irony\Irony.Interpreter.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
@@ -203,6 +209,11 @@
     <Compile Include="Pricing\IPricer.cs" />
     <Compile Include="Pricing\McPricer.cs" />
     <Compile Include="Pricing\PriceConverter.cs" />
+    <Compile Include="Product\CouponDsl\CouponGrammar.cs" />
+    <Compile Include="Product\CouponDsl\CouponPayoffExpression.cs" />
+    <Compile Include="Product\CouponDsl\CouponPayoffExpressionParser.cs" />
+    <Compile Include="Product\CouponDsl\DslCoupon.cs" />
+    <Compile Include="Product\CouponDsl\DslCouponCompiler.cs" />
     <Compile Include="Product\PaymentInfo.cs" />
     <Compile Include="MonteCarlo\Product\IProductPathFlow.cs" />
     <Compile Include="MonteCarlo\Product\ProductPathFlowCalculator.cs" />

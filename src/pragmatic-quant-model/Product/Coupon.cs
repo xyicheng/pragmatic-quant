@@ -6,23 +6,30 @@ namespace pragmatic_quant_model.Product
 {
     public abstract class Coupon : IProduct
     {
-        protected Coupon(PaymentInfo paymentInfo)
+        protected Coupon(PaymentInfo paymentInfo, params IFixing[] fixings)
         {
             PaymentInfo = paymentInfo;
+            Fixings = fixings;
         }
 
         public PaymentInfo PaymentInfo { get; private set; }
-        public abstract IFixing[] Fixings { get; }
+        public IFixing[] Fixings { get; private set; }
         public abstract double Payoff(double[] fixings);
 
         public FinancingId Financing { get { return PaymentInfo.Financing; } }
-        public abstract TResult Accept<TResult>(IProductVisitor<TResult> visitor);
+        
+        public TResult Accept<TResult>(IProductVisitor<TResult> visitor)
+        {
+            return visitor.Visit(this);
+        }
     }
 
     public abstract class RateCoupon : Coupon
     {
-        protected RateCoupon(FinancingId financing, Currency payCurrency, double nominal, CouponSchedule schedule, DayCountFrac basis)
-            : base(new PaymentInfo(payCurrency, schedule.Pay, financing))
+        protected RateCoupon(FinancingId financing, Currency payCurrency, 
+            double nominal, CouponSchedule schedule, DayCountFrac basis, 
+            params IFixing[] fixings)
+            : base(new PaymentInfo(payCurrency, schedule.Pay, financing), fixings)
         {
             Basis = basis;
             Schedule = schedule;
@@ -43,16 +50,14 @@ namespace pragmatic_quant_model.Product
     public class FloatCoupon : RateCoupon
     {
         #region private fields
-        private readonly Libor libor;
         private readonly double add;
         private readonly double mult;
         #endregion
         
         public FloatCoupon(FinancingId financing, Libor libor, double add, double mult,
             double nominal, CouponSchedule schedule, DayCountFrac basis)
-            : base(financing, libor.Currency, nominal, schedule, basis)
+            : base(financing, libor.Currency, nominal, schedule, basis, libor)
         {
-            this.libor = libor;
             this.add = add;
             this.mult = mult;
         }
@@ -65,14 +70,6 @@ namespace pragmatic_quant_model.Product
         protected override double RateFixing(double[] fixings)
         {
             return add + mult * fixings[0];
-        }
-        public override IFixing[] Fixings
-        {
-            get { return new IFixing[] {libor}; }
-        }
-        public override TResult Accept<TResult>(IProductVisitor<TResult> visitor)
-        {
-            return visitor.Visit(this);
         }
     }
 
@@ -87,18 +84,11 @@ namespace pragmatic_quant_model.Product
         }
 
         public double Coupon { get; private set; }
-        public override IFixing[] Fixings
-        {
-            get { return new IFixing[0]; }
-        }
         public override double Payoff(double[] fixings)
         {
             return Coupon;
         }
-        public override TResult Accept<TResult>(IProductVisitor<TResult> visitor)
-        {
-            return visitor.Visit(this);
-        }
+        
     }
     
     public class Leg<TCoupon>
