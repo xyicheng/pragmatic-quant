@@ -3,7 +3,7 @@ using pragmatic_quant_model.MarketDatas;
 
 namespace pragmatic_quant_model.Basic
 {
-    [DebuggerDisplay("{Value} {Currency}")]
+    [DebuggerDisplay("Price = {Value} {Currency}")]
     public class Price
     {
         public Price(double value, Currency currency)

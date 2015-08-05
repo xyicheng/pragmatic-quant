@@ -14,7 +14,7 @@ namespace pragmatic_quant_model.Product.CouponDsl
             this.payoff = payoff;
         }
 
-        public static Coupon Parse(PaymentInfo paymentInfo, IDictionary<string, object> couponParameters, string dslPayoffScript)
+        public static DslCoupon Parse(PaymentInfo paymentInfo, IDictionary<string, object> couponParameters, string dslPayoffScript)
         {
             CouponPayoffExpression payoff = CouponPayoffExpressionParser.Parse(dslPayoffScript, couponParameters);
             return DslCouponCompiler.BuildCoupon(paymentInfo, payoff);

@@ -9,7 +9,7 @@ namespace pragmatic_quant_com.Factories
     using TimeMatrixDatas = LabelledMatrix<DateOrDuration, string, double>;
     using EqtyVolMatrix = LabelledMatrix<DateOrDuration, double, double>; 
 
-    public class BagServices
+    public static class BagServices
     {
         #region private methods
         private static bool IsEmptyCell(object cellValue)

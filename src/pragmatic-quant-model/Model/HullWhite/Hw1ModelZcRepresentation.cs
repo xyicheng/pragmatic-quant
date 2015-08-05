@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics.Contracts;
 using pragmatic_quant_model.Basic.Dates;
+using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Product;

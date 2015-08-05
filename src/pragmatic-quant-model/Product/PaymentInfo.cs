@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using pragmatic_quant_model.MarketDatas;
 
 namespace pragmatic_quant_model.Product
 {
+    [DebuggerDisplay("PaymentInfo : Currency = {Currency}, Date = {Date} ...")]
     public class PaymentInfo
     {
 

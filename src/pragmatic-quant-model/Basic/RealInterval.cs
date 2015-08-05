@@ -38,7 +38,7 @@ namespace pragmatic_quant_model.Basic
         public bool Contain(double x)
         {
             return (IsLeftOpen ? x > Inf : x >= Inf)
-                   && (IsRightOpen ? x < Inf : x <= Inf);
+                   && (IsRightOpen ? x < Sup : x <= Sup);
         }
         public override string ToString()
         {

@@ -93,14 +93,17 @@ namespace pragmatic_quant_model.Product
 
         public static IFixing Parse(string fixingDesc, DateTime date)
         {
-            var elems = fixingDesc.Trim().ToLower().Split('(', ')');
+            var elems = fixingDesc.Trim().Split('(', ')');
+
+            if (elems.Length < 2)
+                throw new Exception("Unable to parse fixing : " + fixingDesc);
 
             var fixingType = elems[0];
             var args = elems[1].Split(',');
 
             IFixing fixing;
             bool parsingSucces;
-            switch (fixingType)
+            switch (fixingType.ToLowerInvariant())
             {
                 case "asset" :
                     parsingSucces = TryParseAsset(date, args, out fixing);

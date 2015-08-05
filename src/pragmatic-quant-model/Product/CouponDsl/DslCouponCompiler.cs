@@ -11,9 +11,14 @@ namespace pragmatic_quant_model.Product.CouponDsl
     {
         #region private fields
         private const string PayoffClassName = "GeneratedCouponDslPayoff";
+        private static int _methodIdentifier; 
         #endregion
         #region private methods
-        private static MethodInfo CompileToMethod(string couponExpression, string fixingArrayId)
+        private static string GetMethodId()
+        {
+            return string.Format("Payoff{0}", _methodIdentifier++);
+        }
+        private static MethodInfo CompileToMethod(string couponExpression, string methodId, string fixingArrayId)
         {
             // Generate C# code
             StringBuilder code = new StringBuilder();
@@ -22,7 +27,7 @@ namespace pragmatic_quant_model.Product.CouponDsl
             code.AppendLine("{");
 
             //PayoffMethod
-            code.AppendLine(string.Format("public static double Payoff(double[] {0})", fixingArrayId));
+            code.AppendLine(string.Format("public static double {0}(double[] {1})", methodId, fixingArrayId));
             code.AppendLine("{");
             code.AppendLine("return " + couponExpression + ";");
             code.AppendLine("}");
@@ -53,13 +58,13 @@ namespace pragmatic_quant_model.Product.CouponDsl
             // Locate the method we've just defined (cf. CodeGenerator).
             return results.CompiledAssembly.GetModules()[0]
                 .GetType(PayoffClassName)
-                .GetMethod("Payoff");
+                .GetMethod(methodId);
         }
         #endregion
-        
-        public static Coupon BuildCoupon(PaymentInfo paymentInfo, CouponPayoffExpression payoffExpression)
+
+        public static DslCoupon BuildCoupon(PaymentInfo paymentInfo, CouponPayoffExpression payoffExpression)
         {
-            var payoffMethod = CompileToMethod(payoffExpression.Expression, payoffExpression.FixingArrayId);
+            var payoffMethod = CompileToMethod(payoffExpression.Expression, GetMethodId(), payoffExpression.FixingArrayId);
             return new DslCoupon(paymentInfo, payoffExpression.Fixings.ToArray(), payoffMethod);
         }
     }

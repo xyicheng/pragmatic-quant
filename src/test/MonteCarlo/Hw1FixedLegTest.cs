@@ -37,9 +37,7 @@ namespace test.MonteCarlo
         {
             const int mat = 10;
             var dates = Enumerable.Range(0, mat).Select(i => refDate + (i + 1) * Duration.Year);
-            
-            var financing = FinancingId.RiskFree(Currency.Eur);
-            var coupons = dates.Map(d => new FixedCoupon(new PaymentInfo(financing.Currency, d, financing), 1.0));
+            var coupons = dates.Map(d => new FixedCoupon(new PaymentInfo(Currency.Eur, d), 1.0));
             return new Leg<FixedCoupon>(coupons);
         }
         #endregion

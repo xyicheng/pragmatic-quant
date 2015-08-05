@@ -100,22 +100,7 @@ namespace pragmatic_quant_model.Product.CouponDsl
             AddToNoReportGroup(NewLine);
             AddOperatorReportGroup("operator");
             AddTermsReportGroup("assignment operator", "=", "+=", "-=", "*=", "/=");
-
-            //8. Console
-            ConsoleTitle = "Irony Expression Evaluator";
-            ConsoleGreeting =
-      @"Irony Expression Evaluator 
-
-  Supports variable assignments, arithmetic operators (+, -, *, /),
-    augmented assignments (+=, -=, etc), prefix/postfix operators ++,--, string operations. 
-  Supports big integer arithmetics, string operations.
-  Supports strings with embedded expressions : ""name: #{name}""
-
-Press Ctrl-C to exit the program at any time.
-";
-            ConsolePrompt = "?";
-            ConsolePromptMoreInput = "?";
-
+            
             //9. Language flags. 
             // Automatically add NewLine before EOF so that our BNF rules work correctly when there's no final line break in source
             LanguageFlags = LanguageFlags.NewLineBeforeEOF | LanguageFlags.CreateAst | LanguageFlags.SupportsBigInt;

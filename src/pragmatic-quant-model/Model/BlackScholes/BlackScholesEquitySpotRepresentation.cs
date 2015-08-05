@@ -17,7 +17,7 @@ namespace pragmatic_quant_model.Model.BlackScholes
             this.assetDiscountCurve = assetDiscountCurve;
             this.probaMeasure = probaMeasure;
         }
-        public override RnRFunction Spot(DateTime date, double initialSpot)
+        public override RnRFunction Spot(DateTime date)
         {
             var forwardWithoutDivs = assetDiscountCurve.Zc(probaMeasure.Date) / assetDiscountCurve.Zc(date);
             return RnRFunctions.Affine(0.0, new[] {forwardWithoutDivs});

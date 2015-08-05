@@ -36,9 +36,9 @@ namespace pragmatic_quant_model.Model
             EquitySpotRepresentation equityRepresentation;
             if (equityRepresentations.TryGetValue(eqtySpot.AssetId, out equityRepresentation))
             {
-                throw new NotImplementedException();
+                return equityRepresentation.Spot(eqtySpot.Date).Eval;
             }
-            throw new Exception(string.Format("Not handled equity {0}", eqtySpot));
+            throw new Exception(string.Format("Not handled equity {0}", eqtySpot.AssetId));
         }
         #endregion
         public FactorRepresentation(Market market,
@@ -98,7 +98,7 @@ namespace pragmatic_quant_model.Model
         {
             Asset = asset;
         }
-        public abstract RnRFunction Spot(DateTime date, double initialSpot);
+        public abstract RnRFunction Spot(DateTime date);
         public AssetId Asset { get; private set; }
     }
     

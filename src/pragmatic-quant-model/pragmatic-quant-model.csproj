@@ -144,7 +144,7 @@
     <Compile Include="Basic\StepFunction.cs" />
     <Compile Include="Basic\Structure\LabelledMatrix.cs" />
     <Compile Include="Basic\Structure\Singleton.cs" />
-    <Compile Include="Basic\Structure\TimeMatrixData.cs" />
+    <Compile Include="Basic\Structure\MapRawDatas.cs" />
     <Compile Include="Basic\Dates\TimeMeasure.cs" />
     <Compile Include="MarketDatas\AssetId.cs" />
     <Compile Include="MarketDatas\AssetMarket.cs" />
@@ -214,6 +214,7 @@
     <Compile Include="Product\CouponDsl\CouponPayoffExpressionParser.cs" />
     <Compile Include="Product\CouponDsl\DslCoupon.cs" />
     <Compile Include="Product\CouponDsl\DslCouponCompiler.cs" />
+    <Compile Include="Product\GenericLegFactory.cs" />
     <Compile Include="Product\PaymentInfo.cs" />
     <Compile Include="MonteCarlo\Product\IProductPathFlow.cs" />
     <Compile Include="MonteCarlo\Product\ProductPathFlowCalculator.cs" />

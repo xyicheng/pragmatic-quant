@@ -46,7 +46,7 @@ namespace test.Model
             var refDate = DateTime.Parse("07/06/2009");
             var hw1 = new Hw1Model(TimeMeasure.Act365(refDate), Currency.Eur, lambda, sigma);
 
-            var probaMeasure = new PaymentInfo(hw1.Currency, refDate + probaMaturity, FinancingId.RiskFree(hw1.Currency));
+            var probaMeasure = new PaymentInfo(hw1.Currency, refDate + probaMaturity);
             var t = refDate + simulationMaturity;
 
             var hw1PathGen = new Hw1ModelPathGeneratorFactory().Build(hw1, null, probaMeasure, new[] {t});

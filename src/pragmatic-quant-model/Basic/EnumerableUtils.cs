@@ -32,6 +32,10 @@ namespace pragmatic_quant_model.Basic
         {
             return lists.Aggregate(new T[0], (result, current) => result.Concat(current).ToArray());
         }
+        public static IDictionary<TIn, TOut> ZipToDictionary<TIn, TOut>(this IList<TIn> keys, IList<TOut> values)
+        {
+            return Enumerable.Range(0, keys.Count).ToDictionary(i => keys[i], i => values[i]);
+        }
     }
 
     public static class FuncUtils

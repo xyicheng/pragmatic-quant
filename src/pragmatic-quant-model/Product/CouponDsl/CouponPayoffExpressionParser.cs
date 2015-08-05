@@ -40,6 +40,8 @@ namespace pragmatic_quant_model.Product.CouponDsl
         #region private methods
         private object RetrieveParameter(string paramName)
         {
+            paramName = paramName.Trim().ToLowerInvariant();
+
             object obj;
             if (!couponParameters.TryGetValue(paramName, out obj))
                 throw new Exception(string.Format("Missing coupon parameter : {0} ", paramName));

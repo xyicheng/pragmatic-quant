@@ -20,7 +20,7 @@ namespace pragmatic_quant_model.MonteCarlo
         private PaymentInfo ProbaMeasure(IEnumerable<DateTime> simulatedDates, IModel model)
         {
             var horizon = simulatedDates.Max();
-            return new PaymentInfo(model.PivotCurrency, horizon, FinancingId.RiskFree(model.PivotCurrency));
+            return new PaymentInfo(model.PivotCurrency, horizon);
         }
         #endregion
 

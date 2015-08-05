@@ -19,7 +19,7 @@ namespace pragmatic_quant_model.Model.BlackScholes
                 .OrderBy(div => div.Date)
                 .ToArray();
             //If step end date is not a div date, we insert a fictious zero dividend
-            if (!end.Equals(stepDividends.Last().Date))
+            if (!(stepDividends.Any() && end.Equals(stepDividends.Last().Date)))
                 stepDividends = stepDividends.Union(new[] {DiscreteLocalDividend.ZeroDiv(end)}).ToArray();
             
             var variance = (model.Sigma * model.Sigma).Integral(0.0);
@@ -134,8 +134,9 @@ namespace pragmatic_quant_model.Model.BlackScholes
                 {
                     var dW = dWs[brownianIndex++][0];
                     double fwdBeforeDiv = currentFwd * Math.Exp(stepVols[subStep] * dW + stepVarDrifts[subStep]);
-                    double div = stepDivs[subStep].Value(fwdBeforeDiv * stepDiscount[subStep]);
-                    currentFwd = Math.Max(0.0, fwdBeforeDiv - div);
+                    double discount = stepDiscount[subStep];
+                    double div = stepDivs[subStep].Value(fwdBeforeDiv * discount);
+                    currentFwd = Math.Max(0.0, fwdBeforeDiv - div / discount);
                 }
                 processPath[step] = new[] {currentFwd};
             }

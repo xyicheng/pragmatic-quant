@@ -30,7 +30,7 @@ namespace pragmatic_quant_model.Basic
             if (rowStartIndex < 0 || rowStartIndex + rowLength > array.GetLength(0))
                 throw new IndexOutOfRangeException();
             if (colStartIndex < 0 || colStartIndex + colLength > array.GetLength(1))
-                throw new IndexOutOfRangeException(); 
+                throw new IndexOutOfRangeException();
 
             var result = new T[rowLength, colLength];
             for (int i = 0; i < result.GetLength(0); i++)
@@ -50,7 +50,7 @@ namespace pragmatic_quant_model.Basic
         public static TResult[,] Map<T, TResult>(this T[,] array, Func<T, TResult> map)
         {
             var result = new TResult[array.GetLength(0), array.GetLength(1)];
-            for(int i=0; i<result.GetLength(0); i++)
+            for (int i = 0; i < result.GetLength(0); i++)
                 for (int j = 0; j < result.GetLength(1); j++)
                     result[i, j] = map(array[i, j]);
             return result;
@@ -58,7 +58,7 @@ namespace pragmatic_quant_model.Basic
         public static TResult[,] CartesianProd<TA, TB, TResult>(TA[] a, TB[] b, Func<TA, TB, TResult> func)
         {
             var result = new TResult[a.Count(), b.Count()];
-            for(int i=0; i<a.Count(); i++)
+            for (int i = 0; i < a.Count(); i++)
                 for (int j = 0; j < b.Count(); j++)
                     result[i, j] = func(a[i], b[j]);
             return result;
@@ -84,7 +84,20 @@ namespace pragmatic_quant_model.Basic
             for (int i = 0; i < row.Length; i++)
                 array[rowIndex, i] = row[i];
         }
-        
+        public static void SetSubArray<T>(ref T[,] array, int rowIndex, int colIndex, T[,] subArray)
+        {
+            if (rowIndex < 0 || rowIndex >= array.GetLength(0)
+                || colIndex < 0 || colIndex >= array.GetLength(1))
+                throw new IndexOutOfRangeException();
+            if (rowIndex + subArray.GetLength(0) > array.GetLength(0)
+                || colIndex + subArray.GetLength(1) > array.GetLength(1))
+                throw new IndexOutOfRangeException();
+
+            for (int i = 0; i < subArray.GetLength(0); i++)
+                for (int j = 0; j < subArray.GetLength(1); j++)
+                    array[rowIndex + i, colIndex + j] = subArray[i, j];
+        }
+
         public static int FindIndex<T>(this T[] array, T element)
         {
             return array.ToList().FindIndex(e => e.Equals(element));
