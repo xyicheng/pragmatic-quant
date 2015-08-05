@@ -56,7 +56,7 @@ namespace pragmatic_quant_com.Factories
         }
         #endregion
 
-        public static bool Has(object[,] bag, string name, out int row, out int col)
+        public static bool Has(this object[,] bag, string name, out int row, out int col)
         {
             var loweredName = name.ToLowerInvariant().Trim();
 
@@ -74,13 +74,13 @@ namespace pragmatic_quant_com.Factories
             col = int.MaxValue;
             return false;
         }
-        public static bool Has(object[,] bag, string name)
+        public static bool Has(this object[,] bag, string name)
         {
             int row, col;
             return Has(bag, name, out row, out col);
         }
 
-        public static T ProcessScalar<T>(object[,] bag, int row, int col, Func<object, T> valueMap, string missingException)
+        public static T ProcessScalar<T>(this object[,] bag, int row, int col, Func<object, T> valueMap, string missingException)
         {
             if (col >= bag.GetUpperBound(1))
                 throw new Exception(missingException);
@@ -92,7 +92,7 @@ namespace pragmatic_quant_com.Factories
 
             return valueMap(scalar);
         }
-        public static T ProcessScalar<T>(object[,] bag, string name, Func<object, T> valueMap)
+        public static T ProcessScalar<T>(this object[,] bag, string name, Func<object, T> valueMap)
         {
             int row, col;
             if (Has(bag, name, out row, out col))
@@ -101,20 +101,20 @@ namespace pragmatic_quant_com.Factories
             }
             throw MissingParameter(name);
         }
-        public static double ProcessScalarDouble(object[,] bag, string name)
+        public static double ProcessScalarDouble(this object[,] bag, string name)
         {
             return ProcessScalar(bag, name, DoubleValueConverter(name));
         }
-        public static string ProcessScalarString(object[,] bag, string name)
+        public static string ProcessScalarString(this object[,] bag, string name)
         {
             return ProcessScalar(bag, name, o => o.ToString());
         }
-        public static DateOrDuration ProcessScalarDateOrDuration(object[,] bag, string name)
+        public static DateOrDuration ProcessScalarDateOrDuration(this object[,] bag, string name)
         {
             return ProcessScalar(bag, name, DateOrDurationValueConverter(name));
         }
 
-        public static T[] ProcessVector<T>(object[,] bag, int baseRow, int baseCol, Func<object, T> valueMap, string missingException)
+        public static T[] ProcessVector<T>(this object[,] bag, int baseRow, int baseCol, Func<object, T> valueMap, string missingException)
         {
             if (baseRow >= bag.GetUpperBound(0))
                 throw new Exception(missingException);
@@ -132,7 +132,7 @@ namespace pragmatic_quant_com.Factories
 
             return values.ToArray();
         }
-        public static T[] ProcessVector<T>(object[,] bag, string name, Func<object, T> valueMap)
+        public static T[] ProcessVector<T>(this object[,] bag, string name, Func<object, T> valueMap)
         {
             int row, col;
             if (Has(bag, name, out row, out col))
@@ -141,20 +141,20 @@ namespace pragmatic_quant_com.Factories
             }
             throw MissingParameter(name);
         }
-        public static double[] ProcessVectorDouble(object[,] bag, string name)
+        public static double[] ProcessVectorDouble(this object[,] bag, string name)
         {
             return ProcessVector(bag, name, DoubleValueConverter(name));
         }
-        public static string[] ProcessVectorString(object[,] bag, string name)
+        public static string[] ProcessVectorString(this object[,] bag, string name)
         {
             return ProcessVector(bag, name, o => o.ToString());
         }
-        public static DateOrDuration[] ProcessVectorDateOrDuration(object[,] bag, string name)
+        public static DateOrDuration[] ProcessVectorDateOrDuration(this object[,] bag, string name)
         {
             return ProcessVector(bag, name, DateOrDurationValueConverter(name));
         }
 
-        public static T[,] ProcessMatrix<T>(object[,] bag, int baseRow, int baseCol, Func<object, T> valueMap, string missingException)
+        public static T[,] ProcessMatrix<T>(this object[,] bag, int baseRow, int baseCol, Func<object, T> valueMap, string missingException)
         {
             if (baseRow >= bag.GetUpperBound(0))
                 throw new Exception(missingException);
@@ -186,7 +186,7 @@ namespace pragmatic_quant_com.Factories
             }
             return result;
         }
-        public static T[,] ProcessMatrix<T>(object[,] bag, string name, Func<object, T> valueMap)
+        public static T[,] ProcessMatrix<T>(this object[,] bag, string name, Func<object, T> valueMap)
         {
             int row, col;
             if (Has(bag, name, out row, out col))
@@ -195,16 +195,16 @@ namespace pragmatic_quant_com.Factories
             }
             throw MissingParameter(name);
         }
-        public static double[,] ProcessMatrixDouble(object[,] bag, string name)
+        public static double[,] ProcessMatrixDouble(this object[,] bag, string name)
         {
             return ProcessMatrix(bag, name, DoubleValueConverter(name));
         }
-        public static string[,] ProcessMatrixString(object[,] bag, string name)
+        public static string[,] ProcessMatrixString(this object[,] bag, string name)
         {
             return ProcessMatrix(bag, name, o => o.ToString());
         }
 
-        public static LabelledMatrix<TRow, TCol, TVal> ProcessLabelledMatrix<TRow, TCol, TVal>(object[,] bag, string name,
+        public static LabelledMatrix<TRow, TCol, TVal> ProcessLabelledMatrix<TRow, TCol, TVal>(this object[,] bag, string name,
             Func<object, TRow> rowLabelMap, Func<object, TCol> colLabelMap, Func<object, TVal> valueMap)
         {
             int row, col;
@@ -231,11 +231,11 @@ namespace pragmatic_quant_com.Factories
             }
             throw MissingParameter(name);
         }
-        public static TimeMatrixDatas ProcessTimeMatrixDatas(object[,] bag, string name)
+        public static TimeMatrixDatas ProcessTimeMatrixDatas(this object[,] bag, string name)
         {
             return ProcessLabelledMatrix(bag, name, DateOrDurationValueConverter(name), o => o.ToString(), DoubleValueConverter(name));
         }
-        public static EqtyVolMatrix ProcessEqtyVolMatrix(object[,] bag, string name)
+        public static EqtyVolMatrix ProcessEqtyVolMatrix(this object[,] bag, string name)
         {
             return ProcessLabelledMatrix(bag, name, DateOrDurationValueConverter(name), DoubleValueConverter(name), DoubleValueConverter(name));
         }

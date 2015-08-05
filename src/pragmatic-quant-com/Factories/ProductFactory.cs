@@ -9,19 +9,18 @@ namespace pragmatic_quant_com.Factories
     {
         public IProduct Build(object[,] bag)
         {
-            var productName = BagServices.ProcessScalarString(bag, "ProductName")
-                                         .ToLowerInvariant().Trim();
+            var productName = bag.ProcessScalarString("ProductName")
+                                 .ToLowerInvariant().Trim();
 
             if (productName.EndsWith("leg"))
             {
                 var legId = productName.Replace("leg", "");
 
-                var parameters = BagServices.ProcessLabelledMatrix(bag, legId + "PayDate",
+                var parameters = bag.ProcessLabelledMatrix(legId + "PayDate",
                     DateAndDurationConverter.ConvertDate,
-                    o => o.ToString(),
-                    o => o);
+                    o => o.ToString(), o => o);
 
-                string couponScript = BagServices.ProcessScalarString(bag, legId + "CouponScript");
+                string couponScript = bag.ProcessScalarString(legId + "CouponScript");
                 return GenericLegFactory.Build(parameters, couponScript);
             }
 

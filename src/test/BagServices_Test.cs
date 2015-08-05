@@ -22,8 +22,8 @@ namespace test
                     {null, null, "ToTo"}
                 };
             int row, col;
-            bool hasToto1 = BagServices.Has(bag1, "Toto", out row, out col);
-            bool hasToto2 = BagServices.Has(bag1, " tOtO ");
+            bool hasToto1 = bag1.Has("Toto", out row, out col);
+            bool hasToto2 = bag1.Has(" tOtO ");
 
             Assert.IsTrue(hasToto1);
             Assert.IsTrue(hasToto2);
@@ -41,7 +41,7 @@ namespace test
                     {null, null, ""}
                 };
 
-            var totoVal = BagServices.ProcessScalarString(bag, "Toto");
+            var totoVal = bag.ProcessScalarString("Toto");
             Assert.AreEqual(totoVal, "hello");
         }
 
@@ -55,7 +55,7 @@ namespace test
                     {"", "Toto", 3.14159265},
                     {null, null, ""}
                 };
-            var totoDoubleVal1 = BagServices.ProcessScalarDouble(bag1, "Toto");
+            var totoDoubleVal1 = bag1.ProcessScalarDouble("Toto");
             Assert.AreEqual(totoDoubleVal1, 3.14159265);
 
             //Test2
@@ -65,7 +65,7 @@ namespace test
                     {"", "Toto", 3.14159265.ToString(CultureInfo.InvariantCulture)},
                     {null, null, ""}
                 };
-            var totoDoubleVal2 = BagServices.ProcessScalarDouble(bag2, "Toto");
+            var totoDoubleVal2 = bag2.ProcessScalarDouble("Toto");
             Assert.AreEqual(totoDoubleVal2, 3.14159265);
         }
 
@@ -80,7 +80,7 @@ namespace test
                     {"", "Toto", date},
                     {null, null, ""}
                 };
-            var totoDateVal1 = BagServices.ProcessScalarDateOrDuration(bag1, "Toto");
+            var totoDateVal1 = bag1.ProcessScalarDateOrDuration("Toto");
             Assert.AreEqual(totoDateVal1.Date, date);
 
             //Test2
@@ -90,7 +90,7 @@ namespace test
                     {"", "Toto", date.ToString(CultureInfo.InvariantCulture) },
                     {null, null, ""}
                 };
-            var totoDateVal2 = BagServices.ProcessScalarDateOrDuration(bag2, "Toto");
+            var totoDateVal2 = bag2.ProcessScalarDateOrDuration("Toto");
             Assert.AreEqual(totoDateVal2.Date, date);
         }
 
@@ -106,7 +106,7 @@ namespace test
                     {"", "Toto", "10y "},
                     {null, null, ""}
                 };
-            var totoVal1 = BagServices.ProcessScalarDateOrDuration(bag1, "Toto");
+            var totoVal1 = bag1.ProcessScalarDateOrDuration("Toto");
             Assert.AreEqual(totoVal1.Duration, dur);
 
             //Test2
@@ -116,7 +116,7 @@ namespace test
                     {"", " Toto", dur},
                     {null, null, ""}
                 };
-            var totoVal2 = BagServices.ProcessScalarDateOrDuration(bag2, "Toto");
+            var totoVal2 = bag2.ProcessScalarDateOrDuration("Toto");
             Assert.AreEqual(totoVal2.Duration, dur);
 
             //Test3
@@ -126,7 +126,7 @@ namespace test
                     {"", " Toto", dur.ToString()},
                     {null, null, ""}
                 };
-            var totoVal3 = BagServices.ProcessScalarDateOrDuration(bag3, "Toto");
+            var totoVal3 = bag3.ProcessScalarDateOrDuration("Toto");
             Assert.AreEqual(totoVal3.Duration, dur);
         }
 
@@ -142,7 +142,7 @@ namespace test
                     {"", "Toto", " 112m "},
                     {null, null, ""}
                 };
-            var totoVal1 = BagServices.ProcessScalarDateOrDuration(bag1, "Toto");
+            var totoVal1 = bag1.ProcessScalarDateOrDuration("Toto");
             Assert.AreEqual(totoVal1.Duration, dur);
 
             //Test2
@@ -152,7 +152,7 @@ namespace test
                     {"", " Toto", dur},
                     {null, null, ""}
                 };
-            var totoVal2 = BagServices.ProcessScalarDateOrDuration(bag2, "Toto");
+            var totoVal2 = bag2.ProcessScalarDateOrDuration("Toto");
             Assert.AreEqual(totoVal2.Duration, dur);
 
             //Test3
@@ -162,7 +162,7 @@ namespace test
                     {"", " Toto", dur.ToString()},
                     {null, null, ""}
                 };
-            var totoVal3 = BagServices.ProcessScalarDateOrDuration(bag3, "Toto");
+            var totoVal3 = bag3.ProcessScalarDateOrDuration("Toto");
             Assert.AreEqual(totoVal3.Duration, dur);
         }
 
@@ -178,7 +178,7 @@ namespace test
                     {"", "Toto", " 30d "},
                     {null, null, ""}
                 };
-            var totoVal1 = BagServices.ProcessScalarDateOrDuration(bag1, "Toto");
+            var totoVal1 = bag1.ProcessScalarDateOrDuration("Toto");
             Assert.AreEqual(totoVal1.Duration, dur);
 
             //Test2
@@ -188,7 +188,7 @@ namespace test
                     {"", " Toto", dur},
                     {null, null, ""}
                 };
-            var totoVal2 = BagServices.ProcessScalarDateOrDuration(bag2, "Toto");
+            var totoVal2 = bag2.ProcessScalarDateOrDuration("Toto");
             Assert.AreEqual(totoVal2.Duration, dur);
 
             //Test3
@@ -198,7 +198,7 @@ namespace test
                     {"", " Toto", dur.ToString()},
                     {null, null, ""}
                 };
-            var totoVal3 = BagServices.ProcessScalarDateOrDuration(bag3, "Toto");
+            var totoVal3 = bag3.ProcessScalarDateOrDuration("Toto");
             Assert.AreEqual(totoVal3.Duration, dur);
         }
 
@@ -215,7 +215,7 @@ namespace test
                     {null, "val2", ""},
                     {null, "val3", ""}
                 };
-            var myParamArray1 = BagServices.ProcessVectorString(bag1, "MyParam");
+            var myParamArray1 = bag1.ProcessVectorString("MyParam");
             UnitTestUtils.EqualArrays(myParamArray1, new[] { "val1", "val2", "val3" });
 
             //Test2
@@ -227,7 +227,7 @@ namespace test
                     {null, "val2", ""},
                     {null, null, ""}
                 };
-            var myParamArray2 = BagServices.ProcessVectorString(bag2, "MyParam");
+            var myParamArray2 = bag2.ProcessVectorString("MyParam");
             UnitTestUtils.EqualArrays(myParamArray2, new[] { "val1", "val2" });
 
             //Test3
@@ -240,7 +240,7 @@ namespace test
                     {null, null, ""}
                     //{null, ExcelDna.Integration.ExcelEmpty.Value, ""}
                 };
-            var myParamArray3 = BagServices.ProcessVectorString(bag3, "MyParam");
+            var myParamArray3 = bag3.ProcessVectorString("MyParam");
             UnitTestUtils.EqualArrays(myParamArray3, new[] { "val1", "val2" });
 
             //Test4
@@ -252,7 +252,7 @@ namespace test
                     {null, "val2", ""},
                     {null, "", ""}
                 };
-            var myParamArray4 = BagServices.ProcessVectorString(bag4, "MyParam");
+            var myParamArray4 = bag4.ProcessVectorString("MyParam");
             UnitTestUtils.EqualArrays(myParamArray4, new[] { "val1", "val2" });
 
             //Test5
@@ -264,7 +264,7 @@ namespace test
                     {null, "val2", ""},
                     {null, "   ", ""}
                 };
-            var myParamArray5 = BagServices.ProcessVectorString(bag5, "MyParam");
+            var myParamArray5 = bag5.ProcessVectorString("MyParam");
             UnitTestUtils.EqualArrays(myParamArray5, new[] { "val1", "val2" });
         }
         
@@ -280,7 +280,7 @@ namespace test
                     {null, "val21", "val22"},
                     {null, "val31", "val32"}
                 };
-            var myParamArray1 = BagServices.ProcessMatrixString(bag1, "MyParam");
+            var myParamArray1 = bag1.ProcessMatrixString("MyParam");
             UnitTestUtils.EqualMatrix(myParamArray1, new[,] {{"val11", "val12"}, {"val21", "val22"}, {"val31", "val32"}});
 
             //Test2
@@ -292,7 +292,7 @@ namespace test
                     {null, "val21", "val22", ""},
                     {null, null, "", ""}
                 };
-            var myParamArray2 = BagServices.ProcessMatrixString(bag2, "MyParam");
+            var myParamArray2 = bag2.ProcessMatrixString("MyParam");
             UnitTestUtils.EqualMatrix(myParamArray2, new[,] {{"val11", "val12"}, {"val21", "val22"}});
         }
 
@@ -309,7 +309,7 @@ namespace test
                 {null, "10y", "3.0", 1.0}
             };
             
-            TimeMatrixDatas timeDatas = BagServices.ProcessTimeMatrixDatas(bag1, "MyParam");
+            TimeMatrixDatas timeDatas = bag1.ProcessTimeMatrixDatas("MyParam");
             var helloDatas = timeDatas.GetCol("hello");
             var totoDatas = timeDatas.GetCol("toto");
             

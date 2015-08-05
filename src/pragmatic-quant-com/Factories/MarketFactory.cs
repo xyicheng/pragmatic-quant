@@ -15,7 +15,7 @@ namespace pragmatic_quant_com.Factories
         #region private methods
         private static DateTime RefDate(object[,] bag)
         {
-            return BagServices.ProcessScalarDateOrDuration(bag, "RefDate").Date;
+            return bag.ProcessScalarDateOrDuration("RefDate").Date;
         }
         private static ITimeMeasure RateTimeMeasure(DateTime refDate)
         {
@@ -44,7 +44,7 @@ namespace pragmatic_quant_com.Factories
         private static DividendQuote[] ProcessDiv(object[,] bag, DateTime refDate, string assetName)
         {
             var divId = String.Format("Dividend.{0}", assetName);
-            var dividendsRawDatas = BagServices.ProcessTimeMatrixDatas(bag, divId);
+            var dividendsRawDatas = bag.ProcessTimeMatrixDatas(divId);
             var cashs = dividendsRawDatas.GetCol("Cash");
             var yields = dividendsRawDatas.GetCol("Yield");
             var divQuotes = dividendsRawDatas.RowLabels.Select((d, idx) =>
@@ -54,17 +54,16 @@ namespace pragmatic_quant_com.Factories
         private static VolatilityMatrix AssetVolMatrix(object[,] bag, ITimeMeasure time, string assetName)
         {
             var volId = String.Format("Vol.{0}", assetName);
-            var eqtyVolMatrix = BagServices.ProcessEqtyVolMatrix(bag, volId);
+            var eqtyVolMatrix = bag.ProcessEqtyVolMatrix(volId);
             var pillars = eqtyVolMatrix.RowLabels.Map(d => d.ToDate(time.RefDate));
             return new VolatilityMatrix(time, pillars, eqtyVolMatrix.ColLabels, eqtyVolMatrix.Values);
         }
         private static AssetMarket[] ProcessAssetMkt(object[,] bag, DateTime refDate)
         {
             var eqtyTime = TimeMeasure.Act365(refDate);
-            var assetRawDatas = BagServices.ProcessLabelledMatrix(bag, "Asset",
-                o => o.ToString(), o => o.ToString(), o => o);
+            var assetRawDatas = bag.ProcessLabelledMatrix("Asset", o => o.ToString(), o => o.ToString(), o => o);
 
-            TimeMatrixDatas repoRawDatas = BagServices.ProcessTimeMatrixDatas(bag, "Repo");
+            TimeMatrixDatas repoRawDatas = bag.ProcessTimeMatrixDatas("Repo");
             var repoPillars = repoRawDatas.RowLabels
                 .Select(dOrDur => dOrDur.ToDate(refDate)).ToArray();
 
@@ -101,7 +100,7 @@ namespace pragmatic_quant_com.Factories
             DateTime refDate = RefDate(bag);
             AssetMarket[] assetMarket = ProcessAssetMkt(bag, refDate);
 
-            TimeMatrixDatas curveRawDatas = BagServices.ProcessTimeMatrixDatas(bag, "Discount");
+            TimeMatrixDatas curveRawDatas = bag.ProcessTimeMatrixDatas("Discount");
             var discountCurves = RateCurveFromRawDatas(curveRawDatas, refDate);
 
             return new Market(discountCurves, assetMarket);
