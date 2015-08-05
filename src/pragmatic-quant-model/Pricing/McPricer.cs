@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.MarketDatas;
-using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Model;
 using pragmatic_quant_model.MonteCarlo;
 using pragmatic_quant_model.MonteCarlo.Product;
@@ -38,7 +37,7 @@ namespace pragmatic_quant_model.Pricing
             var mcModelFactory = new McModelFactory(
                 FactorRepresentationFactories.For(modelDescription),
                 ModelPathGeneratorFactories.For(modelDescription),
-                RandomGenerators.GaussianSobol(mcConfig.SobolDirection));
+                mcConfig.RandomGenerator);
             return new McPricer(mcModelFactory, mcConfig);
         }
 

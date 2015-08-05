@@ -50,12 +50,13 @@ namespace test.MonteCarlo
             const double lambda = 0.01;
             var sigma = new StepFunction(new[] {0.0, 1.0, 2.0}, new[] {0.007, 0.004, 0.0065}, 0.0);
             var hw1 = new Hw1Model(TimeMeasure.Act365(market.RefDate), Currency.Eur, lambda, sigma);
-            var mcConfig = new MonteCarloConfig(20000, SobolDirection.JoeKuoD5);
+            var mcConfig = new MonteCarloConfig(20000,
+                RandomGenerators.GaussianSobol(SobolDirection.JoeKuoD5));
 
             var mcModelFactory = new McModelFactory(
                 Hw1FactorRepresentationFactory.Instance,
                 Hw1ModelPathGeneratorFactory.Instance,
-                RandomGenerators.GaussianSobol(mcConfig.SobolDirection));
+                mcConfig.RandomGenerator);
             var mcPricer = new McPricer(mcModelFactory, mcConfig);
 
             var fixedLeg = Leg(market.RefDate);

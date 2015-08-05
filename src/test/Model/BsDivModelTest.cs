@@ -7,6 +7,7 @@ using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.MarketDatas;
+using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Sobol;
 using pragmatic_quant_model.Model;
 using pragmatic_quant_model.Model.BlackScholes;
@@ -47,7 +48,7 @@ namespace test.Model
 
             var zeroVol = new MapRawDatas<DateOrDuration, double>(new[] {new DateOrDuration(assetMkt.RefDate)}, new[] {0.0});
             var blackScholesDesc = new BlackScholesModelDescription(assetMkt.Asset, zeroVol, true);
-            var mcConfig = new MonteCarloConfig(1, SobolDirection.Kuo3);
+            var mcConfig = new MonteCarloConfig(1, RandomGenerators.GaussianSobol(SobolDirection.Kuo3));
 
             var blackScholesModel = ModelFactories.For(blackScholesDesc).Build(blackScholesDesc, market);
             var mcPricer = McPricer.For(blackScholesDesc, mcConfig);

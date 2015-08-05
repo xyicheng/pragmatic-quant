@@ -1,4 +1,4 @@
-﻿using pragmatic_quant_model.Maths.Sobol;
+﻿using pragmatic_quant_model.Maths;
 
 namespace pragmatic_quant_model.Model
 {
@@ -6,12 +6,12 @@ namespace pragmatic_quant_model.Model
 
     public class MonteCarloConfig : INumericalMethodConfig
     {
-        public MonteCarloConfig(int nbPaths, SobolDirection sobolDirection)
+        public MonteCarloConfig(int nbPaths, IRandomGeneratorFactory randomGenerator)
         {
-            SobolDirection = sobolDirection;
+            RandomGenerator = randomGenerator;
             NbPaths = nbPaths;
         }
         public int NbPaths { get; private set; }
-        public SobolDirection SobolDirection { get; private set; }
+        public IRandomGeneratorFactory RandomGenerator { get; private set; }
     }
 }
