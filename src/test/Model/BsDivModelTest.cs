@@ -47,7 +47,7 @@ namespace test.Model
             var market = new Market(new[] {zcCurve}, new[] {assetMkt});
 
             var zeroVol = new MapRawDatas<DateOrDuration, double>(new[] {new DateOrDuration(assetMkt.RefDate)}, new[] {0.0});
-            var blackScholesDesc = new BlackScholesModelDescription(assetMkt.Asset, zeroVol, true);
+            var blackScholesDesc = new BlackScholesModelDescription(assetMkt.Asset.Name, zeroVol, true);
             var mcConfig = new MonteCarloConfig(1, RandomGenerators.GaussianSobol(SobolDirection.Kuo3));
 
             var blackScholesModel = ModelFactories.For(blackScholesDesc).Build(blackScholesDesc, market);

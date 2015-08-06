@@ -22,7 +22,7 @@ namespace pragmatic_quant_model.Model
     public static class ModelFactories
     {
         #region private fields
-        private static readonly IDictionary<Type, IModelFactory> Factories = GetFactories();
+        private static readonly IDictionary<Type, IModelFactory> factories = GetFactories();
         #endregion
         #region private methods
         private static IDictionary<Type, IModelFactory> GetFactories()
@@ -39,7 +39,7 @@ namespace pragmatic_quant_model.Model
         public static IModelFactory For(IModelDescription modelDescription)
         {
             IModelFactory modelfactory;
-            if (Factories.TryGetValue(modelDescription.GetType(), out modelfactory))
+            if (factories.TryGetValue(modelDescription.GetType(), out modelfactory))
                 return modelfactory;
             throw new ArgumentException(string.Format("Missing Model Factory for {0}", modelDescription));
         }
@@ -54,7 +54,7 @@ namespace pragmatic_quant_model.Model
             var modelDescImplem = modelDescription as TModelDesc;
             if (modelDescImplem == null)
                 throw new Exception(string.Format("ModelFactory : {0} expected but was {1}",
-                    typeof (TModelDesc), modelDescription.GetType()));
+                                                  typeof (TModelDesc), modelDescription.GetType()));
             return Build(modelDescImplem, market);
         }
     }

@@ -63,7 +63,7 @@ namespace pragmatic_quant_model.Basic
                     result[i, j] = func(a[i], b[j]);
             return result;
         }
-
+        
         public static void SetCol<T>(ref T[,] array, int colIndex, T[] col)
         {
             if (colIndex < 0 || colIndex >= array.GetLength(1))
@@ -96,6 +96,19 @@ namespace pragmatic_quant_model.Basic
             for (int i = 0; i < subArray.GetLength(0); i++)
                 for (int j = 0; j < subArray.GetLength(1); j++)
                     array[rowIndex + i, colIndex + j] = subArray[i, j];
+        }
+
+        public static T[,] AsColumn<T>(this T[] col)
+        {
+            var result = new T[col.Length, 1];
+            SetCol(ref result, 0, col);
+            return result;
+        }
+        public static T[,] AsRow<T>(this T[] row)
+        {
+            var result = new T[1, row.Length];
+            SetRow(ref result, 0, row);
+            return result;
         }
 
         public static int FindIndex<T>(this T[] array, T element)

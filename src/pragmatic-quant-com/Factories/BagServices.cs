@@ -16,8 +16,9 @@ namespace pragmatic_quant_com.Factories
         {
             if (cellValue == null)
                 return true;
-
-            if ((cellValue is string) && ((string) cellValue).Trim() == "")
+            
+            var cellAsString = cellValue as string;
+            if ((cellAsString != null) && cellAsString.Trim() == "")
                 return true;
 
             if (cellValue is ExcelDna.Integration.ExcelEmpty
@@ -105,9 +106,17 @@ namespace pragmatic_quant_com.Factories
         {
             return ProcessScalar(bag, name, DoubleValueConverter(name));
         }
-        public static string ProcessScalarString(this object[,] bag, string name)
+        public static int ProcessScalarInteger(this object[,] bag, string name)
         {
-            return ProcessScalar(bag, name, o => o.ToString());
+            return (int) bag.ProcessScalarDouble(name);
+        }
+        public static bool ProcessScalarBoolean(this object[,] bag, string name)
+        {
+            return ProcessScalar(bag, name, o => (bool) o);
+        }
+        public static string ProcessScalarString(this object[,] bag, string name, bool trim = true)
+        {
+            return ProcessScalar(bag, name, o => trim ? o.ToString().Trim() : o.ToString());
         }
         public static DateOrDuration ProcessScalarDateOrDuration(this object[,] bag, string name)
         {
@@ -240,4 +249,5 @@ namespace pragmatic_quant_com.Factories
             return ProcessLabelledMatrix(bag, name, DateOrDurationValueConverter(name), DoubleValueConverter(name), DoubleValueConverter(name));
         }
     }
+
 }

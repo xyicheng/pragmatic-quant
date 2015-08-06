@@ -183,12 +183,14 @@
     <Compile Include="Model\BlackScholes\BlackScholesModel.cs" />
     <Compile Include="Model\BlackScholes\BlackScholesModelDescription.cs" />
     <Compile Include="Model\BlackScholes\DiscreteLocalDividend.cs" />
+    <Compile Include="Model\ExplicitCalibration.cs" />
     <Compile Include="Model\HullWhite\Hw1Model.cs" />
     <Compile Include="Model\HullWhite\Hw1ModelZcRepresentation.cs" />
     <Compile Include="Maths\Stochastic\OrnsteinUhlenbeck.cs" />
     <Compile Include="Maths\Stochastic\OrnsteinUhlenbeck1DGenerator.cs" />
     <Compile Include="Model\HullWhite\Hw1ModelPathGeneratorFactory.cs" />
     <Compile Include="Model\HullWhite\Hw1ModelDescription.cs" />
+    <Compile Include="Model\ICalibrationDescription.cs" />
     <Compile Include="Model\IFactorModelRepresentation.cs" />
     <Compile Include="Model\IModel.cs" />
     <Compile Include="Model\IModelDescription.cs" />

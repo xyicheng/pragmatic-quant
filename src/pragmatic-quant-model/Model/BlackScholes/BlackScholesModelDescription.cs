@@ -7,13 +7,13 @@ namespace pragmatic_quant_model.Model.BlackScholes
 {
     public class BlackScholesModelDescription : IModelDescription
     {
-        public BlackScholesModelDescription(AssetId asset, MapRawDatas<DateOrDuration, double> sigma, bool withDivs)
+        public BlackScholesModelDescription(string asset, MapRawDatas<DateOrDuration, double> sigma, bool withDivs)
         {
             Sigma = sigma;
             WithDivs = withDivs;
             Asset = asset;
         }
-        public AssetId Asset { get; private set; }
+        public string Asset { get; private set; }
         public MapRawDatas<DateOrDuration, double> Sigma { get; private set; }
         public bool WithDivs { get; private set; }
     }
@@ -24,13 +24,13 @@ namespace pragmatic_quant_model.Model.BlackScholes
         public override IModel Build(BlackScholesModelDescription bs, Market market)
         {
             var time = ModelFactoryUtils.DefaultTime(market.RefDate);
-            
-            var assetMkt = market.AssetMarket(bs.Asset);
+
+            var assetMkt = market.AssetMarketFromName(bs.Asset);
             var localDividends = bs.WithDivs
                 ? assetMkt.Dividends.Map(div => div.DivModel())
                 : new DiscreteLocalDividend[0];
 
-            return new BlackScholesModel(time, bs.Asset, bs.Sigma.ToFunction(time), localDividends);
+            return new BlackScholesModel(time, assetMkt.Asset, bs.Sigma.ToFunction(time), localDividends);
         }
     }
 }

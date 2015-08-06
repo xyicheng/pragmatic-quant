@@ -9,8 +9,7 @@ namespace pragmatic_quant_com.Factories
     {
         public IProduct Build(object[,] bag)
         {
-            var productName = bag.ProcessScalarString("ProductName")
-                                 .ToLowerInvariant().Trim();
+            var productName = bag.ProcessScalarString("ProductName").ToLowerInvariant();
 
             if (productName.EndsWith("leg"))
             {

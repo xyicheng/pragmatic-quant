@@ -56,7 +56,7 @@ namespace pragmatic_quant_model.MarketDatas
 
     public static class MarketUtils
     {
-        public static AssetMarket AssetMarketFromName(this Market mkt, string assetName)
+        public static AssetId AssetIdFromName(this Market mkt, string assetName)
         {
             var ids = mkt.AssetIds.Where(id => id.Name.Equals(assetName)).ToArray();
 
@@ -65,7 +65,11 @@ namespace pragmatic_quant_model.MarketDatas
             if (ids.Length > 1)
                 throw new Exception(string.Format("Ambiguous asset name : {0}", assetName));
 
-            return mkt.AssetMarket(ids.First());
+            return ids.First();
+        }
+        public static AssetMarket AssetMarketFromName(this Market mkt, string assetName)
+        {
+            return mkt.AssetMarket(mkt.AssetIdFromName(assetName));
         }
     }
 

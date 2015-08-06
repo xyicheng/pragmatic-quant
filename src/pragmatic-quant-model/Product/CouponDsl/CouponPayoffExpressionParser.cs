@@ -104,8 +104,18 @@ namespace pragmatic_quant_model.Product.CouponDsl
         }
         private string GetExpression(LiteralValueNode litValueNode, IDictionary<IFixing, string> fixingRefs)
         {
-            double value = (double)litValueNode.Value;
-            return value.ToString("r", CultureInfo.InvariantCulture) + "d"; ;
+            var value = litValueNode.Value;
+            double valueAsDouble = double.NaN; 
+            if (value is double)
+            {
+                valueAsDouble = (double) value;
+            }
+            else if (value is int)
+            {
+                valueAsDouble = (int) value;
+            }
+
+            return valueAsDouble.ToString("r", CultureInfo.InvariantCulture) + "d"; ;
         }
         private string GetExpression(BinaryOperationNode binOp, IDictionary<IFixing, string> fixingRefs)
         {
