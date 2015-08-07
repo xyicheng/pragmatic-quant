@@ -25,6 +25,23 @@ namespace pragmatic_quant_com
                 return false;
             }
         }
+        
+        [ExcelFunction(Description = "Get market reference date",
+                       Category = "PragmaticQuant_MarketFunctions")]
+        public static object MarketRefDate(object mktObj)
+        {
+            try
+            {
+                var market = MarketManager.Instance.GetMarket(mktObj);
+                return market.RefDate;
+            }
+            catch (Exception e)
+            {
+                var error = new object[1, 1];
+                error[0, 0] = string.Format("ERROR, {0}", e.Message);
+                return error;
+            }
+        }
 
         [ExcelFunction(Description = "Discount zero coupon function", 
                        Category = "PragmaticQuant_MarketFunctions")]

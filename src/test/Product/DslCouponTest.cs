@@ -13,11 +13,12 @@ namespace test.Product
         [Test]
         public void MonoCallPayoff()
         {
-            const string payoffScript = "Max(0.0,  1.2 * stock@fixingdate - 0.95)";
+            const string payoffScript = "Max(0.0,  1.2 * stock@fixingdate - strike)";
             var couponParameters = new Dictionary<string, object>
             {
                 {"stock", "asset(eurostoxx,EUR)"},
-                {"fixingdate", new DateTime(2015, 07, 31)}
+                {"fixingdate", new DateTime(2015, 07, 31)},
+                {"strike", 0.95}
             };
 
             var payment = new PaymentInfo(Currency.Eur, new DateTime(2015, 07, 31));

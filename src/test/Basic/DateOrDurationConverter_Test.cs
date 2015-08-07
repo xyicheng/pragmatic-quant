@@ -15,6 +15,7 @@ namespace test.Basic
             Assert.AreEqual(DateAndDurationConverter.ConvertDate(new DateOrDuration(refDate)), refDate);
             Assert.AreEqual(DateAndDurationConverter.ConvertDate("27 Jan 2015"), refDate);
             Assert.AreEqual(DateAndDurationConverter.ConvertDate("01/27/2015"), refDate);
+            Assert.AreEqual(DateAndDurationConverter.ConvertDate("27/01/2015"), refDate);
         }
         [Test]
         public void TestConvertDuration()

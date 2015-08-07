@@ -38,4 +38,5 @@ namespace pragmatic_quant_com
             }
         }
     }
+
 }

@@ -26,7 +26,13 @@ namespace pragmatic_quant_model.Basic.Dates
                 return true;
             }
 
-            return DateTime.TryParse(o.ToString(), CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out result);
+            var asString = o.ToString(); 
+            if (DateTime.TryParse(asString, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out result))
+                return true;
+
+            //Last chance to parse a date... 
+            //Not a very safe method 
+            return DateTime.TryParse(asString, out result);
         }
         public static bool TryConvertDuration(object o, out Duration result)
         {

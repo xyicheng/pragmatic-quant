@@ -32,7 +32,7 @@ namespace pragmatic_quant_model.Model.BlackScholes
                 
                 var subStep = RealInterval.Compact(model.Time[subStepStart], model.Time[subStepEnd]);
                 var stepVariance = variance.Eval(subStep.Sup) - variance.Eval(subStep.Inf);
-                var stepVarDrift = 0.5 * stepVariance;
+                var stepVarDrift = -0.5 * stepVariance;
 
                 stepVols[i] = Math.Sqrt(stepVariance / subStep.Length);
                 stepVarDrifts[i] = stepVarDrift;

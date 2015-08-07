@@ -43,6 +43,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DateFunctions.cs" />
     <Compile Include="Factories\AlgorithmFactory.cs" />
     <Compile Include="Factories\BagServices.cs" />
     <Compile Include="Factories\ModelCalibrationFactory.cs" />

@@ -57,7 +57,7 @@ namespace pragmatic_quant_model.Product.CouponDsl
             var obj = RetrieveParameter(paramName);
             return DateAndDurationConverter.ConvertDate(obj);
         }
-
+        
         private string FixingReference(IFixing fixing, IDictionary<IFixing, string> fixingRefs)
         {
             string fixingRef;
@@ -68,6 +68,21 @@ namespace pragmatic_quant_model.Product.CouponDsl
             }
             return fixingRef;
         }
+        private string DoubleReference(double number)
+        {
+            return number.ToString("r", CultureInfo.InvariantCulture) + "d";
+        }
+        private string ObjectReference(object o)
+        {
+            if (o is double)
+                return DoubleReference((double)o);
+            
+            if (o is int)
+                return DoubleReference((int)o);
+
+            return o.ToString();
+        }
+
         private string GetExpression(FixingNode fixingNode, IDictionary<IFixing, string> fixingRefs)
         {
             string fixingDesc = RetrieveStringParameter(fixingNode.FixingId);
@@ -105,23 +120,18 @@ namespace pragmatic_quant_model.Product.CouponDsl
         private string GetExpression(LiteralValueNode litValueNode, IDictionary<IFixing, string> fixingRefs)
         {
             var value = litValueNode.Value;
-            double valueAsDouble = double.NaN; 
-            if (value is double)
-            {
-                valueAsDouble = (double) value;
-            }
-            else if (value is int)
-            {
-                valueAsDouble = (int) value;
-            }
-
-            return valueAsDouble.ToString("r", CultureInfo.InvariantCulture) + "d"; ;
+            return ObjectReference(value);
         }
         private string GetExpression(BinaryOperationNode binOp, IDictionary<IFixing, string> fixingRefs)
         {
             var leftExpression = GetExpression(binOp.Left, fixingRefs);
             var rightExpression = GetExpression(binOp.Right, fixingRefs);
             return "(" + leftExpression + ")" + binOp.OpSymbol + "(" + rightExpression + ")";
+        }
+        private string GetExpression(IdentifierNode id, IDictionary<IFixing, string> fixingRefs)
+        {
+            var idValue = RetrieveParameter(id.Symbol);
+            return ObjectReference(idValue);
         }
         private string GetExpression(AstNode node, IDictionary<IFixing, string> fixingRefs)
         {
@@ -140,6 +150,10 @@ namespace pragmatic_quant_model.Product.CouponDsl
             var function = node as FunctionCallNode;
             if (function != null)
                 return GetExpression(function, fixingRefs);
+
+            var identifier = node as IdentifierNode;
+            if (identifier != null)
+                return GetExpression(identifier, fixingRefs); 
 
             throw new ArgumentException(string.Format("Not handled node {0} ", node));
         }
