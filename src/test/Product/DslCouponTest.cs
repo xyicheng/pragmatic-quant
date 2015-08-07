@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Product;
@@ -20,9 +21,11 @@ namespace test.Product
                 {"fixingdate", new DateTime(2015, 07, 31)},
                 {"strike", 0.95}
             };
-
             var payment = new PaymentInfo(Currency.Eur, new DateTime(2015, 07, 31));
-            var coupon = DslCoupon.Parse(payment, couponParameters, payoffScript);
+            
+            CouponPayoffExpression payoff = CouponPayoffExpressionParser.Parse(payoffScript, couponParameters);
+            var dslCouponData = new DslCouponData(payoff, payment);
+            var coupon =  DslCouponCompiler.BuildCoupon(dslCouponData).First();
 
             var rand = new Random(4321);
             for (int i = 0; i < 100; i++)

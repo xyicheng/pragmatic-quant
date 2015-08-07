@@ -216,6 +216,7 @@
     <Compile Include="Product\CouponDsl\CouponPayoffExpressionParser.cs" />
     <Compile Include="Product\CouponDsl\DslCoupon.cs" />
     <Compile Include="Product\CouponDsl\DslCouponCompiler.cs" />
+    <Compile Include="Product\CouponDsl\DslCouponData.cs" />
     <Compile Include="Product\GenericLegFactory.cs" />
     <Compile Include="Product\PaymentInfo.cs" />
     <Compile Include="MonteCarlo\Product\IProductPathFlow.cs" />

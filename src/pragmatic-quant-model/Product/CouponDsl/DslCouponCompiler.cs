@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Microsoft.CSharp;
+using pragmatic_quant_model.Basic;
 
 namespace pragmatic_quant_model.Product.CouponDsl
 {
@@ -11,30 +12,36 @@ namespace pragmatic_quant_model.Product.CouponDsl
     {
         #region private fields
         private const string PayoffClassName = "GeneratedCouponDslPayoff";
-        private static int _methodIdentifier; 
+        private static int _methodIdentifier;
         #endregion
         #region private methods
         private static string GetMethodId()
         {
             return string.Format("Payoff{0}", _methodIdentifier++);
         }
-        private static MethodInfo CompileToMethod(string couponExpression, string methodId, string fixingArrayId)
+        private static string GenerateCode(CouponPayoffExpression[] expressions, string[] methodIds)
         {
-            // Generate C# code
             StringBuilder code = new StringBuilder();
             code.AppendLine("using System;");
             code.AppendLine(string.Format("public static partial class {0}", PayoffClassName));
             code.AppendLine("{");
 
-            //PayoffMethod
-            code.AppendLine(string.Format("public static double {0}(double[] {1})", methodId, fixingArrayId));
-            code.AppendLine("{");
-            code.AppendLine("return " + couponExpression + ";");
-            code.AppendLine("}");
+            for (int i = 0; i < expressions.Length; i++)
+            {
+                //Payoff Methods
+                code.AppendLine(string.Format("public static double {0}(double[] {1})",
+                    methodIds[i], expressions[i].FixingArrayId));
+                code.AppendLine("{");
+                code.AppendLine("return " + expressions[i].Expression + ";");
+                code.AppendLine("}");
+            }
 
             code.AppendLine("}");
             string generatedCode = code.ToString();
-
+            return generatedCode;
+        }
+        private static Type Compile(string generatedCode)
+        {
             // Prepare the compiler.
             CompilerParameters parameters = new CompilerParameters
             {
@@ -57,15 +64,23 @@ namespace pragmatic_quant_model.Product.CouponDsl
 
             // Locate the method we've just defined (cf. CodeGenerator).
             return results.CompiledAssembly.GetModules()[0]
-                .GetType(PayoffClassName)
-                .GetMethod(methodId);
+                                           .GetType(PayoffClassName);
         }
         #endregion
 
-        public static DslCoupon BuildCoupon(PaymentInfo paymentInfo, CouponPayoffExpression payoffExpression)
+        public static DslCoupon[] BuildCoupon(params DslCouponData[] dslCouponDatas)
         {
-            var payoffMethod = CompileToMethod(payoffExpression.Expression, GetMethodId(), payoffExpression.FixingArrayId);
-            return new DslCoupon(paymentInfo, payoffExpression.Fixings.ToArray(), payoffMethod);
+            var methodIds = EnumerableUtils.For(0, dslCouponDatas.Length, i => GetMethodId());
+            string generatedCode = GenerateCode(dslCouponDatas.Map(d => d.Expression), methodIds);
+            Type methodClassContainer = Compile(generatedCode);
+            MethodInfo[] payoffMethods = methodIds.Map(methodId => methodClassContainer.GetMethod(methodId));
+
+            return EnumerableUtils.For(0, dslCouponDatas.Length, i =>
+            {
+                var fixings = dslCouponDatas[i].Expression.Fixings.ToArray();
+                var paymentInfo = dslCouponDatas[i].PaymentInfo;
+                return new DslCoupon(paymentInfo, fixings, payoffMethods[i]);
+            });
         }
     }
 }

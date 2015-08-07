@@ -19,7 +19,7 @@ namespace pragmatic_quant_model.Product
             if (paramLabels.Count(l => l == "paycurrency") != 1)
                 throw new ArgumentException("Leg Parameters must contain a pay currency !");
 
-            var coupons = new List<DslCoupon>();
+            var couponDatas = new List<DslCouponData>();
             for (int row = 0; row < legParameters.RowLabels.Length; row++)
             {
                 var paramVals = legParameters.Values.Row(row);
@@ -29,10 +29,14 @@ namespace pragmatic_quant_model.Product
                 DateTime payDate = legParameters.RowLabels[row];
                 var couponPayment = new PaymentInfo(payCurrency, payDate);
 
-                var coupon = DslCoupon.Parse(couponPayment, couponParameters, dslCouponPayoff);
-                coupons.Add(coupon);
+                var payoff = CouponPayoffExpressionParser.Parse(dslCouponPayoff, couponParameters);
+                var dslCouponData = new DslCouponData(payoff, couponPayment);
+
+                couponDatas.Add(dslCouponData);
             }
-            return new Leg<DslCoupon>(coupons.ToArray());
+
+            var coupons = DslCouponCompiler.BuildCoupon(couponDatas.ToArray());
+            return new Leg<DslCoupon>(coupons);
         }
     }
 }

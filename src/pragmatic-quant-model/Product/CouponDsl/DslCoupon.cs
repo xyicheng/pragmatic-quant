@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace pragmatic_quant_model.Product.CouponDsl
@@ -12,12 +11,6 @@ namespace pragmatic_quant_model.Product.CouponDsl
             : base(paymentInfo, fixings)
         {
             this.payoff = payoff;
-        }
-
-        public static DslCoupon Parse(PaymentInfo paymentInfo, IDictionary<string, object> couponParameters, string dslPayoffScript)
-        {
-            CouponPayoffExpression payoff = CouponPayoffExpressionParser.Parse(dslPayoffScript, couponParameters);
-            return DslCouponCompiler.BuildCoupon(paymentInfo, payoff);
         }
 
         public override double Payoff(double[] fixings)
