@@ -23,9 +23,9 @@ namespace test.Product
             };
             var payment = new PaymentInfo(Currency.Eur, new DateTime(2015, 07, 31));
             
-            CouponPayoffExpression payoff = CouponPayoffExpressionParser.Parse(payoffScript, couponParameters);
+            DslPayoffExpression payoff = DslPayoffParser.Parse(payoffScript, couponParameters);
             var dslCouponData = new DslCouponData(payoff, payment);
-            var coupon =  DslCouponCompiler.BuildCoupon(dslCouponData).First();
+            var coupon =  DslCouponCompiler.Compile(dslCouponData).First();
 
             var rand = new Random(4321);
             for (int i = 0; i < 100; i++)

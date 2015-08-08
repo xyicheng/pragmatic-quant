@@ -8,7 +8,7 @@ using pragmatic_quant_model.Basic;
 
 namespace pragmatic_quant_model.Product.CouponDsl
 {
-    public class DslCouponCompiler
+    public static class DslCouponCompiler
     {
         #region private fields
         private const string PayoffClassName = "GeneratedCouponDslPayoff";
@@ -19,7 +19,7 @@ namespace pragmatic_quant_model.Product.CouponDsl
         {
             return string.Format("Payoff{0}", _methodIdentifier++);
         }
-        private static string GenerateCode(CouponPayoffExpression[] expressions, string[] methodIds)
+        private static string GenerateCode(DslPayoffExpression[] expressions, string[] methodIds)
         {
             StringBuilder code = new StringBuilder();
             code.AppendLine("using System;");
@@ -68,7 +68,7 @@ namespace pragmatic_quant_model.Product.CouponDsl
         }
         #endregion
 
-        public static DslCoupon[] BuildCoupon(params DslCouponData[] dslCouponDatas)
+        public static DslCoupon[] Compile(params DslCouponData[] dslCouponDatas)
         {
             var methodIds = EnumerableUtils.For(0, dslCouponDatas.Length, i => GetMethodId());
             string generatedCode = GenerateCode(dslCouponDatas.Map(d => d.Expression), methodIds);

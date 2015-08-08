@@ -29,13 +29,13 @@ namespace pragmatic_quant_model.Product
                 DateTime payDate = legParameters.RowLabels[row];
                 var couponPayment = new PaymentInfo(payCurrency, payDate);
 
-                var payoff = CouponPayoffExpressionParser.Parse(dslCouponPayoff, couponParameters);
+                var payoff = DslPayoffParser.Parse(dslCouponPayoff, couponParameters);
                 var dslCouponData = new DslCouponData(payoff, couponPayment);
 
                 couponDatas.Add(dslCouponData);
             }
 
-            var coupons = DslCouponCompiler.BuildCoupon(couponDatas.ToArray());
+            var coupons = DslCouponCompiler.Compile(couponDatas.ToArray());
             return new Leg<DslCoupon>(coupons);
         }
     }

@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace pragmatic_quant_model.Product.CouponDsl
 {
-    public class CouponPayoffExpression
+    public class DslPayoffExpression
     {
-        public CouponPayoffExpression(IFixing[] fixings, string expression, string fixingArrayId)
+        public DslPayoffExpression(IFixing[] fixings, string expression, string fixingArrayId)
         {
             Fixings = fixings;
             Expression = expression;

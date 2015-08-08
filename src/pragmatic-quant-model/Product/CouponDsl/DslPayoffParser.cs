@@ -9,7 +9,7 @@ using pragmatic_quant_model.Basic.Dates;
 
 namespace pragmatic_quant_model.Product.CouponDsl
 {
-    public static class CouponPayoffExpressionParser
+    public static class DslPayoffParser
     {
         #region private fields
         private static readonly Parser grammarParser = InitParser();
@@ -17,21 +17,21 @@ namespace pragmatic_quant_model.Product.CouponDsl
         #region private methods
         private static Parser InitParser()
         {
-            var couponLanguage = new LanguageData(new CouponGrammar());
-            return new Parser(couponLanguage);
+            var payoffLanguage = new LanguageData(new PayoffGrammar());
+            return new Parser(payoffLanguage);
         }
         #endregion
-        public static CouponPayoffExpression Parse(string dslPayoffScript, IDictionary<string, object> couponParameters)
+        public static DslPayoffExpression Parse(string dslPayoffScript, IDictionary<string, object> couponParameters)
         {
             var payoffParsedTree = grammarParser.Parse(dslPayoffScript);
             var payoffAst = payoffParsedTree.Root.AstNode as AstNode;
 
-            var couponBuilder = new CouponExpressionBuilder(couponParameters);
+            var couponBuilder = new DslExpressionBuilder(couponParameters);
             return couponBuilder.Build(payoffAst);
         }
     }
 
-    internal class CouponExpressionBuilder
+    internal class DslExpressionBuilder
     {
         #region private fields
         private const string FixingArrayId = "f";
@@ -158,16 +158,16 @@ namespace pragmatic_quant_model.Product.CouponDsl
             throw new ArgumentException(string.Format("Not handled node {0} ", node));
         }
         #endregion
-        public CouponExpressionBuilder(IDictionary<string, object> couponParameters)
+        public DslExpressionBuilder(IDictionary<string, object> couponParameters)
         {
             this.couponParameters = couponParameters;
         }
 
-        public CouponPayoffExpression Build(AstNode node)
+        public DslPayoffExpression Build(AstNode node)
         {
             IDictionary<IFixing, string> fixingRefs = new Dictionary<IFixing, string>();
             var expression = GetExpression(node, fixingRefs);
-            return new CouponPayoffExpression(fixingRefs.Keys.ToArray(), expression, FixingArrayId);
+            return new DslPayoffExpression(fixingRefs.Keys.ToArray(), expression, FixingArrayId);
         }
     }
 }

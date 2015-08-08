@@ -211,9 +211,9 @@
     <Compile Include="Pricing\IPricer.cs" />
     <Compile Include="Pricing\McPricer.cs" />
     <Compile Include="Pricing\PriceConverter.cs" />
-    <Compile Include="Product\CouponDsl\CouponGrammar.cs" />
-    <Compile Include="Product\CouponDsl\CouponPayoffExpression.cs" />
-    <Compile Include="Product\CouponDsl\CouponPayoffExpressionParser.cs" />
+    <Compile Include="Product\CouponDsl\PayoffGrammar.cs" />
+    <Compile Include="Product\CouponDsl\DslPayoffExpression.cs" />
+    <Compile Include="Product\CouponDsl\DslPayoffParser.cs" />
     <Compile Include="Product\CouponDsl\DslCoupon.cs" />
     <Compile Include="Product\CouponDsl\DslCouponCompiler.cs" />
     <Compile Include="Product\CouponDsl\DslCouponData.cs" />

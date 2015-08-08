@@ -7,9 +7,9 @@ using Irony.Parsing;
 namespace pragmatic_quant_model.Product.CouponDsl
 {
     [Language("Coupon Payoff DSL", "1.0", "Financial coupon description")]
-    public class CouponGrammar : InterpretedLanguageGrammar
+    public class PayoffGrammar : InterpretedLanguageGrammar
     {
-        public CouponGrammar()
+        public PayoffGrammar()
             : base(false)
         {
             #region 1. Terminals
