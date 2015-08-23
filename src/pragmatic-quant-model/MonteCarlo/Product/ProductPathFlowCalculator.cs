@@ -4,15 +4,15 @@ using pragmatic_quant_model.Product;
 namespace pragmatic_quant_model.MonteCarlo.Product
 {
     public class ProductPathFlowCalculator 
-        : IPathFlowCalculator<PathFlows<double, PaymentInfo>, PaymentInfo[]>
+        : IPathFlowCalculator<PathFlows<double, PaymentInfo>>
     {
         #region private fields
-        private readonly IPathFlowCalculator<PathFlows<double[], IFixing[]>, IFixing[][]> fixingPathCalculator;
-        private readonly IPathFlowCalculator<PathFlows<double[], PaymentInfo[]>, PaymentInfo[][]> numerairePathCalc;
+        private readonly IPathFlowCalculator<PathFlows<double[], IFixing[]>> fixingPathCalculator;
+        private readonly IPathFlowCalculator<PathFlows<double[], PaymentInfo[]>> numerairePathCalc;
         private readonly IProductPathFlow productPathFlowInstrument;
         #endregion
-        public ProductPathFlowCalculator(IPathFlowCalculator<PathFlows<double[], IFixing[]>, IFixing[][]> fixingPathCalculator,
-                                           IPathFlowCalculator<PathFlows<double[], PaymentInfo[]>, PaymentInfo[][]> numerairePathCalc,
+        public ProductPathFlowCalculator(IPathFlowCalculator<PathFlows<double[], IFixing[]>> fixingPathCalculator,
+                                           IPathFlowCalculator<PathFlows<double[], PaymentInfo[]>> numerairePathCalc,
                                            IProductPathFlow productPathFlowInstrument)
         {
             this.fixingPathCalculator = fixingPathCalculator;
@@ -26,7 +26,6 @@ namespace pragmatic_quant_model.MonteCarlo.Product
             var numerairePath = numerairePathCalc.Compute(processPath);
             return productPathFlowInstrument.Compute(fixingsPath, numerairePath);
         }
-        public PaymentInfo[] Labels { get { return productPathFlowInstrument.Payments; } }
         public int SizeOfPathInBits
         {
             get { return productPathFlowInstrument.SizeOfPathInBits; }

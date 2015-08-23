@@ -3,14 +3,14 @@
 namespace pragmatic_quant_model.MonteCarlo
 {
 
-    public class ProcessPathFlowGenerator<TPathFlow, TLabel> : IPathGenerator<TPathFlow>
+    public class ProcessPathFlowGenerator<TPathFlow> : IPathGenerator<TPathFlow>
     {
         #region private fields
         private readonly IProcessPathGenerator processPathGen;
-        private readonly IPathFlowCalculator<TPathFlow, TLabel> flowPathCalculator;
+        private readonly IPathFlowCalculator<TPathFlow> flowPathCalculator;
         #endregion
         public ProcessPathFlowGenerator(IProcessPathGenerator processPathGen,
-                                        IPathFlowCalculator<TPathFlow, TLabel> flowPathCalculator)
+                                        IPathFlowCalculator<TPathFlow> flowPathCalculator)
         {
             this.processPathGen = processPathGen;
             this.flowPathCalculator = flowPathCalculator;
@@ -27,10 +27,9 @@ namespace pragmatic_quant_model.MonteCarlo
         }
     }
 
-    public interface IPathFlowCalculator<out TPathFlow, out TLabel>
+    public interface IPathFlowCalculator<out TPathFlow>
     {
         TPathFlow Compute(IProcessPath processPath);
-        TLabel Labels { get; }
         int SizeOfPathInBits { get; }
     }
 }

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.CodeDom;
-using System.Runtime.InteropServices.ComTypes;
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Serialization;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.MarketDatas;
 

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Product;
@@ -9,6 +8,18 @@ namespace pragmatic_quant_model.MonteCarlo.Product
     public class ProductPathFlowFactory
     {
         #region private fields
+        private static IFixing[][] FixingsByDate(IProduct product)
+        {
+            IFixing[] allFixings = product.RetrieveFixings();
+            var fixingsByDate = allFixings.GroupBy(f => f.Date).ToArray();
+            return fixingsByDate.Map(g => g.ToArray());
+        }
+        private static PaymentInfo[][] PaymentsByDate(IProduct product)
+        {
+            var allPayments = product.RetrievePaymentInfos();
+            var paymentsByDate = allPayments.GroupBy(p => p.Date).ToArray();
+            return paymentsByDate.Map(g => g.ToArray());
+        }
         private static Func<double[], double> FlowRebasement(PaymentInfo payment, McModel model)
         {
             var modelMeasure = model.ProbaMeasure;
@@ -23,40 +34,33 @@ namespace pragmatic_quant_model.MonteCarlo.Product
             double num0 = model.Numeraire0;
             return f => num0/ zcFunc(f);
         }
-        private static ArrayPathCalculator<PaymentInfo> NumerairePathCalc(IEnumerable<PaymentInfo> payments,
-                                                                           McModel model)
+        private static ArrayPathCalculator<PaymentInfo> NumerairePathCalc(PaymentInfo[][] payments, McModel model)
         {
-            var simulatedDates = model.SimulatedDates;
-            var indexedPaymentsByDate = payments.Select((f, i) => new { Fixing = f, Index = i })
-                                              .GroupBy(f => f.Fixing.Date)
-                                              .ToArray();
-            int[] datesIndexes = indexedPaymentsByDate.Select(g => simulatedDates.FindIndex(g.Key)).ToArray();
-            PaymentInfo[][] paymentsByDate = indexedPaymentsByDate.Select(g => g.Select(fi => fi.Fixing).ToArray()).ToArray();
-            Func<double[], double>[][] funcsByDate = paymentsByDate.Select(g => g.Select(fi => FlowRebasement(fi, model)).ToArray()).ToArray();
-            return new ArrayPathCalculator<PaymentInfo>(datesIndexes, paymentsByDate, funcsByDate);
+            var payDates = payments.Map(ps => ps.Map(p => p.Date).Single());
+            int[] datesIndexes = payDates.Map(model.SimulatedDates.FindIndex);
+
+            Func<double[], double>[][] funcsByDate = payments.Map(ps => ps.Map(p => FlowRebasement(p, model)));
+            return new ArrayPathCalculator<PaymentInfo>(datesIndexes, payments, funcsByDate);
         }
         private static ArrayPathCalculator<IFixing> FixingPathCalc(DateTime[] simulatedDates,
-                                                                   IEnumerable<IFixing> fixings,
-                                                                   Func<double[], double>[] fixingFromFactors)
+                                                                   IFixing[][] fixings,
+                                                                   Func<double[], double>[][] fixingFromFactors)
         {
-            var indexedFixingsByDate = fixings.Select((f, i) => new { Fixing = f, Index = i })
-                                              .GroupBy(f => f.Fixing.Date)
-                                              .ToArray();
-            int[] datesIndexes = indexedFixingsByDate.Select(g => simulatedDates.FindIndex(g.Key)).ToArray();
-            IFixing[][] fixingsByDate = indexedFixingsByDate.Select(g => g.Select(fi => fi.Fixing).ToArray()).ToArray();
-            Func<double[], double>[][] funcsByDate = indexedFixingsByDate.Select(g => g.Select(fi => fixingFromFactors[fi.Index]).ToArray()).ToArray();
-            return new ArrayPathCalculator<IFixing>(datesIndexes, fixingsByDate, funcsByDate);
+            var fixingDates = fixings.Map(fs => fs.Map(f => f.Date).Single());
+            var dateIndexes = fixingDates.Map(simulatedDates.FindIndex);
+            return new ArrayPathCalculator<IFixing>(dateIndexes, fixings, fixingFromFactors);
         }
         #endregion
         public static ProductPathFlowCalculator Build(IProduct product, McModel model)
         {
-            IFixing[] fixings = product.RetrieveFixings();
-            Func<double[], double>[] fixingsFunc = fixings.Map(f => model.FactorRepresentation[f]);
-            ArrayPathCalculator<IFixing> fixingPathCalc = FixingPathCalc(model.SimulatedDates, fixings, fixingsFunc);
+            IFixing[][] fixings = FixingsByDate(product);
+            Func<double[], double>[][] fixingFromFactors = fixings.Map(fs => fs.Map(f => model.FactorRepresentation[f]));
+            ArrayPathCalculator<IFixing> fixingPathCalc = FixingPathCalc(model.SimulatedDates, fixings, fixingFromFactors);
 
-            ArrayPathCalculator<PaymentInfo> numerairePathCalc = NumerairePathCalc(product.RetrievePaymentInfos(), model);
+            PaymentInfo[][] paymentsByDate = PaymentsByDate(product);
+            ArrayPathCalculator<PaymentInfo> numerairePathCalc = NumerairePathCalc(paymentsByDate, model);
 
-            var pathFlowVisitor = new ProductPathFlowVisitor(fixingPathCalc.Labels, numerairePathCalc.Labels);
+            var pathFlowVisitor = new ProductPathFlowVisitor(fixings, paymentsByDate);
             IProductPathFlow productPathFlow = product.Accept(pathFlowVisitor);
 
             return new ProductPathFlowCalculator(fixingPathCalc, numerairePathCalc, productPathFlow);
@@ -121,7 +125,8 @@ namespace pragmatic_quant_model.MonteCarlo.Product
             this.coupons = coupons;
             Payments = coupons.Map(cpn => cpn.PaymentInfo);
             Fixings = coupons.Aggregate(new IFixing[0], (prev, cpn) => prev.Union(cpn.Fixings).ToArray())
-                .OrderBy(f => f.Date).ToArray();
+                             .OrderBy(f => f.Date)
+                             .ToArray();
         }
         
         public PathFlows<double, PaymentInfo> Compute(PathFlows<double[], IFixing[]> fixingsPath,

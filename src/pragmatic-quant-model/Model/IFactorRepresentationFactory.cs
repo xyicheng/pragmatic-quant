@@ -15,7 +15,7 @@ namespace pragmatic_quant_model.Model
     public static class FactorRepresentationFactories
     {
         #region private fields
-        private static readonly IDictionary<Type, IFactorRepresentationFactory> Factories = GetFactories();
+        private static readonly IDictionary<Type, IFactorRepresentationFactory> factories = GetFactories();
         #endregion
         #region private methods
         private static IDictionary<Type, IFactorRepresentationFactory> GetFactories()
@@ -32,7 +32,7 @@ namespace pragmatic_quant_model.Model
         public static IFactorRepresentationFactory For(IModelDescription model)
         {
             IFactorRepresentationFactory factorRepresentationFactory;
-            if (Factories.TryGetValue(model.GetType(), out factorRepresentationFactory))
+            if (factories.TryGetValue(model.GetType(), out factorRepresentationFactory))
                 return factorRepresentationFactory;
             throw new ArgumentException(string.Format("Missing Factor Representation Factory for {0}", model));
         }

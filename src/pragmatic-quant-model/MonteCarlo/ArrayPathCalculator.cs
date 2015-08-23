@@ -1,11 +1,12 @@
 using System;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using pragmatic_quant_model.Maths.Stochastic;
 
 namespace pragmatic_quant_model.MonteCarlo
 {
     public class ArrayPathCalculator<TLabel>
-        : IPathFlowCalculator<PathFlows<double[], TLabel[]>, TLabel[][]>
+        : IPathFlowCalculator<PathFlows<double[], TLabel[]>>
     {
         #region private fields
         private readonly int[] datesIndexes;
@@ -16,6 +17,8 @@ namespace pragmatic_quant_model.MonteCarlo
                                     TLabel[][] labels, 
                                     Func<double[], double>[][] factorEvaluators)
         {
+            Contract.Requires(labels.Length == factorEvaluators.Length);
+
             this.datesIndexes = datesIndexes;
             this.labels = labels;
             this.factorEvaluators = factorEvaluators;
@@ -31,13 +34,9 @@ namespace pragmatic_quant_model.MonteCarlo
             }
             return new PathFlows<double[], TLabel[]>(values, labels);
         }
-        public TLabel[][] Labels
-        {
-            get { return labels; }
-        }
         public int SizeOfPathInBits
         {
-            get { return labels.Select(f => f.Length).Sum() * sizeof(double); }
+            get { return factorEvaluators.Select(f => f.Length).Sum() * sizeof(double); }
         }
     }
 }
