@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Model;
@@ -20,7 +18,7 @@ namespace pragmatic_quant_model.Pricing
         private McEngine<PathFlows<double, PaymentInfo>, PathFlows<double, PaymentInfo>> McEngine(IProduct product, McModel mcModel)
         {
             var productPathFlowCalculator = ProductPathFlowFactory.Build(product, mcModel);
-            var processPathFlowGen = new ProcessPathFlowGenerator<PathFlows<double, PaymentInfo>>
+            var processPathFlowGen = new ProcessPathFlowGenerator<double, PaymentInfo>
                 (mcModel.ProcessPathGen, productPathFlowCalculator);
             return new McEngine<PathFlows<double, PaymentInfo>, PathFlows<double, PaymentInfo>>
                 (mcModel.RandomGenerator, processPathFlowGen, PriceFlowsAggregator.Value);
@@ -47,17 +45,8 @@ namespace pragmatic_quant_model.Pricing
             McModel mcModel = mcModelFactory.Build(model, market, simulatedDates);
             var mcEngine = McEngine(product, mcModel);
             
-            Console.WriteLine("Starting Monte-Carlo simulation...");
-            var time = new Stopwatch();
-            time.Start();
-            
             PathFlows<double, PaymentInfo> result = mcEngine.Run(mcConfig.NbPaths);
-
-            time.Stop();
-            var mcTime = time.Elapsed;
-            Console.WriteLine("Monte-Carlo done in {0} min {1} s {2} ms", 
-                                mcTime.Minutes, mcTime.Seconds, mcTime.Milliseconds);
-
+            
             var refCurrency = product.Financing.Currency;
             var priceDetails = new Dictionary<PaymentInfo, Price>();
             var totalPrice = 0.0;

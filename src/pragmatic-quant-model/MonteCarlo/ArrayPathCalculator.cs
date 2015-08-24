@@ -6,7 +6,7 @@ using pragmatic_quant_model.Maths.Stochastic;
 namespace pragmatic_quant_model.MonteCarlo
 {
     public class ArrayPathCalculator<TLabel>
-        : IPathFlowCalculator<PathFlows<double[], TLabel[]>>
+        : IPathFlowCalculator<double[], TLabel[]>
     {
         #region private fields
         private readonly int[] datesIndexes;
@@ -14,8 +14,8 @@ namespace pragmatic_quant_model.MonteCarlo
         private readonly Func<double[], double>[][] factorEvaluators;
         #endregion
         public ArrayPathCalculator(int[] datesIndexes, 
-                                    TLabel[][] labels, 
-                                    Func<double[], double>[][] factorEvaluators)
+                                   TLabel[][] labels, 
+                                   Func<double[], double>[][] factorEvaluators)
         {
             Contract.Requires(labels.Length == factorEvaluators.Length);
 
