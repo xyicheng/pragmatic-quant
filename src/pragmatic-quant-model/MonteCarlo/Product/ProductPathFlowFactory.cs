@@ -118,6 +118,18 @@ namespace pragmatic_quant_model.MonteCarlo.Product
         private readonly Tuple<int, int>[] flowRebasementIndex;
         private readonly Coupon[] coupons;
         #endregion
+        #region private methods
+        private double[][] CouponFixingBuffer()
+        {
+            //TODO perhaps use a pool instead of instanciate a new one
+            var buffer = new double[coupons.Length][];
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                buffer[i] = new double[fixingsIndexes[i].Length];
+            }
+            return buffer;
+        }
+        #endregion
         public CouponArrayPathFlow(Tuple<int, int>[][] fixingsIndexes, Tuple<int, int>[] flowRebasementIndex, Coupon[] coupons)
         {
             this.fixingsIndexes = fixingsIndexes;
@@ -133,11 +145,19 @@ namespace pragmatic_quant_model.MonteCarlo.Product
                                                       PathFlows<double[], PaymentInfo[]> flowRebasementPath)
         {
             double[][] fixings = fixingsPath.Flows;
-
+            double[][] cpnFixingByDates = CouponFixingBuffer();
+            
             var payoffFlows = new double[coupons.Length];
             for (int i = 0; i < coupons.Length; i++)
             {
-                var couponFixings = fixingsIndexes[i].Map(index => fixings[index.Item1][index.Item2]);
+                Tuple<int, int>[] cpnCoordinates = fixingsIndexes[i];
+                double[] couponFixings = cpnFixingByDates[i];
+                for (int j = 0; j < cpnCoordinates.Length; j++)
+                {
+                    Tuple<int, int> coordinate = cpnCoordinates[j];
+                    couponFixings[j] = fixings[coordinate.Item1][coordinate.Item2];
+                }
+                
                 var flowRebasement = flowRebasementPath.Flows[flowRebasementIndex[i].Item1]
                                                              [flowRebasementIndex[i].Item2];
                 payoffFlows[i] = coupons[i].Payoff(couponFixings) * flowRebasement; 

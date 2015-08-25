@@ -11,12 +11,18 @@ namespace test.Maths
     [TestFixture]
     public class BrownianBridge_Test
     {
+        #region private methods
+        private double[] BrownianPath1d(BrownianBridge bbridge,double[] x)
+        {
+            return bbridge.Path(x, 1).Map(v => v[0]);
+        }
+        #endregion
         [Test, TestCaseSource(typeof(BrownianBridgeTestDatas), "SinglePathCovariance")]
         public void SinglePathCovariance(double[] dates, double epsilon, double precision)
         {
             var brownian = BrownianBridge.Create(dates);
             var dim = brownian.GaussianSize(1);
-            var jacobian = FiniteDifferenceUtils.CenteredJacobian(x => brownian.Path(x), dim, new double[dim], epsilon);
+            var jacobian = FiniteDifferenceUtils.CenteredJacobian(x => BrownianPath1d(brownian, x), dim, new double[dim], epsilon);
             var covariance = jacobian.Prod(jacobian.Tranpose());
 
             for(int i=0; i< dates.Length; i++)

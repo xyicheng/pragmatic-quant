@@ -63,10 +63,10 @@ namespace pragmatic_quant_model.Maths.Stochastic
         {
             if (importantIndexes.Any(index => index > dates.Length))
                 throw new Exception("BrownianBridge : importantIndexes contain an index higher that dates.Length !");
-            
+
             if (!EnumerableUtils.IsSorted(dates))
                 throw new Exception("BrownianBridge : dates must be sorted ! ");
-            
+
             if (dates[0] < 0.0)
                 throw new Exception("BrownianBridge : First date must be positive");
 
@@ -89,7 +89,7 @@ namespace pragmatic_quant_model.Maths.Stochastic
                 }
                 else
                 {
-                    double maxVariance =  dateVariances.Max();
+                    double maxVariance = dateVariances.Max();
                     currentIndex = dateVariances.Select((v, i) => new {Var = v, Index = i})
                         .Where(v => DoubleUtils.MachineEquality(v.Var, maxVariance))
                         .Select(v => v.Index)
@@ -122,27 +122,17 @@ namespace pragmatic_quant_model.Maths.Stochastic
             return new BrownianBridge(dates, simulationIndexes, simulationStdDevs, leftIndex, rightIndex);
         }
 
-        public double[] Path(double[] gaussians)
-        {
-            Debug.Assert(gaussians.Length == dates.Length);
-            var path = new double[dates.Length];
-            for (int i = 0; i < simulationIndexes.Length; ++i)
-            {
-                int currentIndex = simulationIndexes[i];
-                int leftIndex = leftIndexes[currentIndex];
-                int rightIndex = rightIndexes[currentIndex];
-
-                var leftVal = (leftIndex == -1) ? 0.0 : path[leftIndex];
-                var rightVal = (rightIndex == dates.Length) ? 0.0 : path[rightIndex];
-                path[currentIndex] = leftVal * leftWeigths[i] + rightVal * rightWeigths[i] + gaussians[i] * simulationStdDevs[i];
-            }
-            return path;
-        }
         public double[][] Path(double[] gaussians, int dimension)
         {
-            Debug.Assert(gaussians.Length == dates.Length * dimension);
-            var path = new double[dates.Length][];
-            
+            var path = ArrayUtils.CreateJaggedArray<double>(dates.Length, dimension);
+            FillPath(ref path, gaussians);
+            return path;
+        }
+        public void FillPath(ref double[][] path, double[] gaussians)
+        {
+            int dimension = path[0].Length;
+            Debug.Assert(gaussians.Length == dates.Length * dimension && path.Length == dates.Length);
+
             int gaussIndex = 0;
             for (int i = 0; i < simulationIndexes.Length; ++i)
             {
@@ -157,27 +147,40 @@ namespace pragmatic_quant_model.Maths.Stochastic
                 var rightVal = (rightIndex == dates.Length) ? new double[dimension] : path[rightIndex];
                 var rightWeight = rightWeigths[i];
 
-                var currentVal = new double[dimension];
+                var currentVal = path[currentIndex];
+                Debug.Assert(currentVal.Length == dimension);
                 for (int k = 0; k < currentVal.Length; k++)
                 {
                     currentVal[k] = leftVal[k] * lefWeight + rightVal[k] * rightWeight
                                     + gaussians[gaussIndex++] * currentStdDev;
                 }
-                path[currentIndex] = currentVal;
             }
-            return path;
         }
+
         public double[][] PathIncrements(double[] gaussians, int dimension)
         {
-            var paths = Path(gaussians, dimension);
-            var increments = new double[paths.Length][];
-            increments[0] = paths[0];
-            for (int i = 1; i < paths.Length; i++)
-            {
-                increments[i] = paths[i].Substract(paths[i - 1]);
-            }
+            var increments = ArrayUtils.CreateJaggedArray<double>(dates.Length, dimension);
+            FillPathIncrements(ref increments, gaussians);
             return increments;
         }
+        public void FillPathIncrements(ref double[][] increments, double[] gaussians)
+        {
+            FillPath(ref increments, gaussians);
+
+            var dim = increments[0].Length;
+            var previous = new double[dim];
+            for (int i = 0; i < increments.Length; i++)
+            {
+                var increment = increments[i];
+                for (int j = 0; j < increment.Length; j++)
+                {
+                    double temp = increment[j];
+                    increment[j] -= previous[j];
+                    previous[j] = temp;
+                }
+            }
+        }
+
         public int GaussianSize(int dimension)
         {
             return dates.Length * dimension;

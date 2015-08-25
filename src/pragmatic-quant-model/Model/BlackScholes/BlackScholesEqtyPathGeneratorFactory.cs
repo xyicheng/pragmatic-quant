@@ -119,7 +119,9 @@ namespace pragmatic_quant_model.Model.BlackScholes
 
         public IProcessPath Path(double[] gaussians)
         {
-            var dWs = brownianBridge.PathIncrements(gaussians, 1);
+            //TODO perhaps use a pool instead of instanciate a new one
+            var dWs = ArrayUtils.CreateJaggedArray<double>(brownianBridge.Dates.Length, 1);
+            brownianBridge.FillPathIncrements(ref dWs, gaussians);
             
             var processPath = new double[pathDates.Length][];
             double currentFwd = initialFwd;

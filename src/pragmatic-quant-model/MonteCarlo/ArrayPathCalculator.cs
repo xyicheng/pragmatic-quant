@@ -13,6 +13,17 @@ namespace pragmatic_quant_model.MonteCarlo
         private readonly TLabel[][] labels;
         private readonly Func<double[], double>[][] factorEvaluators;
         #endregion
+        #region private methods
+        private double[][] ValuesBuffer()
+        { 
+            //TODO perhaps use a pool instead of instanciate a new one
+            var values = new double[datesIndexes.Length][];
+            for (int i = 0; i < datesIndexes.Length; i++)
+                values[i] = new double[factorEvaluators[i].Length];
+            return values;
+        }
+
+        #endregion
         public ArrayPathCalculator(int[] datesIndexes, 
                                    TLabel[][] labels, 
                                    Func<double[], double>[][] factorEvaluators)
@@ -26,12 +37,17 @@ namespace pragmatic_quant_model.MonteCarlo
         
         public PathFlows<double[], TLabel[]> Compute(IProcessPath processPath)
         {
-            var values = new double[datesIndexes.Length][];
+            var values = ValuesBuffer();
             for (int i = 0; i < datesIndexes.Length; i++)
             {
-                var value = processPath.GetProcessValue(datesIndexes[i]);
-                values[i] = factorEvaluators[i].Select(f => f(value)).ToArray();
+                Func<double[], double>[] funcs = factorEvaluators[i];
+                double[] val = values[i];
+                
+                double[] factor = processPath.GetProcessValue(datesIndexes[i]);
+                for (int j = 0; j < val.Length; j++)
+                    val[j] = funcs[j](factor);
             }
+            
             return new PathFlows<double[], TLabel[]>(values, labels);
         }
         public int SizeOfPathInBits

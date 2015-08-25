@@ -110,6 +110,13 @@ namespace pragmatic_quant_model.Basic
             SetRow(ref result, 0, row);
             return result;
         }
+        public static T[][] CreateJaggedArray<T>(int nbRows, int nbCols)
+        {
+            var array = new T[nbRows][];
+            for (int i = 0; i < nbRows; i++)
+                array[i] = new T[nbCols];
+            return array;
+        }
 
         public static int FindIndex<T>(this T[] array, T element)
         {
