@@ -1,8 +1,10 @@
 ﻿namespace pragmatic_quant_model.MonteCarlo
 {
-    public interface IPathGenerator<out TPath>
+    public interface IPathGenerator<TPath>
     {
-        TPath ComputePath(double[] randoms);
-        int SizeOfPathInBits { get; }
+        void ComputePath(ref TPath path, double[] randoms);
+
+        TPath NewPath();
+        int SizeOfPath { get; }
     }
 }

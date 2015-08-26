@@ -13,17 +13,6 @@ namespace pragmatic_quant_model.MonteCarlo
         private readonly TLabel[][] labels;
         private readonly Func<double[], double>[][] factorEvaluators;
         #endregion
-        #region private methods
-        private double[][] ValuesBuffer()
-        { 
-            //TODO perhaps use a pool instead of instanciate a new one
-            var values = new double[datesIndexes.Length][];
-            for (int i = 0; i < datesIndexes.Length; i++)
-                values[i] = new double[factorEvaluators[i].Length];
-            return values;
-        }
-
-        #endregion
         public ArrayPathCalculator(int[] datesIndexes, 
                                    TLabel[][] labels, 
                                    Func<double[], double>[][] factorEvaluators)
@@ -34,23 +23,27 @@ namespace pragmatic_quant_model.MonteCarlo
             this.labels = labels;
             this.factorEvaluators = factorEvaluators;
         }
-        
-        public PathFlows<double[], TLabel[]> Compute(IProcessPath processPath)
+
+        public void ComputeFlows(ref PathFlows<double[], TLabel[]> pathFlows, IProcessPath processPath)
         {
-            var values = ValuesBuffer();
             for (int i = 0; i < datesIndexes.Length; i++)
             {
                 Func<double[], double>[] funcs = factorEvaluators[i];
-                double[] val = values[i];
-                
                 double[] factor = processPath.GetProcessValue(datesIndexes[i]);
-                for (int j = 0; j < val.Length; j++)
-                    val[j] = funcs[j](factor);
+
+                double[] flows = pathFlows.Flows[i];
+                for (int j = 0; j < flows.Length; j++)
+                    flows[j] = funcs[j](factor);
             }
-            
-            return new PathFlows<double[], TLabel[]>(values, labels);
         }
-        public int SizeOfPathInBits
+        public PathFlows<double[], TLabel[]> NewPathFlow()
+        {
+            var flows = new double[datesIndexes.Length][];
+            for (int i = 0; i < datesIndexes.Length; i++)
+                flows[i] = new double[factorEvaluators[i].Length];
+            return new PathFlows<double[], TLabel[]>(flows, labels);
+        }
+        public int SizeOfPath
         {
             get { return factorEvaluators.Select(f => f.Length).Sum() * sizeof(double); }
         }

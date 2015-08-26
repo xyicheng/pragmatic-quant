@@ -4,10 +4,14 @@ namespace pragmatic_quant_model.MonteCarlo.Product
 {
     public interface IProductPathFlow
     {
-        PathFlows<double, PaymentInfo> Compute(PathFlows<double[], IFixing[]> fixingsPath,
-                                          PathFlows<double[], PaymentInfo[]> flowRebasementPath);
+         void ComputePathFlows(ref PathFlows<double, PaymentInfo> pathFlows, 
+                               PathFlows<double[], IFixing[]> fixingsPath,
+                               PathFlows<double[], PaymentInfo[]> flowRebasementPath);
+
+        PathFlows<double, PaymentInfo> NewPathFlow();
+        int SizeOfPath { get; }
+
         IFixing[] Fixings { get; }
         PaymentInfo[] Payments { get; }
-        int SizeOfPathInBits { get; }
     }
 }

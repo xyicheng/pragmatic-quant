@@ -9,26 +9,40 @@ namespace pragmatic_quant_model.MonteCarlo.Product
         #region private fields
         private readonly IPathFlowCalculator<double[], IFixing[]> fixingPathCalculator;
         private readonly IPathFlowCalculator<double[], PaymentInfo[]> numerairePathCalc;
-        private readonly IProductPathFlow productPathFlowInstrument;
+        private readonly IProductPathFlow productPathFlow;
         #endregion
+        #region private fields (buffers)
+        private PathFlows<double[], IFixing[]> fixingsPath;
+        private PathFlows<double[], PaymentInfo[]> numerairePath;
+        #endregion
+
         public ProductPathFlowCalculator(IPathFlowCalculator<double[], IFixing[]> fixingPathCalculator,
                                          IPathFlowCalculator<double[], PaymentInfo[]> numerairePathCalc,
-                                         IProductPathFlow productPathFlowInstrument)
+                                         IProductPathFlow productPathFlow)
         {
             this.fixingPathCalculator = fixingPathCalculator;
             this.numerairePathCalc = numerairePathCalc;
-            this.productPathFlowInstrument = productPathFlowInstrument;
+            this.productPathFlow = productPathFlow;
+            
+            //Buffers initialization
+            fixingsPath = fixingPathCalculator.NewPathFlow();
+            numerairePath = numerairePathCalc.NewPathFlow();
         }
 
-        public PathFlows<double, PaymentInfo> Compute(IProcessPath processPath)
+        public void ComputeFlows(ref PathFlows<double, PaymentInfo> pathFlows, IProcessPath processPath)
         {
-            var fixingsPath = fixingPathCalculator.Compute(processPath);
-            var numerairePath = numerairePathCalc.Compute(processPath);
-            return productPathFlowInstrument.Compute(fixingsPath, numerairePath);
+            fixingPathCalculator.ComputeFlows(ref fixingsPath, processPath);
+            numerairePathCalc.ComputeFlows(ref numerairePath, processPath);
+            productPathFlow.ComputePathFlows(ref pathFlows, fixingsPath, numerairePath);
         }
-        public int SizeOfPathInBits
+        public PathFlows<double, PaymentInfo> NewPathFlow()
         {
-            get { return productPathFlowInstrument.SizeOfPathInBits; }
+            return productPathFlow.NewPathFlow();
+        }
+        public int SizeOfPath
+        {
+            get { return productPathFlow.SizeOfPath; }
         }
     }
+
 }

@@ -118,10 +118,12 @@ namespace pragmatic_quant_model.MonteCarlo.Product
         private readonly Tuple<int, int>[] flowRebasementIndex;
         private readonly Coupon[] coupons;
         #endregion
+        #region private fields (buffer)
+        private readonly double[][] cpnFixingByDates;
+        #endregion
         #region private methods
         private double[][] CouponFixingBuffer()
         {
-            //TODO perhaps use a pool instead of instanciate a new one
             var buffer = new double[coupons.Length][];
             for (int i = 0; i < buffer.Length; i++)
             {
@@ -139,15 +141,19 @@ namespace pragmatic_quant_model.MonteCarlo.Product
             Fixings = coupons.Aggregate(new IFixing[0], (prev, cpn) => prev.Union(cpn.Fixings).ToArray())
                              .OrderBy(f => f.Date)
                              .ToArray();
+
+            //Buffer initialization
+            cpnFixingByDates = CouponFixingBuffer();
         }
         
-        public PathFlows<double, PaymentInfo> Compute(PathFlows<double[], IFixing[]> fixingsPath,
-                                                      PathFlows<double[], PaymentInfo[]> flowRebasementPath)
+        public void ComputePathFlows(ref PathFlows<double, PaymentInfo> pathFlows, 
+                                     PathFlows<double[], IFixing[]> fixingsPath, 
+                                     PathFlows<double[], PaymentInfo[]> flowRebasementPath)
         {
             double[][] fixings = fixingsPath.Flows;
-            double[][] cpnFixingByDates = CouponFixingBuffer();
-            
-            var payoffFlows = new double[coupons.Length];
+            double[][] rebasements = flowRebasementPath.Flows;
+
+            double[] couponsFlows = pathFlows.Flows;
             for (int i = 0; i < coupons.Length; i++)
             {
                 Tuple<int, int>[] cpnCoordinates = fixingsIndexes[i];
@@ -157,19 +163,23 @@ namespace pragmatic_quant_model.MonteCarlo.Product
                     Tuple<int, int> coordinate = cpnCoordinates[j];
                     couponFixings[j] = fixings[coordinate.Item1][coordinate.Item2];
                 }
-                
-                var flowRebasement = flowRebasementPath.Flows[flowRebasementIndex[i].Item1]
-                                                             [flowRebasementIndex[i].Item2];
-                payoffFlows[i] = coupons[i].Payoff(couponFixings) * flowRebasement; 
-            }
 
-            return new PathFlows<double, PaymentInfo>(payoffFlows, Payments);
+                double flowRebasement = rebasements[flowRebasementIndex[i].Item1][flowRebasementIndex[i].Item2];
+                couponsFlows[i] = coupons[i].Payoff(couponFixings) * flowRebasement;
+            }
         }
-        public IFixing[] Fixings { get; private set; }
-        public PaymentInfo[] Payments { get; private set; }
-        public int SizeOfPathInBits
+        public PathFlows<double, PaymentInfo> NewPathFlow()
+        {
+            return new PathFlows<double, PaymentInfo>(new double[coupons.Length], Payments);
+        }
+        public int SizeOfPath
         {
             get { return coupons.Length * sizeof (double); }
         }
+
+        public IFixing[] Fixings { get; private set; }
+        public PaymentInfo[] Payments { get; private set; }
+
     }
+
 }

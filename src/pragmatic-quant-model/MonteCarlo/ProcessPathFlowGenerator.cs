@@ -17,21 +17,28 @@ namespace pragmatic_quant_model.MonteCarlo
             this.flowPathCalculator = flowPathCalculator;
         }
 
-        public PathFlows<TFlow, TLabel> ComputePath(double[] randoms)
+        public  void ComputePath(ref PathFlows<TFlow, TLabel> path, double[] randoms)
         {
             IProcessPath processPath = processPathGen.Path(randoms);
-            return flowPathCalculator.Compute(processPath);
+            flowPathCalculator.ComputeFlows(ref path, processPath);
         }
-        public int SizeOfPathInBits
+        
+        public PathFlows<TFlow, TLabel> NewPath()
         {
-            get { return flowPathCalculator.SizeOfPathInBits; }
+            return flowPathCalculator.NewPathFlow();
+        }
+        public int SizeOfPath
+        {
+            get { return flowPathCalculator.SizeOfPath; }
         }
     }
 
     public interface IPathFlowCalculator<TFlow, TLabel>
     {
-        PathFlows<TFlow, TLabel> Compute(IProcessPath processPath);
-        int SizeOfPathInBits { get; }
+        void ComputeFlows(ref PathFlows<TFlow, TLabel> pathFlows, IProcessPath processPath);
+
+        PathFlows<TFlow, TLabel> NewPathFlow();
+        int SizeOfPath { get; }
     }
 
 }
