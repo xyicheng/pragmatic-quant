@@ -30,21 +30,21 @@ namespace pragmatic_quant_model.Basic
             if (x < pillars[0]) return -1;
             if (x >= pillars[pillars.Length - 1]) return pillars.Length - 1;
 
-            int jl = 0;
-            int ju = pillars.Length - 1;
-            while (ju - jl > 1)
+            int lower = 0;
+            int upper = pillars.Length - 1;
+            while (upper - lower > 1)
             {
-                int jm = (ju + jl) >> 1;
-                if (x < pillars[jm])
+                int mid = (upper + lower) >> 1;
+                if (x < pillars[mid])
                 {
-                    ju = jm;
+                    upper = mid;
                 }
                 else
                 {
-                    jl = jm;
+                    lower = mid;
                 }
             }
-            return jl;
+            return lower;
         }
 
         /// <summary>

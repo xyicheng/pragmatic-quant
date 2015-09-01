@@ -34,7 +34,7 @@ namespace pragmatic_quant_model.Maths
         {
             throw new NotImplementedException("RrFunction.Inverse");
         }
-
+        
         public static implicit operator RrFunction(double cst)
         {
             return RrFunctions.Constant(cst);

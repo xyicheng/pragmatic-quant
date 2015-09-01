@@ -6,6 +6,7 @@ using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Function;
 using pragmatic_quant_model.Maths.Interpolation;
+using pragmatic_quant_model.Model.LocalVolatility;
 
 namespace pragmatic_quant_model.MarketDatas
 {
@@ -130,6 +131,7 @@ namespace pragmatic_quant_model.MarketDatas
         {
             return cumulatedDividendFunc.Eval(d);
         } 
+
     }
 
     public class VolatilityMatrix
@@ -151,10 +153,10 @@ namespace pragmatic_quant_model.MarketDatas
     public class VolatilitySurface
     {
         #region private fields
-        private readonly MixedLinearInterpolation2D varianceInterpoler;
+        private readonly VarianceInterpoler varianceInterpoler;
         private readonly MoneynessProvider moneyness; 
         #endregion
-        protected VolatilitySurface(ITimeMeasure time, MixedLinearInterpolation2D varianceInterpoler, MoneynessProvider moneyness)
+        protected VolatilitySurface(ITimeMeasure time, VarianceInterpoler varianceInterpoler, MoneynessProvider moneyness)
         {
             Time = time;
             this.varianceInterpoler = varianceInterpoler;
@@ -173,7 +175,7 @@ namespace pragmatic_quant_model.MarketDatas
                 return (RrFunction) SplineInterpoler.BuildCubicSpline(moneynessPillars, varianceSlice);
             });
 
-            var varianceInterpol = new MixedLinearInterpolation2D(timePillars, varianceSlices, varianceSlices.First());
+            var varianceInterpol = new VarianceInterpoler(timePillars, varianceSlices);
             return new VolatilitySurface(volMatrix.Time, varianceInterpol, moneyness);
         }
 
@@ -191,6 +193,7 @@ namespace pragmatic_quant_model.MarketDatas
             return Volatility(Time[maturity], strike);
         }
         public ITimeMeasure Time { get; private set; }
+
     }
 
     public abstract class MoneynessProvider
@@ -221,6 +224,7 @@ namespace pragmatic_quant_model.MarketDatas
             }
         }
         #endregion
+
     }
     
 }

@@ -32,43 +32,4 @@ namespace pragmatic_quant_model.Maths.Interpolation
             get { return ySearcher.Pillars; }
         }
     }
-
-    public class MixedLinearInterpolation2D
-    {
-        #region private fields
-        private readonly StepSearcher linearAxisSearcher;
-        private readonly double[] linearPillars;
-        private readonly RrFunction[] functions;
-        private readonly RrFunction extrapolFunction;
-        #endregion
-
-        public MixedLinearInterpolation2D(double[] linearPillars, RrFunction[] functions, RrFunction extrapolFunction)
-        {
-            this.linearPillars = linearPillars;
-            this.functions = functions;
-            this.extrapolFunction = extrapolFunction;
-            linearAxisSearcher = new StepSearcher(linearPillars);
-        }
-        
-        public double Eval(double x, double y)
-        {
-            var linearIndex = linearAxisSearcher.LocateLeftIndex(x);
-            var leftFunc = linearIndex < 0 ? extrapolFunction : functions[linearIndex];
-
-            if (linearIndex == functions.Length - 1)
-                return leftFunc.Eval(y);
-
-            var rightFunc = functions[linearIndex + 1];
-
-            double w = (x - linearPillars[linearIndex]) / (linearPillars[linearIndex + 1] - linearPillars[linearIndex]);
-            return (1.0 - w) * leftFunc.Eval(y) + w * rightFunc.Eval(y);
-        }
-
-        public MixedLinearInterpolation2D DerivativeY()
-        {
-            var funcDerivatives = functions.Map(f => f.Derivative());
-            return new MixedLinearInterpolation2D(linearPillars, funcDerivatives, extrapolFunction.Derivative());
-        }
-    }
-
 }
