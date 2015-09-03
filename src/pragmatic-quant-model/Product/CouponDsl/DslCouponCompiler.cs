@@ -65,26 +65,21 @@ namespace pragmatic_quant_model.Product.CouponDsl
         /// <summary>
         /// Code from Ben Watson's book : "Writing High-Performance .Net Code"
         /// </summary>
-        public static T GenerateMethodCall<T>(MethodInfo methodInfo,
-                                              Type extensionType,
-                                              Type returnType,
-                                              Type[] parametersTypes) where T : class
+        public static T FastMethodCall<T>(MethodInfo methodInfo,
+                                          Type extensionType,
+                                          Type returnType,
+                                          Type[] parametersTypes) where T : class
         {
-            
-
             var dynamicMethod = new DynamicMethod("Invoke_" + methodInfo.Name, returnType, parametersTypes, true);
             var ilGenerator = dynamicMethod.GetILGenerator();
-
-            ilGenerator.DeclareLocal(extensionType);
+            
             // object's this parameter
             ilGenerator.Emit(OpCodes.Ldarg_0);
             // cast it to the correct type
             ilGenerator.Emit(OpCodes.Castclass, extensionType);
             // actual method argument
-            ilGenerator.Emit(OpCodes.Stloc_0);
-            ilGenerator.Emit(OpCodes.Ldloc_0);
             ilGenerator.Emit(OpCodes.Ldarg_1);
-            ilGenerator.EmitCall(OpCodes.Callvirt, methodInfo, null);
+            ilGenerator.EmitCall(OpCodes.Call, methodInfo, null);
             ilGenerator.Emit(OpCodes.Ret);
 
             object del = dynamicMethod.CreateDelegate(typeof(T));
@@ -108,7 +103,7 @@ namespace pragmatic_quant_model.Product.CouponDsl
                 var fixings = dslCouponDatas[i].Expression.Fixings.ToArray();
                 var paymentInfo = dslCouponDatas[i].PaymentInfo;
 
-                var payoff = GenerateMethodCall<Func<object, double[], double>>
+                var payoff = FastMethodCall<Func<object, double[], double>>
                     (payoffMethods[i], payoffClassType, typeof (double), new[] {typeof (object), typeof (double[])});
                 
                 return new DslCoupon(paymentInfo, fixings, payoff, payoffObj);

@@ -58,6 +58,7 @@
     <Compile Include="LoggerForm.Designer.cs">
       <DependentUpon>LoggerForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="MarketManager.cs" />
     <Compile Include="Publishers\IPublisher.cs" />
     <Compile Include="Publishers\PriceResultPublisher.cs" />
     <Compile Include="Publishers\PublisherServices.cs" />
