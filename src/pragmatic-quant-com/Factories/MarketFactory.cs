@@ -58,7 +58,7 @@ namespace pragmatic_quant_com.Factories
             var pillars = eqtyVolMatrix.RowLabels.Map(d => d.ToDate(time.RefDate));
             return new VolatilityMatrix(time, pillars, eqtyVolMatrix.ColLabels, eqtyVolMatrix.Values);
         }
-        private static AssetMarket[] ProcessAssetMkt(object[,] bag, DateTime refDate)
+        private static AssetMarket[] ProcessAssetMkt(object[,] bag, DateTime refDate, DiscountCurve[] discountCurves)
         {
             var eqtyTime = TimeMeasure.Act365(refDate);
             var assetRawDatas = bag.ProcessLabelledMatrix("Asset", o => o.ToString(), o => o.ToString(), o => o);
@@ -88,7 +88,11 @@ namespace pragmatic_quant_com.Factories
                 var divQuotes = ProcessDiv(bag, refDate, assetName);
                 var volMatrix = AssetVolMatrix(bag, eqtyTime, assetName);
 
-                var mkt = new AssetMarket(assetId, refDate, eqtyTime, spot, repoCurve, divQuotes, volMatrix);
+                var riskFreeDiscount = discountCurves.Single(curve => curve.Financing.Equals(FinancingId.RiskFree(currency)));
+
+                var mkt = new AssetMarket(assetId, refDate, eqtyTime,
+                                          spot, riskFreeDiscount, repoCurve, 
+                                          divQuotes, volMatrix);
                 assetMkts.Add(mkt);
             }
 
@@ -98,11 +102,12 @@ namespace pragmatic_quant_com.Factories
         public Market Build(object[,] bag)
         {
             DateTime refDate = RefDate(bag);
-            AssetMarket[] assetMarket = ProcessAssetMkt(bag, refDate);
 
             TimeMatrixDatas curveRawDatas = bag.ProcessTimeMatrixDatas("Discount");
-            var discountCurves = RateCurveFromRawDatas(curveRawDatas, refDate);
+            DiscountCurve[] discountCurves = RateCurveFromRawDatas(curveRawDatas, refDate);
 
+            AssetMarket[] assetMarket = ProcessAssetMkt(bag, refDate, discountCurves);
+            
             return new Market(discountCurves, assetMarket);
         }
     }

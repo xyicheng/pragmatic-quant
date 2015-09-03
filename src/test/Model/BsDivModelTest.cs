@@ -43,7 +43,7 @@ namespace test.Model
         [Test, TestCaseSource(typeof(BsDivModelTestDatas), "AssetMarket")]
         public void CheckZeroVolForward(AssetMarket assetMkt)
         {
-            var zcCurve = DiscountCurve.Flat(FinancingId.RiskFree(Currency.Eur), assetMkt.RefDate, 0.01);
+            var zcCurve = assetMkt.RiskFreeDiscount;
             var market = new Market(new[] {zcCurve}, new[] {assetMkt});
 
             var zeroVol = new MapRawDatas<DateOrDuration, double>(new[] {new DateOrDuration(assetMkt.RefDate)}, new[] {0.0});
@@ -81,13 +81,14 @@ namespace test.Model
                 var refDate = DateTime.Parse("07/06/2009");
                 var asset = new AssetId("Stoxx50", Currency.Eur);
                 var time = TimeMeasure.Act365(refDate);
-                
+
+                var zcCurve = DiscountCurve.Flat(FinancingId.RiskFree(Currency.Eur), refDate, 0.01);
                 var repo = DiscountCurve.Flat(FinancingId.RiskFree(asset.Currency), refDate, 0.03);
                 
                 var divDates = EnumerableUtils.For(1, 60, i => refDate + i * Duration.Month);
                 var divQuotes = divDates.Map(d => new DividendQuote(d, 0.03 / 12.0, 0.02));
 
-                var assetMarket = new AssetMarket(asset, refDate, time, 1.0, repo, divQuotes, null);
+                var assetMarket = new AssetMarket(asset, refDate, time, 1.0, zcCurve, repo, divQuotes, null);
                 yield return new object[] { assetMarket };
             }
         }

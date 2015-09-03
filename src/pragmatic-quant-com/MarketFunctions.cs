@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using ExcelDna.Integration;
-using pragmatic_quant_com.Factories;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
-using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.MarketDatas;
 
 namespace pragmatic_quant_com
@@ -105,21 +102,17 @@ namespace pragmatic_quant_com
         {
             try
             {
-                var market = MarketManager.Instance.GetMarket(mktObj);
-                var assetMarket = market.AssetMarketFromName(assetName);
-
-                DiscountCurve cashCurve = market.RiskFreeDiscountCurve(assetMarket.Asset.Currency);
-                AssetForwardCurve assetForward = assetMarket.Forward(cashCurve);
-                MoneynessProvider moneyness = MoneynessProvider.FromFwdCurve(assetForward);
-                VolatilitySurface volSurface = VolatilitySurface.BuildInterpol(assetMarket.VolMatrix, moneyness);
+                Market market = MarketManager.Instance.GetMarket(mktObj);
+                AssetMarket assetMarket = market.AssetMarketFromName(assetName);
+                VolatilitySurface volSurface = assetMarket.VolSurface();
                 
                 var maturities = dates.Map(o =>
                 {
                     var dateOrDuration = DateAndDurationConverter.ConvertDateOrDuration(o);
-                    return dateOrDuration.ToDate(assetForward.RefDate);
+                    return dateOrDuration.ToDate(assetMarket.RefDate);
                 });
                 
-                return ArrayUtils.CartesianProd(maturities, strikes, (m, k) => volSurface.Volatility(m, k));
+                return ArrayUtils.CartesianProd(maturities, strikes, volSurface.Volatility);
             }
             catch (Exception e)
             {
@@ -130,60 +123,32 @@ namespace pragmatic_quant_com
         }
     }
 
-    public sealed class MarketManager : Singleton<MarketManager>
+    public class ModelFunctions
     {
-        #region private fields
-        private readonly IDictionary<string, Market> marketByIds;
-        #endregion
-        #region private methods
-        private string FormattedId(string id)
+        [ExcelFunction(Description = "Equity local volatility function",
+                       Category = "PragmaticQuant_ModelFunctions")]
+        public static object LocalVolSurface(object mktObj, object[] dates, double[] strikes, string assetName)
         {
-            return id.Trim().ToLowerInvariant();
-        }
-        public MarketManager()
-        {
-            marketByIds= new Dictionary<string, Market>();
-        }
-        #endregion
-        
-        public void SetMarket(string mktId, object[,] marketBag)
-        {
-            var market = MarketFactory.Instance.Build(marketBag);
+            try
+            {
+                Market market = MarketManager.Instance.GetMarket(mktObj);
+                AssetMarket assetMarket = market.AssetMarketFromName(assetName);
+                VolatilitySurface volSurface = assetMarket.VolSurface();
 
-            var formatedId = FormattedId(mktId);
-            if (marketByIds.ContainsKey(formatedId))
-            {
-                marketByIds[formatedId] = market;
-            }
-            else
-            {
-                lock (this)
+                var maturities = dates.Map(o =>
                 {
-                    marketByIds.Add(formatedId, market);
-                }
+                    var dateOrDuration = DateAndDurationConverter.ConvertDateOrDuration(o);
+                    return dateOrDuration.ToDate(assetMarket.RefDate);
+                });
+
+                return ArrayUtils.CartesianProd(maturities, strikes, volSurface.LocalVol);
             }
-        }
-        public bool HasMarket(string mktId)
-        {
-            return marketByIds.ContainsKey(FormattedId(mktId));
-        }
-        public Market GetMarket(object mktObj)
-        {
-            var mktBag = mktObj as object[,];
-            if (mktBag != null)
-                return MarketFactory.Instance.Build(mktBag);
-
-            if (!(mktObj is string))
-                throw new ApplicationException(string.Format("Unable to build market from : {0}", mktObj));
-            var mktId = (String) mktObj;
-
-            Market mkt;
-            if (!marketByIds.TryGetValue(FormattedId(mktId), out mkt))
+            catch (Exception e)
             {
-                throw new ApplicationException(string.Format("No market for id : {0}", mktId));
+                var error = new object[1, 1];
+                error[0, 0] = string.Format("ERROR, {0}", e.Message);
+                return error;
             }
-            return mkt;
         }
     }
-
 }

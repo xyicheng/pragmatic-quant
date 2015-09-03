@@ -102,17 +102,17 @@ namespace pragmatic_quant_model.Model.LocalVolatility
 
             double localVariance = varianceTimeDerivatives[stepIndex].Eval(y);
 
-            RrFunction leftDenom = localVarianceDenominators[stepIndex];
+            double leftDenom = localVarianceDenominators[stepIndex].Eval(y);
             if (stepIndex < maturityPillars.Length - 1)
             {
                 var rightDenom = localVarianceDenominators[stepIndex + 1];
                 double w = (t - maturityPillars[stepIndex]) / (maturityPillars[stepIndex + 1] - maturityPillars[stepIndex]);
 
-                localVariance /= (1.0 - w) * leftDenom.Eval(y) + w * rightDenom.Eval(y);
+                localVariance /= (1.0 - w) * leftDenom + w * rightDenom.Eval(y);
             }
             else
             {
-                localVariance /= t * leftDenom.Eval(y) / maturityPillars[stepIndex];
+                localVariance /= t * leftDenom / maturityPillars[stepIndex];
             }
             return localVariance;
         }

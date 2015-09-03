@@ -14,18 +14,20 @@ namespace pragmatic_quant_model.MarketDatas
     {
         #region private fields
         private readonly ITimeMeasure time;
-        private readonly double spot;
-        private readonly DiscountCurve repoCurve;
-        private readonly DividendQuote[] dividends;
         #endregion
         
         public AssetMarket(AssetId asset, DateTime refDate, ITimeMeasure time,
-            double spot, DiscountCurve repoCurve, DividendQuote[] dividends, VolatilityMatrix volMatrix)
+                           double spot,
+                           DiscountCurve riskFreeDiscount,
+                           DiscountCurve repoCurve, 
+                           DividendQuote[] dividends, 
+                           VolatilityMatrix volMatrix)
         {
             this.time = time;
-            this.spot = spot;
-            this.repoCurve = repoCurve;
-            this.dividends = dividends;
+            Spot = spot;
+            RiskFreeDiscount = riskFreeDiscount;
+            RepoCurve = repoCurve;
+            Dividends = dividends;
             VolMatrix = volMatrix;
             RefDate = refDate;
             Asset = asset;
@@ -36,28 +38,27 @@ namespace pragmatic_quant_model.MarketDatas
 
         public DateTime RefDate { get; private set; }
         public AssetId Asset { get; private set; }
-        public double Spot
-        {
-            get { return spot; }
-        }
-        public DividendQuote[] Dividends
-        {
-            get { return dividends; }
-        }
-        public DiscountCurve RepoCurve
-        {
-            get { return repoCurve; }
-        }
+        public double Spot { get; private set; }
+        public DividendQuote[] Dividends { get; private set; }
+        public DiscountCurve RiskFreeDiscount { get; private set; }
+        public DiscountCurve RepoCurve { get; private set; }
         public VolatilityMatrix VolMatrix { get; private set; }
 
         public DiscountCurve AssetFinancingCurve(DiscountCurve cashFinancingCurve)
         {
-            return DiscountCurve.Product(repoCurve, cashFinancingCurve, FinancingId.AssetCollat(Asset));
+            return DiscountCurve.Product(RepoCurve, cashFinancingCurve, FinancingId.AssetCollat(Asset));
         }
         public AssetForwardCurve Forward(DiscountCurve cashFinancingCurve)
         {
             var assetFinancingCurve = AssetFinancingCurve(cashFinancingCurve);
-            return new AssetForwardCurve(spot, dividends, assetFinancingCurve, time);
+            return new AssetForwardCurve(Spot, Dividends, assetFinancingCurve, time);
+        }
+
+        public VolatilitySurface VolSurface()
+        {
+            AssetForwardCurve assetForward = Forward(RiskFreeDiscount);
+            MoneynessProvider moneyness = MoneynessProvider.FromFwdCurve(assetForward);
+            return VolatilitySurface.BuildInterpol(VolMatrix, moneyness);
         }
     }
 
@@ -154,13 +155,16 @@ namespace pragmatic_quant_model.MarketDatas
     {
         #region private fields
         private readonly VarianceInterpoler varianceInterpoler;
+        private readonly LocalVariance localVariance;
         private readonly MoneynessProvider moneyness; 
         #endregion
-        protected VolatilitySurface(ITimeMeasure time, VarianceInterpoler varianceInterpoler, MoneynessProvider moneyness)
+        protected VolatilitySurface(ITimeMeasure time, MoneynessProvider moneyness, 
+                                    VarianceInterpoler varianceInterpoler, LocalVariance localVariance)
         {
             Time = time;
             this.varianceInterpoler = varianceInterpoler;
             this.moneyness = moneyness;
+            this.localVariance = localVariance;
         }
 
         public static VolatilitySurface BuildInterpol(VolatilityMatrix volMatrix, MoneynessProvider moneyness)
@@ -176,7 +180,7 @@ namespace pragmatic_quant_model.MarketDatas
             });
 
             var varianceInterpol = new VarianceInterpoler(timePillars, varianceSlices);
-            return new VolatilitySurface(volMatrix.Time, varianceInterpol, moneyness);
+            return new VolatilitySurface(volMatrix.Time, moneyness, varianceInterpol, varianceInterpol.BuildLocalVariance());
         }
 
         public double Variance(double maturity, double strike)
@@ -192,8 +196,22 @@ namespace pragmatic_quant_model.MarketDatas
         {
             return Volatility(Time[maturity], strike);
         }
-        public ITimeMeasure Time { get; private set; }
 
+        public double LocalVariance(double maturity, double strike)
+        {
+            var m = moneyness.Moneyness(maturity, strike);
+            return localVariance.Eval(maturity, m);
+        }
+        public double LocalVol(double maturity, double strike)
+        {
+            return Math.Sqrt(LocalVariance(maturity, strike));
+        }
+        public double LocalVol(DateTime maturity, double strike)
+        {
+            return LocalVol(Time[maturity], strike);
+        }
+
+        public ITimeMeasure Time { get; private set; }
     }
 
     public abstract class MoneynessProvider
