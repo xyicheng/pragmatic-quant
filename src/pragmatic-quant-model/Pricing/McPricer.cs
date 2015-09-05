@@ -19,7 +19,7 @@ namespace pragmatic_quant_model.Pricing
         {
             var productPathFlowCalculator = ProductPathFlowFactory.Build(product, mcModel);
             var processPathFlowGen = new ProcessPathFlowGenerator<double, PaymentInfo>
-                (mcModel.ProcessPathGen, productPathFlowCalculator);
+                (mcModel.BrownianBridge, mcModel.ProcessPathGen, productPathFlowCalculator);
             return new McEngine<PathFlows<double, PaymentInfo>, PathFlows<double, PaymentInfo>>
                 (mcModel.RandomGenerator, processPathFlowGen, PriceFlowsAggregator.Value);
         }

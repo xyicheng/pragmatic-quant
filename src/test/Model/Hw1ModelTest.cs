@@ -8,6 +8,7 @@ using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Function;
 using pragmatic_quant_model.Maths.Integration;
+using pragmatic_quant_model.Maths.Stochastic;
 using pragmatic_quant_model.Model.HullWhite;
 using pragmatic_quant_model.Product;
 
@@ -41,7 +42,7 @@ namespace test.Model
 
         [Test, TestCaseSource(typeof (Hw1ModelTestDatas), "ProbaMeasure")]
         public void ProbaMeasure(double lambda, RrFunction sigma, Duration probaMaturity, Duration simulationMaturity,
-                                 int quadratureNbPoints, double precision)
+            int quadratureNbPoints, double precision)
         {
             var refDate = DateTime.Parse("07/06/2009");
             var hw1 = new Hw1Model(TimeMeasure.Act365(refDate), Currency.Eur, lambda, sigma);
@@ -50,10 +51,11 @@ namespace test.Model
             var t = refDate + simulationMaturity;
 
             var hw1PathGen = new Hw1ModelPathGeneratorFactory().Build(hw1, null, probaMeasure, new[] {t});
+            var brownianBridge = BrownianBridge.Create(hw1PathGen.AllSimulatedDates);
             var hw1Zc = new Hw1ModelZcRepresentation(hw1);
             var numeraireZc = hw1Zc.Zc(t, probaMeasure.Date, 1.0);
 
-            Assert.AreEqual(hw1PathGen.RandomDim, 1);
+            Assert.AreEqual(hw1PathGen.AllSimulatedDates.Length, 1);
 
             double[] x, w;
             GaussHermite.GetQuadrature(quadratureNbPoints, out x, out w);
@@ -61,10 +63,11 @@ namespace test.Model
             double flow = 0.0;
             for (int i = 0; i < x.Length; i++)
             {
-                var ornstein = hw1PathGen.Path(new[] {x[i]}).GetProcessValue(0);
+                var dw = brownianBridge.PathIncrements(new[] {x[i]}, 1);
+                var ornstein = hw1PathGen.Path(dw).GetProcessValue(0);
                 flow += w[i] * 1.0 / numeraireZc.Eval(ornstein);
             }
-            
+
             var error = Math.Abs(flow - 1.0);
             Assert.LessOrEqual(error, precision);
         }

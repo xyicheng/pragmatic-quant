@@ -6,7 +6,6 @@ namespace pragmatic_quant_model.Maths.Stochastic
     public class OrnsteinUhlenbeck1DGenerator : IProcessPathGenerator
     {
         #region private fields
-        private readonly BrownianBridge brownianBridge;
         private readonly double[] dates;
         private readonly double[] stepSlopes;
         private readonly double[] stepDrifts;
@@ -20,13 +19,11 @@ namespace pragmatic_quant_model.Maths.Stochastic
             this.stepSlopes = stepSlopes;
             this.stepDrifts = stepDrifts;
             this.stepVols = stepVols;
-            brownianBridge = BrownianBridge.Create(dates);
-            RandomDim = brownianBridge.GaussianSize(1);
+            AllSimulatedDates = dates;
         }
 
-        public IProcessPath Path(double[] gaussians)
+        public IProcessPath Path(double[][] dWs)
         {
-            var dWs = brownianBridge.PathIncrements(gaussians, 1);
             var processPath = new double[dWs.Length][];
 
             var currentProcess = initialValue;
@@ -40,7 +37,7 @@ namespace pragmatic_quant_model.Maths.Stochastic
         }
         public double[] Dates { get { return dates; } }
         public int ProcessDim { get { return 1; } }
-        public int RandomDim { get; private set; }
+        public double[] AllSimulatedDates { get; private set; }
     }
 
     public class OrnsteinUhlenbeck1DGeneratorFactory
@@ -72,6 +69,7 @@ namespace pragmatic_quant_model.Maths.Stochastic
                 stepDrifts[i] = StepDrift(previous, dates[i], ouProcess);
                 stepVols[i] = StepVol(previous, dates[i], ouProcess);
             }
+
             return new OrnsteinUhlenbeck1DGenerator(dates, ouProcess.Value0, stepSlopes, stepDrifts, stepVols);
         }
     }

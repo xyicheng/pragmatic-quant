@@ -155,6 +155,7 @@
     <Compile Include="Maths\BachelierOption.cs" />
     <Compile Include="Maths\BlackScholesOption.cs" />
     <Compile Include="Maths\FiniteDifferenceUtils.cs" />
+    <Compile Include="Model\LocalVolatility\LocalVolatilityModel.cs" />
     <Compile Include="Model\LocalVolatility\VarianceInterpoler.cs" />
     <Compile Include="Maths\Polynomial.cs" />
     <Compile Include="Maths\Stochastic\BrownianBridge.cs" />

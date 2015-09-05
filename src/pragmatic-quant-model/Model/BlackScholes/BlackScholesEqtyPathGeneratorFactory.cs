@@ -62,7 +62,7 @@ namespace pragmatic_quant_model.Model.BlackScholes
             BsEqtySimulatorStepDatas[] stepSimulDatas = EnumerableUtils.For(0, simulatedDates.Length,
                 i => StepSchedule(i > 0 ? simulatedDates[i - 1] : market.RefDate, simulatedDates[i], 
                                   model, assetDiscount, probaMeasure.Date));
-            
+
             return new BlackScholesEquityPathGenerator(stepSimulDatas, forward);
         }
     }
@@ -95,7 +95,6 @@ namespace pragmatic_quant_model.Model.BlackScholes
     {
         #region private fields
         private readonly double[] pathDates;
-        private readonly BrownianBridge brownianBridge;
         private readonly double[][] vols;
         private readonly double[][] varDrifts;
         private readonly double[][] discounts;
@@ -104,8 +103,6 @@ namespace pragmatic_quant_model.Model.BlackScholes
         #endregion
         public BlackScholesEquityPathGenerator(BsEqtySimulatorStepDatas[] stepDatas, double forward)
         {
-            var allDates = EnumerableUtils.Append(stepDatas.Map(step => step.Dates));
-            brownianBridge = BrownianBridge.Create(allDates);
             initialFwd = forward;
 
             pathDates = stepDatas.Map(step => step.Step.Sup);
@@ -114,15 +111,11 @@ namespace pragmatic_quant_model.Model.BlackScholes
             discounts = stepDatas.Map(step => step.Discounts);
             divs = stepDatas.Map(step => step.Dividends);
 
-            RandomDim = brownianBridge.GaussianSize(1);
+            AllSimulatedDates = EnumerableUtils.Append(stepDatas.Map(data => data.Dates));
         }
 
-        public IProcessPath Path(double[] gaussians)
+        public IProcessPath Path(double[][] dWs)
         {
-            //TODO perhaps use a pool instead of instanciate a new one
-            var dWs = ArrayUtils.CreateJaggedArray<double>(brownianBridge.Dates.Length, 1);
-            brownianBridge.FillPathIncrements(ref dWs, gaussians);
-            
             var processPath = new double[pathDates.Length][];
             double currentFwd = initialFwd;
             int brownianIndex = 0;
@@ -147,7 +140,7 @@ namespace pragmatic_quant_model.Model.BlackScholes
         }
         public double[] Dates { get { return pathDates; } }
         public int ProcessDim { get { return 1; } }
-        public int RandomDim { get; private set; }
+        public double[] AllSimulatedDates { get; private set; }
     }
 
 }

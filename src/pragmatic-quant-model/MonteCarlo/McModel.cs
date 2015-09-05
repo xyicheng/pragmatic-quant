@@ -11,6 +11,7 @@ namespace pragmatic_quant_model.MonteCarlo
         public McModel(IFactorModelRepresentation factorRepresentation,
             DateTime[] simulatedDates,
             IRandomGenerator randomGenerator,
+            BrownianBridge brownianBridge,
             IProcessPathGenerator processPathGen,
             PaymentInfo probaMeasure, double numeraire0)
         {
@@ -18,6 +19,7 @@ namespace pragmatic_quant_model.MonteCarlo
             ProbaMeasure = probaMeasure;
             ProcessPathGen = processPathGen;
             RandomGenerator = randomGenerator;
+            BrownianBridge = brownianBridge;
             SimulatedDates = simulatedDates;
             FactorRepresentation = factorRepresentation;
         }
@@ -25,6 +27,7 @@ namespace pragmatic_quant_model.MonteCarlo
         public IFactorModelRepresentation FactorRepresentation { get; private set; }
         
         public IRandomGenerator RandomGenerator { get; private set; }
+        public BrownianBridge BrownianBridge { get; private set; }
         public IProcessPathGenerator ProcessPathGen { get; private set; }
         
         public DateTime[] SimulatedDates { get; private set; }

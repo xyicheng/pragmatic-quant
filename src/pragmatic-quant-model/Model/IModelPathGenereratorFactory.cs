@@ -17,7 +17,7 @@ namespace pragmatic_quant_model.Model
     public class ModelPathGeneratorFactories
     {
         #region private fields
-        private static readonly IDictionary<Type, IModelPathGenereratorFactory> Factories = GetFactories();
+        private static readonly IDictionary<Type, IModelPathGenereratorFactory> factories = GetFactories();
         #endregion
         #region private methods
         private static IDictionary<Type, IModelPathGenereratorFactory> GetFactories()
@@ -34,7 +34,7 @@ namespace pragmatic_quant_model.Model
         public static IModelPathGenereratorFactory For(IModelDescription model)
         {
             IModelPathGenereratorFactory modelPathGenfactory;
-            if (Factories.TryGetValue(model.GetType(), out modelPathGenfactory))
+            if (factories.TryGetValue(model.GetType(), out modelPathGenfactory))
                 return modelPathGenfactory;
             throw new ArgumentException(string.Format("Missing ModelPathGeneratorFactory for {0}", model));
         }

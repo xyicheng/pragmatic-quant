@@ -39,13 +39,15 @@ namespace pragmatic_quant_model.MonteCarlo
             
             IFactorModelRepresentation factorRepresentation = factorRepresentationFactory.Build(model, market, probaMeasure);
             IProcessPathGenerator processPathGenerator = modelPathGenFactory.Build(model, market, probaMeasure, simulatedDates);
-            
-            IRandomGenerator randomGenerator = randGeneratorFactory.Build(processPathGenerator.RandomDim);
+
+            BrownianBridge brownianBridge = BrownianBridge.Create(processPathGenerator.AllSimulatedDates);
+            int randomDim = brownianBridge.GaussianSize(processPathGenerator.ProcessDim);
+            IRandomGenerator randomGenerator = randGeneratorFactory.Build(randomDim);
             double numeraire0 = market.DiscountCurve(probaMeasure.Financing).Zc(probaMeasure.Date);
             
-            return new McModel(factorRepresentation,
-                simulatedDates, randomGenerator, processPathGenerator,
-                probaMeasure, numeraire0);
+            return new McModel(factorRepresentation, simulatedDates, 
+                               randomGenerator, brownianBridge, processPathGenerator,
+                               probaMeasure, numeraire0);
         }
     }
 
