@@ -17,7 +17,7 @@ namespace pragmatic_quant_model.MonteCarlo
             this.flowPathCalculator = flowPathCalculator;
         }
 
-        public  void ComputePath(ref PathFlows<TFlow, TLabel> path, double[] randoms)
+        public void ComputePath(ref PathFlows<TFlow, TLabel> path, double[] randoms)
         {
             IProcessPath processPath = processPathGen.Path(randoms);
             flowPathCalculator.ComputeFlows(ref path, processPath);

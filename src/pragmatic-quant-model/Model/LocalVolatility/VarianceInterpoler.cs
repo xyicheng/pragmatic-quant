@@ -26,17 +26,18 @@ namespace pragmatic_quant_model.Model.LocalVolatility
         public double Eval(double t, double y)
         {
             var linearIndex = maturityStepSearcher.LocateLeftIndex(t);
-            RrFunction leftVariance = linearIndex < 0 ? RrFunctions.Zero : pillarVariances[linearIndex];
-
+            
+            if (linearIndex < 0)
+            {
+                return t * pillarVariances[0].Eval(y) / maturityPillars[0];
+            }
             if (linearIndex == pillarVariances.Length - 1)
             {
-                return t * leftVariance.Eval(y) / maturityPillars[linearIndex];
+                return t * pillarVariances[pillarVariances.Length - 1].Eval(y) / maturityPillars[pillarVariances.Length - 1];
             }
-
-            var rightVariance = pillarVariances[linearIndex + 1];
-
+            
             double w = (t - maturityPillars[linearIndex]) / (maturityPillars[linearIndex + 1] - maturityPillars[linearIndex]);
-            return (1.0 - w) * leftVariance.Eval(y) + w * rightVariance.Eval(y);
+            return (1.0 - w) * pillarVariances[linearIndex].Eval(y) + w * pillarVariances[linearIndex + 1].Eval(y);
         }
         public LocalVariance BuildLocalVariance()
         {
@@ -48,6 +49,7 @@ namespace pragmatic_quant_model.Model.LocalVolatility
     public class LocalVariance
     {
         #region private fields
+        private static readonly RrFunction Y = RrFunctions.Affine(1.0, 0.0);
         private readonly StepSearcher maturityStepSearcher;
         private readonly double[] maturities;
         private readonly RrFunction[] vs;
@@ -71,9 +73,8 @@ namespace pragmatic_quant_model.Model.LocalVolatility
             //                                  sigma^2
             // short local variance = -------------------------------------------
             //                         (y * (dsigma^2/dy) / (2 * sigma^2) - 1)^2 
-            var y = RrFunctions.Affine(1.0, 0.0);
             var sigma2 = vs[0] / maturities[0];
-            shortLocalVar = 0.5 * y * sigma2.Derivative() / sigma2 - 1.0;
+            shortLocalVar = 0.5 * Y * sigma2.Derivative() / sigma2 - 1.0;
             shortLocalVar = sigma2 / (shortLocalVar * shortLocalVar);
         }
         #endregion
@@ -97,9 +98,7 @@ namespace pragmatic_quant_model.Model.LocalVolatility
         public double Eval(double t, double y)
         {
             var stepIndex = maturityStepSearcher.LocateLeftIndex(t);
-
             double v, dVdY, d2Vd2Y, dVdT;
-
             if (stepIndex < 0)
             {
                 double w = t / maturities[0];
@@ -138,7 +137,47 @@ namespace pragmatic_quant_model.Model.LocalVolatility
             localVar = dVdT / localVar;
             return localVar;
         }
+        public RrFunction TimeSlice(double t)
+        {
+            var stepIndex = maturityStepSearcher.LocateLeftIndex(t);
+            RrFunction v, dVdY, d2Vd2Y, dVdT;
+            if (stepIndex < 0)
+            {
+                double w = t / maturities[0];
 
+                if (Math.Abs(w) < 1.0e-10)
+                    return shortLocalVar;
+
+                v = w * vs[0];
+                dVdY = w * dVdYs[0];
+                d2Vd2Y = w * d2Vd2Ys[0];
+                dVdT = vs[0] / maturities[0];
+            }
+            else if (stepIndex == maturities.Length - 1)
+            {
+                double w = t / maturities[maturities.Length - 1];
+                v = vs[stepIndex] * w;
+                dVdY = dVdYs[stepIndex] * w;
+                d2Vd2Y = d2Vd2Ys[stepIndex] * w;
+                dVdT = dVdTs[stepIndex];
+            }
+            else
+            {
+                double w = (t - maturities[stepIndex]) / (maturities[stepIndex + 1] - maturities[stepIndex]);
+                v = (1.0 - w) * vs[stepIndex] + w * vs[stepIndex + 1];
+                dVdY = (1.0 - w) * dVdYs[stepIndex] + w * dVdYs[stepIndex + 1];
+                d2Vd2Y = (1.0 - w) * d2Vd2Ys[stepIndex] + w * d2Vd2Ys[stepIndex + 1];
+                dVdT = dVdTs[stepIndex];
+            }
+
+            //                                                  dv/dt 
+            // local variance = ------------------------------------------------------------------------------------
+            //                   (y * (dv/dy) / (2 * v) - 1)^2 + 1/2 * (d^2 v/dy^2) - 1/4 * (1/4 + 1/v) * (dv/dy)^2
+            var localVar = 0.5 * Y * dVdY / v - 1.0;
+            localVar = localVar * localVar + 0.5 * d2Vd2Y - 0.25 * (0.25 + 1.0 / v) * dVdY * dVdY;
+            localVar = dVdT / localVar;
+            return localVar;
+        }
     }
 
 }

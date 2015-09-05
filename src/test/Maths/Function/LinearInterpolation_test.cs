@@ -95,7 +95,7 @@ namespace test.Maths.Function
                 var err = Math.Abs(mult.Eval(x) - (cubic1.Eval(x) * cubic2.Eval(x)));
                 Assert.AreEqual(err, 0.0);
             }
-
+            
             var rand = new Random(251);
             for (int i = 0; i < 100; i++)
             {
