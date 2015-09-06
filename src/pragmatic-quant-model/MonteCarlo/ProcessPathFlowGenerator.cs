@@ -12,6 +12,10 @@ namespace pragmatic_quant_model.MonteCarlo
         private readonly IProcessPathGenerator processPathGen;
         private readonly IPathFlowCalculator<TFlow, TLabel> flowPathCalculator;
         #endregion
+        #region private fields (buffer)
+        //TODO Be carefull to clone this field in multithreaded environment
+        private double[][] dWs;
+        #endregion
         public ProcessPathFlowGenerator(BrownianBridge brownianBridge,
                                         IProcessPathGenerator processPathGen,
                                         IPathFlowCalculator<TFlow, TLabel> flowPathCalculator)
@@ -19,13 +23,12 @@ namespace pragmatic_quant_model.MonteCarlo
             this.brownianBridge = brownianBridge;
             this.processPathGen = processPathGen;
             this.flowPathCalculator = flowPathCalculator;
+
+            dWs = ArrayUtils.CreateJaggedArray<double>(brownianBridge.Dates.Length, 1);
         }
 
         public void ComputePath(ref PathFlows<TFlow, TLabel> path, double[] gaussians)
         {
-            //TODO perhaps use a pool instead of instanciate a new one
-            var dWs = ArrayUtils.CreateJaggedArray<double>(brownianBridge.Dates.Length, 1);
-            
             brownianBridge.FillPathIncrements(ref dWs, gaussians);
             IProcessPath processPath = processPathGen.Path(dWs);
             flowPathCalculator.ComputeFlows(ref path, processPath);

@@ -12,6 +12,7 @@ namespace pragmatic_quant_model.MonteCarlo.Product
         private readonly IProductPathFlow productPathFlow;
         #endregion
         #region private fields (buffers)
+        //TODO Be carefull to clone this field in multithreaded environment
         private PathFlows<double[], IFixing[]> fixingsPath;
         private PathFlows<double[], PaymentInfo[]> numerairePath;
         #endregion

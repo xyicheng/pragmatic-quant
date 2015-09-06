@@ -91,14 +91,24 @@ namespace pragmatic_quant_model.Model
             return RnRFunctions.Constant(fwdZc, dimension);
         }
     }
-
-    public abstract class EquitySpotRepresentation
+    
+    public class EquitySpotRepresentation
     {
-        protected EquitySpotRepresentation(AssetId asset)
+        #region private fields
+        private readonly DiscountCurve assetDiscountCurve;
+        private readonly PaymentInfo probaMeasure;
+        #endregion
+        public EquitySpotRepresentation(AssetId asset, DiscountCurve assetDiscountCurve, PaymentInfo probaMeasure)
         {
+            this.assetDiscountCurve = assetDiscountCurve;
+            this.probaMeasure = probaMeasure;
             Asset = asset;
         }
-        public abstract RnRFunction Spot(DateTime date);
+        public RnRFunction Spot(DateTime date)
+        {
+            var forwardWithoutDivs = assetDiscountCurve.Zc(probaMeasure.Date) / assetDiscountCurve.Zc(date);
+            return RnRFunctions.Affine(0.0, new[] { forwardWithoutDivs });
+        }
         public AssetId Asset { get; private set; }
     }
     

@@ -9,7 +9,7 @@ using pragmatic_quant_model.Product;
 namespace pragmatic_quant_model.Model.BlackScholes
 {
 
-    public class BlackScholesEqtyPathGeneratorFactory : ModelPathGenereratorFactory<BlackScholesModel>
+    public class BlackScholesEqtyPathGenFactory : ModelPathGenereratorFactory<BlackScholesModel>
     {
         #region private methods
         private BsEqtySimulatorStepDatas StepSchedule(DateTime start, DateTime end, BlackScholesModel model, DiscountCurve assetDiscount, DateTime horizon)
@@ -46,18 +46,19 @@ namespace pragmatic_quant_model.Model.BlackScholes
             return new BsEqtySimulatorStepDatas(step, dates, stepDividends, discounts, stepVols, stepVarDrifts);
         }
         #endregion
-        public static readonly BlackScholesEqtyPathGeneratorFactory Instance = new BlackScholesEqtyPathGeneratorFactory();
+        public static readonly BlackScholesEqtyPathGenFactory Instance = new BlackScholesEqtyPathGenFactory();
         protected override IProcessPathGenerator Build(BlackScholesModel model, Market market, PaymentInfo probaMeasure, DateTime[] simulatedDates)
         {
             var asset = model.Asset;
+            var assetMkt = market.AssetMarket(asset);
+            
             if (!probaMeasure.Financing.Currency.Equals(probaMeasure.Currency)
                 || !probaMeasure.Currency.Equals(asset.Currency))
                 throw new NotImplementedException("TODO !");
 
             var numeraireDiscount = market.DiscountCurve(probaMeasure.Financing);
-            var assetMkt = market.AssetMarket(asset);
             DiscountCurve assetDiscount = assetMkt.AssetFinancingCurve(numeraireDiscount);
-            var forward = assetMkt.Spot / assetDiscount.Zc(probaMeasure.Date);
+            double forward = assetMkt.Spot / assetDiscount.Zc(probaMeasure.Date);
             
             BsEqtySimulatorStepDatas[] stepSimulDatas = EnumerableUtils.For(0, simulatedDates.Length,
                 i => StepSchedule(i > 0 ? simulatedDates[i - 1] : market.RefDate, simulatedDates[i], 
@@ -127,7 +128,7 @@ namespace pragmatic_quant_model.Model.BlackScholes
                 var stepDiscount = discounts[step];
                 for (int subStep = 0; subStep < stepVols.Length; subStep++)
                 {
-                    var dW = dWs[brownianIndex++][0];
+                    double dW = dWs[brownianIndex++][0];
                     double fwdBeforeDiv = currentFwd * Math.Exp(stepVols[subStep] * dW + stepVarDrifts[subStep]);
                     double discount = stepDiscount[subStep];
                     double div = stepDivs[subStep].Value(fwdBeforeDiv * discount);

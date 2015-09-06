@@ -4,6 +4,7 @@ using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.Model;
 using pragmatic_quant_model.Model.BlackScholes;
+using pragmatic_quant_model.Model.LocalVolatility;
 
 namespace pragmatic_quant_com.Factories
 {
@@ -17,6 +18,8 @@ namespace pragmatic_quant_com.Factories
             {
                 case "blackscholes" :
                     return BlackScholesModelFactory.Instance.Build(bag);
+                case "localvol":
+                    return LocalVolModelFactoryFromBag.Instance.Build(bag);
             }
 
             throw new NotImplementedException(modelName);
@@ -48,6 +51,17 @@ namespace pragmatic_quant_com.Factories
             }
 
             throw new ArgumentException(string.Format("Unknown BlackScholes parameter {0}", calibLabel));
+        }
+    }
+
+    public class LocalVolModelFactoryFromBag
+        : Singleton<LocalVolModelFactoryFromBag>, IFactoryFromBag<ICalibrationDescription>
+    {
+        public ICalibrationDescription Build(object[,] bag)
+        {
+            var assetName = bag.ProcessScalarString("Asset");
+            var withDivs = !bag.Has("WithDivs") || bag.ProcessScalarBoolean("WithDivs");
+            return new LocalVolModelCalibDesc(assetName, withDivs);
         }
     }
 

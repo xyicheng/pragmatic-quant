@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Model.BlackScholes;
 using pragmatic_quant_model.Model.HullWhite;
+using pragmatic_quant_model.Model.LocalVolatility;
 
 namespace pragmatic_quant_model.Model
 {
@@ -30,6 +31,7 @@ namespace pragmatic_quant_model.Model
             var result = new Dictionary<Type, IModelCalibration>();
             AddExplicit<Hw1ModelDescription>(result);
             AddExplicit<BlackScholesModelDescription>(result);
+            result.Add(typeof (LocalVolModelCalibDesc), LocalVolModelCalibration.Instance);
             return result;
         }
         #endregion

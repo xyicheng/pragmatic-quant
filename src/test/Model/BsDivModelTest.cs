@@ -60,7 +60,7 @@ namespace test.Model
             PriceResult priceResult = mcPricer.Price(fwdLeg, blackScholesModel, market);
             double[] fwds = priceResult.Details.Map(kv => kv.Value.Value);
 
-            var assetFwdCurve = assetMkt.Forward(zcCurve);
+            var assetFwdCurve = assetMkt.Forward();
             double[] refFwds = fwdDates.Map(d => assetFwdCurve.Fwd(d) * zcCurve.Zc(d));
 
             foreach (var i  in Enumerable.Range(0, fwdDates.Length))

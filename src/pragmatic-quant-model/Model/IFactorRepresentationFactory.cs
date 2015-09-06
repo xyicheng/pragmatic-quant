@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Model.BlackScholes;
 using pragmatic_quant_model.Model.HullWhite;
+using pragmatic_quant_model.Model.LocalVolatility;
 using pragmatic_quant_model.Product;
 
 namespace pragmatic_quant_model.Model
@@ -23,7 +24,8 @@ namespace pragmatic_quant_model.Model
             var result = new Dictionary<Type, IFactorRepresentationFactory>
             {
                 {typeof (Hw1ModelDescription), Hw1FactorRepresentationFactory.Instance},
-                {typeof (BlackScholesModelDescription), BlackScholesFactorRepresentationFactory.Instance}
+                {typeof (BlackScholesModelDescription), EquityFactorRepresentationFactory.Instance},
+                {typeof (LocalVolModelDescription), EquityFactorRepresentationFactory.Instance}
             };
             return result;
         }
@@ -47,8 +49,9 @@ namespace pragmatic_quant_model.Model
             var modelImplem = model as TModel;
             if (modelImplem == null)
                 throw new Exception(string.Format("FactorRepresentationFactory : {0} expected but was {1}", 
-                                                                                typeof (TModel), model.GetType()));
+                                                  typeof (TModel), model.GetType()));
             return Build(modelImplem, market, probaMeasure);
         }
     }
+
 }

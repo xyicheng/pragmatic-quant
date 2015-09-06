@@ -155,7 +155,9 @@
     <Compile Include="Maths\BachelierOption.cs" />
     <Compile Include="Maths\BlackScholesOption.cs" />
     <Compile Include="Maths\FiniteDifferenceUtils.cs" />
+    <Compile Include="Model\EquityModel.cs" />
     <Compile Include="Model\LocalVolatility\LocalVolatilityModel.cs" />
+    <Compile Include="Model\LocalVolatility\LocalVolPathGenFactory.cs" />
     <Compile Include="Model\LocalVolatility\VarianceInterpoler.cs" />
     <Compile Include="Maths\Polynomial.cs" />
     <Compile Include="Maths\Stochastic\BrownianBridge.cs" />
@@ -180,8 +182,7 @@
     <Compile Include="Maths\Sobol\sobolrsg2.cs" />
     <Compile Include="Maths\Sobol\StdDirections.cs" />
     <Compile Include="Basic\Dates\CouponSchedule.cs" />
-    <Compile Include="Model\BlackScholes\BlackScholesEqtyPathGeneratorFactory.cs" />
-    <Compile Include="Model\BlackScholes\BlackScholesEquitySpotRepresentation.cs" />
+    <Compile Include="Model\BlackScholes\BlackScholesEqtyPathGenFactory.cs" />
     <Compile Include="Model\BlackScholes\BlackScholesModel.cs" />
     <Compile Include="Model\BlackScholes\BlackScholesModelDescription.cs" />
     <Compile Include="Model\BlackScholes\DiscreteLocalDividend.cs" />

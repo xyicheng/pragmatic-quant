@@ -4,6 +4,7 @@ using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Maths.Stochastic;
 using pragmatic_quant_model.Model.BlackScholes;
 using pragmatic_quant_model.Model.HullWhite;
+using pragmatic_quant_model.Model.LocalVolatility;
 using pragmatic_quant_model.Product;
 
 namespace pragmatic_quant_model.Model
@@ -25,7 +26,8 @@ namespace pragmatic_quant_model.Model
             var result = new Dictionary<Type, IModelPathGenereratorFactory>
             {
                 {typeof (Hw1ModelDescription), Hw1ModelPathGeneratorFactory.Instance},
-                {typeof (BlackScholesModelDescription), BlackScholesEqtyPathGeneratorFactory.Instance}
+                {typeof (BlackScholesModelDescription), BlackScholesEqtyPathGenFactory.Instance},
+                {typeof(LocalVolModelDescription), LocalVolPathGenFactory.Instance}
             };
             return result;
         }

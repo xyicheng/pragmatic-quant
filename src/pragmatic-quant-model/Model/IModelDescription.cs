@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Basic.Structure;
@@ -9,6 +9,7 @@ using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Function;
 using pragmatic_quant_model.Model.BlackScholes;
 using pragmatic_quant_model.Model.HullWhite;
+using pragmatic_quant_model.Model.LocalVolatility;
 
 namespace pragmatic_quant_model.Model
 {
@@ -30,7 +31,8 @@ namespace pragmatic_quant_model.Model
             var result = new Dictionary<Type, IModelFactory>
             {
                 {typeof (Hw1ModelDescription), Hw1ModelFactory.Instance},
-                {typeof (BlackScholesModelDescription), BlackScholesModelFactory.Instance}
+                {typeof (BlackScholesModelDescription), BlackScholesModelFactory.Instance},
+                {typeof (LocalVolModelDescription), LocalVolModelFactory.Instance}
             };
             return result;
         }

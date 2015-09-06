@@ -76,8 +76,7 @@ namespace pragmatic_quant_com
                 var market = MarketManager.Instance.GetMarket(mktObj);
                 var assetMarket = market.AssetMarketFromName(assetName);
 
-                DiscountCurve cashCurve = market.RiskFreeDiscountCurve(assetMarket.Asset.Currency);
-                AssetForwardCurve assetForward = assetMarket.Forward(cashCurve);
+                AssetForwardCurve assetForward = assetMarket.Forward();
                 
                 var result = dates.Map(o =>
                 {
