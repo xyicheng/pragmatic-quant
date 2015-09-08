@@ -7,9 +7,10 @@ using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Function;
-using pragmatic_quant_model.Model.BlackScholes;
+using pragmatic_quant_model.Model.Equity;
+using pragmatic_quant_model.Model.Equity.BlackScholes;
+using pragmatic_quant_model.Model.Equity.LocalVolatility;
 using pragmatic_quant_model.Model.HullWhite;
-using pragmatic_quant_model.Model.LocalVolatility;
 
 namespace pragmatic_quant_model.Model
 {

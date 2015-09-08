@@ -3,7 +3,7 @@ using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.MarketDatas;
 
-namespace pragmatic_quant_model.Model.BlackScholes
+namespace pragmatic_quant_model.Model.Equity.BlackScholes
 {
     public class BlackScholesModelDescription : IModelDescription
     {

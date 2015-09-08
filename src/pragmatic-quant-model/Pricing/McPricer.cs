@@ -34,7 +34,7 @@ namespace pragmatic_quant_model.Pricing
         {
             var mcModelFactory = new McModelFactory(
                 FactorRepresentationFactories.For(modelDescription),
-                ModelPathGeneratorFactories.For(modelDescription),
+                ModelPathGeneratorFactories.For(modelDescription, mcConfig),
                 mcConfig.RandomGenerator);
             return new McPricer(mcModelFactory, mcConfig);
         }

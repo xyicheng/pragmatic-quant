@@ -2,19 +2,17 @@
 using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Maths;
 
-namespace pragmatic_quant_model.Model.BlackScholes
+namespace pragmatic_quant_model.Model.Equity.BlackScholes
 {
     public class BlackScholesModel : EquityModel
     {
         public BlackScholesModel(ITimeMeasure time, AssetId asset, RrFunction sigma, DiscreteLocalDividend[] dividends)
-            :base(asset, time)
+            : base(asset, dividends, time)
         {
-            Dividends = dividends;
-            Sigma = sigma;
+           Sigma = sigma;
         }
 
         public RrFunction Sigma { get; private set; }
-        public DiscreteLocalDividend[] Dividends { get; private set; }
     }
 
 }

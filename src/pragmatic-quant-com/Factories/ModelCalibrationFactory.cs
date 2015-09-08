@@ -3,8 +3,8 @@ using System.Linq;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.Model;
-using pragmatic_quant_model.Model.BlackScholes;
-using pragmatic_quant_model.Model.LocalVolatility;
+using pragmatic_quant_model.Model.Equity.BlackScholes;
+using pragmatic_quant_model.Model.Equity.LocalVolatility;
 
 namespace pragmatic_quant_com.Factories
 {

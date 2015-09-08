@@ -131,6 +131,7 @@
     <Compile Include="Basic\ArrayUtils.cs" />
     <Compile Include="Basic\Assertions.cs" />
     <Compile Include="Basic\Dates\DayCountFrac.cs" />
+    <Compile Include="Basic\Dates\ScheduleUtils.cs" />
     <Compile Include="Basic\NumberConverter.cs" />
     <Compile Include="Basic\DoubleUtils.cs" />
     <Compile Include="Basic\EnumerableUtils.cs" />
@@ -155,10 +156,10 @@
     <Compile Include="Maths\BachelierOption.cs" />
     <Compile Include="Maths\BlackScholesOption.cs" />
     <Compile Include="Maths\FiniteDifferenceUtils.cs" />
-    <Compile Include="Model\EquityModel.cs" />
-    <Compile Include="Model\LocalVolatility\LocalVolatilityModel.cs" />
-    <Compile Include="Model\LocalVolatility\LocalVolPathGenFactory.cs" />
-    <Compile Include="Model\LocalVolatility\VarianceInterpoler.cs" />
+    <Compile Include="Model\Equity\EquityModel.cs" />
+    <Compile Include="Model\Equity\LocalVolatility\LocalVolatilityModel.cs" />
+    <Compile Include="Model\Equity\LocalVolatility\LocalVolPathGenFactory.cs" />
+    <Compile Include="Model\Equity\LocalVolatility\VarianceInterpoler.cs" />
     <Compile Include="Maths\Polynomial.cs" />
     <Compile Include="Maths\Stochastic\BrownianBridge.cs" />
     <Compile Include="Maths\Cholesky.cs" />
@@ -182,10 +183,10 @@
     <Compile Include="Maths\Sobol\sobolrsg2.cs" />
     <Compile Include="Maths\Sobol\StdDirections.cs" />
     <Compile Include="Basic\Dates\CouponSchedule.cs" />
-    <Compile Include="Model\BlackScholes\BlackScholesEqtyPathGenFactory.cs" />
-    <Compile Include="Model\BlackScholes\BlackScholesModel.cs" />
-    <Compile Include="Model\BlackScholes\BlackScholesModelDescription.cs" />
-    <Compile Include="Model\BlackScholes\DiscreteLocalDividend.cs" />
+    <Compile Include="Model\Equity\BlackScholes\BlackScholesEqtyPathGenFactory.cs" />
+    <Compile Include="Model\Equity\BlackScholes\BlackScholesModel.cs" />
+    <Compile Include="Model\Equity\BlackScholes\BlackScholesModelDescription.cs" />
+    <Compile Include="Model\Equity\DiscreteLocalDividend.cs" />
     <Compile Include="Model\ExplicitCalibration.cs" />
     <Compile Include="Model\HullWhite\Hw1Model.cs" />
     <Compile Include="Model\HullWhite\Hw1ModelZcRepresentation.cs" />

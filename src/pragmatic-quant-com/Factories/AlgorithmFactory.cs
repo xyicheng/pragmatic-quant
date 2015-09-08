@@ -1,4 +1,5 @@
 using System;
+using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Sobol;
@@ -13,11 +14,12 @@ namespace pragmatic_quant_com.Factories
         private static MonteCarloConfig BuildMonteCarloConfig(object[,] bag)
         {
             int nbPaths = bag.ProcessScalarInteger("NbPaths");
-
-            //TODO investigate which generator is the best
-            var randomGenerator = RandomGenerators.GaussianSobol(SobolDirection.Kuo3); 
+            Duration mcStep = bag.Has("McStep") ? bag.ProcessScalarDateOrDuration("McStep").Duration : null;
             
-            return new MonteCarloConfig(nbPaths, randomGenerator);
+            //TODO investigate which generator is the best
+            var randomGenerator = RandomGenerators.GaussianSobol(SobolDirection.Kuo3);
+
+            return new MonteCarloConfig(nbPaths, randomGenerator, mcStep);
         }
         #endregion
         public INumericalMethodConfig Build(object[,] bag)

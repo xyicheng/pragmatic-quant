@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using pragmatic_quant_model.MarketDatas;
-using pragmatic_quant_model.Model.BlackScholes;
+using pragmatic_quant_model.Model.Equity.BlackScholes;
+using pragmatic_quant_model.Model.Equity.LocalVolatility;
 using pragmatic_quant_model.Model.HullWhite;
-using pragmatic_quant_model.Model.LocalVolatility;
 
 namespace pragmatic_quant_model.Model
 {

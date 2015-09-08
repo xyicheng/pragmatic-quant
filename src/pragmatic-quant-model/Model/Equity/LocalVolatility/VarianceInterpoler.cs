@@ -4,7 +4,7 @@ using System.Linq;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Maths;
 
-namespace pragmatic_quant_model.Model.LocalVolatility
+namespace pragmatic_quant_model.Model.Equity.LocalVolatility
 {
     public class VarianceInterpoler
     {

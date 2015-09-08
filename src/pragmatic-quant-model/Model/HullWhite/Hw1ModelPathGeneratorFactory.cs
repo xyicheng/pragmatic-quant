@@ -13,7 +13,7 @@ namespace pragmatic_quant_model.Model.HullWhite
         {
             if (!model.PivotCurrency.Equals(probaMeasure.Currency))
                 throw new Exception("Hw1Model only domestic currency numeraire allowed !");
-            
+
             var drift = model.DriftTerm();
 
             double probaMat = model.Time[probaMeasure.Date];
@@ -26,7 +26,9 @@ namespace pragmatic_quant_model.Model.HullWhite
             return drift;
         }
         #endregion
-        public static readonly ModelPathGenereratorFactory<Hw1Model> Instance = new Hw1ModelPathGeneratorFactory();
+        public Hw1ModelPathGeneratorFactory(MonteCarloConfig mcConfig = null)
+        {
+        }
 
         protected override IProcessPathGenerator Build(Hw1Model model, Market market, PaymentInfo probaMeasure, DateTime[] simulatedDates)
         {
@@ -34,6 +36,6 @@ namespace pragmatic_quant_model.Model.HullWhite
             var drift = Drift(model, probaMeasure);
             var ornsteinUhlenbeck = new OrnsteinUhlenbeck(model.MeanReversion, drift, model.Sigma, 0.0);
             return OrnsteinUhlenbeck1DGeneratorFactory.Build(dates, ornsteinUhlenbeck);
-        } 
+        }
     }
 }

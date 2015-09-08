@@ -3,17 +3,20 @@ using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Product;
 
-namespace pragmatic_quant_model.Model
+namespace pragmatic_quant_model.Model.Equity
 {
     public abstract class EquityModel : IModel
     {
-        protected EquityModel(AssetId asset, ITimeMeasure time)
+        protected EquityModel(AssetId asset, DiscreteLocalDividend[] dividends, ITimeMeasure time)
         {
             Asset = asset;
+            Dividends = dividends;
             Time = time;
         }
 
         public AssetId Asset { get; private set; }
+        public DiscreteLocalDividend[] Dividends { get; private set; }
+
         public ITimeMeasure Time { get; private set; }
         public Currency PivotCurrency { get { return Asset.Currency; } }
         

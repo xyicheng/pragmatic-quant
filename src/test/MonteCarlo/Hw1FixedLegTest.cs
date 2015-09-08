@@ -55,7 +55,7 @@ namespace test.MonteCarlo
 
             var mcModelFactory = new McModelFactory(
                 Hw1FactorRepresentationFactory.Instance,
-                Hw1ModelPathGeneratorFactory.Instance,
+                new Hw1ModelPathGeneratorFactory(),
                 mcConfig.RandomGenerator);
             var mcPricer = new McPricer(mcModelFactory, mcConfig);
 

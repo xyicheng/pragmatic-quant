@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
@@ -16,6 +17,22 @@ namespace pragmatic_quant_model.Basic.Dates
             this.unity = unity;
             this.nbunit = nbunit;
         }
+        private static DateTime Add(DateTime date, BasicDuration unity, int nbunit)
+        {
+            switch (unity)
+            {
+                case BasicDuration.Hour:
+                    return date.AddHours(nbunit);
+                case BasicDuration.Day:
+                    return date.AddDays(nbunit);
+                case BasicDuration.Month:
+                    return date.AddMonths(nbunit);
+                case BasicDuration.Year:
+                    return date.AddYears(nbunit);
+                default:
+                    throw new Exception("Duration : Should not get there !");
+            }
+        }
         #endregion
         private enum BasicDuration { Hour, Day, Month, Year };
         
@@ -26,26 +43,20 @@ namespace pragmatic_quant_model.Basic.Dates
 
         public static DateTime operator +(DateTime date, Duration dur)
         {
-            switch (dur.unity)
-            {
-                case BasicDuration.Hour:
-                    return date.AddHours(dur.nbunit);
-                case BasicDuration.Day:
-                    return date.AddDays(dur.nbunit);
-                case BasicDuration.Month:
-                    return date.AddMonths(dur.nbunit);
-                case BasicDuration.Year:
-                    return date.AddYears(dur.nbunit);
-                default:
-                    throw new Exception("Duration : Should not get there !");
-            }
+            return Add(date, dur.unity, dur.nbunit);
+        }
+        public static DateTime operator -(DateTime date, Duration dur)
+        {
+            return Add(date, dur.unity, -dur.nbunit);
         }
         public static Duration operator *(Duration date, int mult)
         {
+            Contract.Requires(mult >= 0);
             return new Duration(date.unity, date.nbunit * mult);
         }
         public static Duration operator *(int mult, Duration date)
         {
+            Contract.Requires(mult >= 0);
             return new Duration(date.unity, date.nbunit * mult);
         }
         
@@ -93,7 +104,12 @@ namespace pragmatic_quant_model.Basic.Dates
                 return d;
             throw new Exception("Failed to parse duration : " + s);
         }
-        
+
+        public bool IsZero()
+        {
+            return nbunit == 0;
+        }
+
         public override string ToString()
         {
             switch (unity)

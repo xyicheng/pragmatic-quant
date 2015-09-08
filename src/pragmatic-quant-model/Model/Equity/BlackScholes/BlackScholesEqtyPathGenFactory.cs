@@ -6,13 +6,13 @@ using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Maths.Stochastic;
 using pragmatic_quant_model.Product;
 
-namespace pragmatic_quant_model.Model.BlackScholes
+namespace pragmatic_quant_model.Model.Equity.BlackScholes
 {
 
     public class BlackScholesEqtyPathGenFactory : ModelPathGenereratorFactory<BlackScholesModel>
     {
         #region private methods
-        private BsEqtySimulatorStepDatas StepSchedule(DateTime start, DateTime end, BlackScholesModel model, DiscountCurve assetDiscount, DateTime horizon)
+        private BsEqtySimulatorStepDatas StepSimulDatas(DateTime start, DateTime end, BlackScholesModel model, DiscountCurve assetDiscount, DateTime horizon)
         {
             DiscreteLocalDividend[] stepDividends = model.Dividends
                 .Where(div => start < div.Date && div.Date <= end)
@@ -46,7 +46,10 @@ namespace pragmatic_quant_model.Model.BlackScholes
             return new BsEqtySimulatorStepDatas(step, dates, stepDividends, discounts, stepVols, stepVarDrifts);
         }
         #endregion
-        public static readonly BlackScholesEqtyPathGenFactory Instance = new BlackScholesEqtyPathGenFactory();
+        public BlackScholesEqtyPathGenFactory(MonteCarloConfig mcConfig)
+        {
+            
+        }
         protected override IProcessPathGenerator Build(BlackScholesModel model, Market market, PaymentInfo probaMeasure, DateTime[] simulatedDates)
         {
             var asset = model.Asset;
@@ -61,7 +64,7 @@ namespace pragmatic_quant_model.Model.BlackScholes
             double forward = assetMkt.Spot / assetDiscount.Zc(probaMeasure.Date);
             
             BsEqtySimulatorStepDatas[] stepSimulDatas = EnumerableUtils.For(0, simulatedDates.Length,
-                i => StepSchedule(i > 0 ? simulatedDates[i - 1] : market.RefDate, simulatedDates[i], 
+                i => StepSimulDatas(i > 0 ? simulatedDates[i - 1] : market.RefDate, simulatedDates[i], 
                                   model, assetDiscount, probaMeasure.Date));
 
             return new BlackScholesEquityPathGenerator(stepSimulDatas, forward);

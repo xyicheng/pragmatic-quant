@@ -1,23 +1,20 @@
 ﻿using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.MarketDatas;
-using pragmatic_quant_model.Model.BlackScholes;
 
-namespace pragmatic_quant_model.Model.LocalVolatility
+namespace pragmatic_quant_model.Model.Equity.LocalVolatility
 {
     public class LocalVolatilityModel : EquityModel
     {
         public LocalVolatilityModel(ITimeMeasure time, AssetId asset, LocalVariance localVariance,  MoneynessProvider moneyness, DiscreteLocalDividend[] dividends)
-            : base(asset, time)
+            : base(asset, dividends, time)
         {
             LocalVariance = localVariance;
-            Dividends = dividends;
             Moneyness = moneyness;
         }
 
         public LocalVariance LocalVariance { get; private set; }
         public MoneynessProvider Moneyness { get; private set; }
-        public DiscreteLocalDividend[] Dividends { get; private set; }
     }
 
     public class LocalVolModelDescription : IModelDescription

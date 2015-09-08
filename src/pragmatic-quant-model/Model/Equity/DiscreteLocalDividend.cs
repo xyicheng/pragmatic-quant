@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace pragmatic_quant_model.Model.BlackScholes
+namespace pragmatic_quant_model.Model.Equity
 {
     public abstract class DiscreteLocalDividend
     {
@@ -19,7 +19,6 @@ namespace pragmatic_quant_model.Model.BlackScholes
         {
             return AffineDividend(date, 0.0, 0.0);
         }
-
         public abstract double Value(double spotValue);
         public DateTime Date { get; private set; }
         

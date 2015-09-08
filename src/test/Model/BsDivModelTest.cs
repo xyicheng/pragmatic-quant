@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Linq;
-using NUnit.Framework;
+using System.Collections;
 using pragmatic_quant_com.Factories;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
@@ -10,9 +9,10 @@ using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Sobol;
 using pragmatic_quant_model.Model;
-using pragmatic_quant_model.Model.BlackScholes;
+using pragmatic_quant_model.Model.Equity.BlackScholes;
 using pragmatic_quant_model.Pricing;
 using pragmatic_quant_model.Product;
+using NUnit.Framework;
 
 namespace test.Model
 {
