@@ -6,16 +6,13 @@ using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Function;
 using pragmatic_quant_model.Maths.Interpolation;
+using pragmatic_quant_model.Model.Equity;
 using pragmatic_quant_model.Model.Equity.LocalVolatility;
 
 namespace pragmatic_quant_model.MarketDatas
 {
     public class AssetMarket
     {
-        #region private fields
-        private readonly ITimeMeasure time;
-        #endregion
-        
         public AssetMarket(AssetId asset, DateTime refDate, ITimeMeasure time,
                            double spot,
                            DiscountCurve riskFreeDiscount,
@@ -23,7 +20,7 @@ namespace pragmatic_quant_model.MarketDatas
                            DividendQuote[] dividends, 
                            VolatilityMatrix volMatrix)
         {
-            this.time = time;
+            Time = time;
             Spot = spot;
             RiskFreeDiscount = riskFreeDiscount;
             RepoCurve = repoCurve;
@@ -37,6 +34,7 @@ namespace pragmatic_quant_model.MarketDatas
         }
 
         public DateTime RefDate { get; private set; }
+        public ITimeMeasure Time { get; private set; }
         public AssetId Asset { get; private set; }
         public double Spot { get; private set; }
         public DividendQuote[] Dividends { get; private set; }
@@ -51,17 +49,19 @@ namespace pragmatic_quant_model.MarketDatas
         public AssetForwardCurve Forward(DiscountCurve cashFinancingCurve)
         {
             var assetFinancingCurve = AssetFinancingCurve(cashFinancingCurve);
-            return new AssetForwardCurve(Spot, Dividends, assetFinancingCurve, time);
+            return new AssetForwardCurve(Spot, Dividends, assetFinancingCurve, Time);
         }
         public AssetForwardCurve Forward()
         {
             return Forward(RiskFreeDiscount);
         }
-
+        public MoneynessProvider Moneyness
+        {
+            get { return MoneynessProvider.DivAdjusted(Spot, Dividends, RiskFreeDiscount, Time); }
+        }
         public VolatilitySurface VolSurface()
         {
-            MoneynessProvider moneyness = MoneynessProvider.FromFwdCurve(Forward());
-            return VolatilitySurface.BuildInterpol(VolMatrix, moneyness);
+            return VolatilitySurface.BuildInterpol(VolMatrix, Moneyness);
         }
     }
 
@@ -79,6 +79,7 @@ namespace pragmatic_quant_model.MarketDatas
         public double Yield { get; private set; }
     }
     
+    //TODO use AffineDivCurveUtils
     public class AssetForwardCurve
     {
         #region private fields
@@ -135,7 +136,6 @@ namespace pragmatic_quant_model.MarketDatas
         {
             return cumulatedDividendFunc.Eval(d);
         } 
-
     }
 
     public class VolatilityMatrix
@@ -224,9 +224,16 @@ namespace pragmatic_quant_model.MarketDatas
         {
             return new ForwardMoneynessProvider(assetFwd);
         }
+        public static MoneynessProvider DivAdjusted(double spot,
+                                                    DividendQuote[] dividends,
+                                                    DiscountCurve discountCurve,
+                                                    ITimeMeasure time)
+        {
+            return new DivAdjustedMoneyness(spot, new AffineDivCurveUtils(dividends, discountCurve, time));
+        }
 
         #region private class
-        private class ForwardMoneynessProvider : MoneynessProvider
+        private sealed class ForwardMoneynessProvider : MoneynessProvider
         {
             private readonly AssetForwardCurve assetFwd;
             public ForwardMoneynessProvider(AssetForwardCurve assetFwd)
@@ -242,8 +249,31 @@ namespace pragmatic_quant_model.MarketDatas
                 return (Math.Exp(moneyness) * assetFwd.Spot - assetFwd.CumulatedDividends(maturity)) * assetFwd.AssetGrowth(maturity);
             }
         }
-        #endregion
 
+        private sealed class DivAdjustedMoneyness : MoneynessProvider
+        {
+            private readonly double spot;
+            private readonly AffineDivCurveUtils affineDivCurveUtils;
+            public DivAdjustedMoneyness(double spot, AffineDivCurveUtils affineDivCurveUtils)
+            {
+                this.spot = spot;
+                this.affineDivCurveUtils = affineDivCurveUtils;
+            }
+            public override double Moneyness(double maturity, double strike)
+            {
+                var c = affineDivCurveUtils.CumDiscountedCash(maturity);
+                var cAverage = affineDivCurveUtils.CumDiscCashAverage(maturity);
+                var g = affineDivCurveUtils.AssetGrowth(maturity);
+                var dk = g * (c - cAverage);
+
+                return Math.Log((strike + dk) / (g * (spot + cAverage)));
+            }
+            public override double Strike(double maturity, double moneyness)
+            {
+                throw new NotImplementedException();
+            }
+        }
+        #endregion
     }
     
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.MarketDatas;
+using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Stochastic;
 using pragmatic_quant_model.Product;
 
@@ -20,8 +21,10 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
         {
             MoneynessProvider moneyness = model.Moneyness;
             double t = model.Time[date];
-            var localVariance = model.LocalVariance.TimeSlice(t);
-            return spot => Math.Sqrt(localVariance.Eval(moneyness.Moneyness(t, spot)));
+            RrFunction localVariance = model.LocalVariance.TimeSlice(t);
+
+            //TODO very slow !!!
+            return logSpot => Math.Sqrt(localVariance.Eval(moneyness.Moneyness(t, Math.Exp(logSpot)))); 
         }
         private void StepSchedule(DateTime start, DateTime end, EquityModel model,
             out DateTime[] dates, out bool[] isDivDate, out DiscreteLocalDividend[] dividends)
@@ -139,7 +142,6 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
         private readonly Func<double, double>[][] localVols;
         private readonly double[][] dts;
         private readonly bool[][] isDivDates;
-        
         private readonly double[][] discounts;
         private readonly DiscreteLocalDividend[][] divs;
         private readonly double initialFwd;
@@ -172,32 +174,32 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
         public IProcessPath Path(double[][] dWs)
         {
             var processPath = new double[Dates.Length][];
-            double currentFwd = initialFwd;
+            double currentLogFwd = Math.Log(initialFwd);
             int brownianIndex = 0;
             for (int step = 0; step < Dates.Length; step++)
             {
                 var stepLocVols = localVols[step];
                 var stepDts = dts[step];
                 var stepIsDiv = isDivDates[step];
-                
                 var stepDivs = divs[step];
                 var stepDiscount = discounts[step];
 
                 for (int subStep = 0; subStep < stepLocVols.Length; subStep++)
                 {
                     double dW = dWs[brownianIndex++][0];
-                    double localVol = stepLocVols[subStep](currentFwd);
+                    double discount = stepDiscount[subStep];
+                    double localVol = stepLocVols[subStep](currentLogFwd + Math.Log(discount)); //TODO precompute
                     double dt = stepDts[subStep];
-                    currentFwd *= Math.Exp(localVol * dW - 0.5 * dt * localVol * localVol);
+                    currentLogFwd += localVol * dW - 0.5 * dt * localVol * localVol;
 
                     if (stepIsDiv[subStep])
                     {
-                        double discount = stepDiscount[subStep];
-                        double div = stepDivs[subStep].Value(currentFwd * discount);
-                        currentFwd = Math.Max(0.0, currentFwd - div / discount);
+                        double spotBeforeDiv = Math.Exp(currentLogFwd) * discount;
+                        double div = stepDivs[subStep].Value(spotBeforeDiv);
+                        currentLogFwd = Math.Log(Math.Max(0.0, (spotBeforeDiv - div) / discount));
                     }
                 }
-                processPath[step] = new[] { currentFwd };
+                processPath[step] = new[] { Math.Exp(currentLogFwd) };
             }
 
             return new ProcessPath(Dates, 1, processPath);

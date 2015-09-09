@@ -41,11 +41,9 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
                 ? assetMkt.Dividends.Map(div => div.DivModel())
                 : new DiscreteLocalDividend[0];
             
-            AssetForwardCurve assetForward = assetMkt.Forward();
-            MoneynessProvider moneyness = MoneynessProvider.FromFwdCurve(assetForward);
-            VolatilitySurface volSurface = VolatilitySurface.BuildInterpol(lv.VolMatrix, moneyness);
+            VolatilitySurface volSurface = VolatilitySurface.BuildInterpol(lv.VolMatrix, assetMkt.Moneyness);
 
-            return new LocalVolatilityModel(lv.VolMatrix.Time, assetMkt.Asset, volSurface.LocalVariance, moneyness, localDividends);
+            return new LocalVolatilityModel(lv.VolMatrix.Time, assetMkt.Asset, volSurface.LocalVariance, assetMkt.Moneyness, localDividends);
         }
     }
 
