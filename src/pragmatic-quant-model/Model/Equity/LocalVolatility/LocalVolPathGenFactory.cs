@@ -190,7 +190,7 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
                     double discount = stepDiscount[subStep];
                     double localVol = stepLocVols[subStep](currentLogFwd + Math.Log(discount)); //TODO precompute
                     double dt = stepDts[subStep];
-                    currentLogFwd += localVol * dW - 0.5 * dt * localVol * localVol;
+                    currentLogFwd += localVol * dW - 0.5 * localVol * localVol * dt;
 
                     if (stepIsDiv[subStep])
                     {

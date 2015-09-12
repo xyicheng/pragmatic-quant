@@ -21,7 +21,7 @@ namespace pragmatic_quant_model.Maths
             if (q * (f - k) > 0.0)
                 return intrinsic + Price(f, k, sigma, t, -q);
             return Math.Max(intrinsic,
-                (Math.Sqrt(f) * Math.Sqrt(k)) * JaeckelBlackFormula.NormalisedBlack(Math.Log(f / k), sigma * Math.Sqrt(t), q));
+                Math.Sqrt(f * k) * JaeckelBlackFormula.NormalisedBlack(Math.Log(f / k), sigma * Math.Sqrt(t), q));
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace pragmatic_quant_model.Maths
             }
             return
                 JaeckelBlackFormula.UncheckedNormalisedImpliedVolatility(
-                    price / (Math.Sqrt(f) * Math.Sqrt(k)), x, q, n) /
+                    price / Math.Sqrt(f * k), x, q, n) /
                 Math.Sqrt(t);
         }
 

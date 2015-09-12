@@ -202,7 +202,8 @@ namespace pragmatic_quant_model.MarketDatas
        
         public double LocalVol(double maturity, double strike)
         {
-            return Math.Sqrt(LocalVariance.Eval(maturity, strike));
+            double y = Moneyness.Moneyness(maturity, strike);
+            return Math.Sqrt(LocalVariance.Eval(maturity, y));
         }
         public double LocalVol(DateTime maturity, double strike)
         {
@@ -262,7 +263,7 @@ namespace pragmatic_quant_model.MarketDatas
             public override double Moneyness(double maturity, double strike)
             {
                 var c = affineDivCurveUtils.CumDiscountedCash(maturity);
-                var cAverage = affineDivCurveUtils.CumDiscCashAverage(maturity);
+                var cAverage = affineDivCurveUtils.CumDiscCashAverage(0.0, maturity);
                 var g = affineDivCurveUtils.AssetGrowth(maturity);
                 var dk = g * (c - cAverage);
 

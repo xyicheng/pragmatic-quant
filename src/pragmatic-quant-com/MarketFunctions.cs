@@ -3,6 +3,7 @@ using ExcelDna.Integration;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.MarketDatas;
+using pragmatic_quant_model.Model.Equity;
 
 namespace pragmatic_quant_com
 {
@@ -147,6 +148,42 @@ namespace pragmatic_quant_com
                 var error = new object[1, 1];
                 error[0, 0] = string.Format("ERROR, {0}", e.Message);
                 return error;
+            }
+        }
+
+        [ExcelFunction(Description = "Equity vanilla option",
+                       Category = "PragmaticQuant_ModelFunctions")]
+        public static object EquityVanillaOption(object mktObj, string assetName, object maturity, double strike, double vol, string optionType)
+        {
+            try
+            {
+                Market market = MarketManager.Instance.GetMarket(mktObj);
+                AssetMarket assetMarket = market.AssetMarketFromName(assetName);
+                
+                var pricer = new BlackScholesWithDividendOption(assetMarket.Spot,
+                    new AffineDivCurveUtils(assetMarket.Dividends, assetMarket.RiskFreeDiscount, assetMarket.Time)
+                    , 11);
+                
+                double q;
+                switch (optionType.Trim().ToLower())
+                {
+                    case "call":
+                        q = 1.0;
+                        break;
+                    case "put":
+                        q = -1.0;
+                        break;
+                    default:
+                        throw new Exception(string.Format("Unknow option type : {0}", optionType));
+                }
+
+                var matAsDate = DateAndDurationConverter.ConvertDateOrDuration(maturity)
+                                                  .ToDate(assetMarket.RefDate);
+                return pricer.Price(assetMarket.Time[matAsDate], strike, vol, q);
+            }
+            catch (Exception e)
+            {
+                return string.Format("FAILURE '{0}'", e.Message);
             }
         }
     }

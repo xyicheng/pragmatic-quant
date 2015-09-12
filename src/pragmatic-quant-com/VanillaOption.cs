@@ -104,6 +104,7 @@ namespace pragmatic_quant_com
                     default:
                         throw new Exception(string.Format("Unknow option type : {0}", optionType));
                 }
+
                 return BlackScholesOption.Price(forward, strike, vol, maturity, q);
             }
             catch (Exception e)
