@@ -165,7 +165,7 @@ namespace pragmatic_quant_com.Factories
 
         public static T[,] ProcessMatrix<T>(this object[,] bag, int baseRow, int baseCol, Func<object, T> valueMap, string missingException)
         {
-            if (baseRow >= bag.GetUpperBound(0))
+            if (baseRow > bag.GetUpperBound(0))
                 throw new Exception(missingException);
 
             int nbRows = 0, nbCols = 0;
