@@ -48,15 +48,16 @@ namespace pragmatic_quant_model.Model.Equity
         }
         #endregion
     }
-    
+
     public class AffineDivCurveUtils
     {
         #region private fields
         private readonly Func<double, double> assetGrowth;
-        private readonly StepFunction cumDiscountedCash;
-        private readonly RrFunction cumDiscCashIntegral;
+        private readonly StepFunction cashDivBpv;
+        private readonly RrFunction cashBpvIntegral;
+        //private readonly StepFunction squareTimeWeightedCash;
         #endregion
-        public AffineDivCurveUtils(DividendQuote[] dividends, 
+        public AffineDivCurveUtils(DividendQuote[] dividends,
                                    DiscountCurve discountCurve,
                                    ITimeMeasure time)
         {
@@ -70,15 +71,19 @@ namespace pragmatic_quant_model.Model.Equity
                 assetGrowth = t => spotYieldGrowth.Eval(t) / discountCurve.Zc(t);
 
                 double[] discountedCashs = dividends.Map(div => div.Cash / assetGrowth(time[div.Date]));
-                double[] cumDiscountedCashs = discountedCashs.Scan(0.0, (prev, c) => prev + c);
-                cumDiscountedCash = new StepFunction(divDates, cumDiscountedCashs, 0.0);
-                cumDiscCashIntegral = cumDiscountedCash.Integral(0.0);
+                double[] cashBpvs = discountedCashs.Scan(0.0, (prev, c) => prev + c);
+                cashDivBpv = new StepFunction(divDates, cashBpvs, 0.0);
+                cashBpvIntegral = cashDivBpv.Integral(0.0);
+
+                //double[] squareTimeWeightedCashs = discountedCashs.ZipWith(divDates, (c, t) => c * t * t);
+                //squareTimeWeightedCash = new StepFunction(divDates, squareTimeWeightedCashs, 0.0);
             }
             else
             {
                 assetGrowth = t => 1.0 / discountCurve.Zc(t);
-                cumDiscountedCash = new StepFunction(new [] {0.0}, new [] {0.0}, double.NaN);
-                cumDiscCashIntegral = RrFunctions.Zero;
+                cashDivBpv = new StepFunction(new[] {0.0}, new[] {0.0}, double.NaN);
+                cashBpvIntegral = RrFunctions.Zero;
+                //squareTimeWeightedCash = new StepFunction(new[] { 0.0 }, new[] { 0.0 }, double.NaN);
             }
         }
 
@@ -86,13 +91,18 @@ namespace pragmatic_quant_model.Model.Equity
         {
             return assetGrowth(t);
         }
-        public double CumDiscountedCash(double t)
+        public double CashDivBpv(double t)
         {
-            return cumDiscountedCash.Eval(t);
+            return cashDivBpv.Eval(t);
         }
-        public double CumDiscCashAverage(double start, double end)
+        public double CashBpvAverage(double start, double end)
         {
-            return (cumDiscCashIntegral.Eval(end) - cumDiscCashIntegral.Eval(start)) / (end - start);
+            return (cashBpvIntegral.Eval(end) - cashBpvIntegral.Eval(start)) / (end - start);
+        }
+        public double CashBpvTimeWeightedAverage(double t)
+        {
+            throw new NotImplementedException("todo");
+            //return cashDivBpv.Eval(t) - squareTimeWeightedCash.Eval(t) / (t * t );
         }
     }
 
@@ -124,11 +134,11 @@ namespace pragmatic_quant_model.Model.Equity
             var midT = 0.5 * maturity; //TODO find a best heuristic !
             var dT = maturity - midT;
 
-            var displacement1 = affineDivUtils.CumDiscCashAverage(0.0, midT);
-            var displacement2 = affineDivUtils.CumDiscCashAverage(midT, maturity);
+            var displacement1 = affineDivUtils.CashBpvAverage(0.0, midT);
+            var displacement2 = affineDivUtils.CashBpvAverage(midT, maturity);
             var maturityGrowth = affineDivUtils.AssetGrowth(maturity);
 
-            var k = strike + maturityGrowth * (affineDivUtils.CumDiscountedCash(maturity) - displacement2);
+            var k = strike + maturityGrowth * (affineDivUtils.CashDivBpv(maturity) - displacement2);
             double a = maturityGrowth * (spot - displacement1) * Math.Exp(-0.5 * vol * vol * midT);
             double b = maturityGrowth * (displacement1 - displacement2);
             double stdDev = Math.Sqrt(midT) * vol;
@@ -137,7 +147,9 @@ namespace pragmatic_quant_model.Model.Equity
             for (int i = 0; i < quadPoints.Length; i++)
             {
                 double x = a * Math.Exp(stdDev * quadPoints[i]) + b;
-                price += quadWeights[i] * BlackScholesOption.Price(x, k, vol, dT, q);
+                double midTprice = (x > 0.0) ? BlackScholesOption.Price(x, k, vol, dT, q)
+                                             : (q > 0.0) ? 0.0 : k - x;
+                price += quadWeights[i] * midTprice;
             }
             return price;
         }
@@ -145,11 +157,26 @@ namespace pragmatic_quant_model.Model.Equity
         public double PriceLehman(double maturity, double strike, double vol, double q)
         {
             var growth = affineDivUtils.AssetGrowth(maturity);
-            var cumDivAvg = affineDivUtils.CumDiscCashAverage(0.0, maturity);
+            var cashBpvAvg = affineDivUtils.CashBpvAverage(0.0, maturity);
 
-            var formulaForward = (spot - cumDivAvg) * growth;
-            var formulaStrike = strike + growth * (affineDivUtils.CumDiscountedCash(maturity) - cumDivAvg);
+            var formulaForward = (spot - cashBpvAvg) * growth;
+            var formulaStrike = strike + growth * (affineDivUtils.CashDivBpv(maturity) - cashBpvAvg);
             return BlackScholesOption.Price(formulaForward, formulaStrike, vol, maturity, q);
+        }
+
+        public double PriceProxy(double maturity, double strike, double vol, double q)
+        {
+            var growth = affineDivUtils.AssetGrowth(maturity);
+            double cashBpv = affineDivUtils.CashDivBpv(maturity);
+            double cashBpvTimeWAvg = affineDivUtils.CashBpvTimeWeightedAverage(maturity);
+            double cashBpbAvg = affineDivUtils.CashBpvAverage(0.0, maturity);
+            double volAdj = 1.0 + (cashBpvTimeWAvg - cashBpbAvg) / spot;
+
+            double displacement = cashBpvTimeWAvg / volAdj;
+            double formulaForward = growth * (spot - displacement);
+            double formulaStrike = strike + growth * (cashBpv - displacement);
+            double formulaVol = vol * volAdj;
+            return BlackScholesOption.Price(formulaForward, formulaStrike, formulaVol, maturity, q);
         }
     }
 

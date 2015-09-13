@@ -262,8 +262,8 @@ namespace pragmatic_quant_model.MarketDatas
             }
             public override double Moneyness(double maturity, double strike)
             {
-                var c = affineDivCurveUtils.CumDiscountedCash(maturity);
-                var cAverage = affineDivCurveUtils.CumDiscCashAverage(0.0, maturity);
+                var c = affineDivCurveUtils.CashDivBpv(maturity);
+                var cAverage = affineDivCurveUtils.CashBpvAverage(0.0, maturity);
                 var g = affineDivCurveUtils.AssetGrowth(maturity);
                 var dk = g * (c - cAverage);
 
