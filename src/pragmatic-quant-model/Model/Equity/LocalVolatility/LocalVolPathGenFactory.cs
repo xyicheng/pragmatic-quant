@@ -17,14 +17,16 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
         private readonly MonteCarloConfig mcConfig;
         #endregion
         #region private methods
-        private static Func<double, double> LocalVol(DateTime date, LocalVolatilityModel model)
+        private static Func<double, double> StepLocalVol(DateTime startDate, DateTime endDate, LocalVolatilityModel model)
         {
+            var time = model.Time;
+            double start = time[startDate];
+            double end = time[endDate];
+            RrFunction stepLocalVariance = model.LocalVariance.TimeAverage(start, end);
             MoneynessProvider moneyness = model.Moneyness;
-            double t = model.Time[date];
-            RrFunction localVariance = model.LocalVariance.TimeSlice(t);
 
             //TODO very slow !!!
-            return logSpot => Math.Sqrt(localVariance.Eval(moneyness.Moneyness(t, Math.Exp(logSpot)))); 
+            return logSpot => Math.Sqrt(stepLocalVariance.Eval(moneyness.Moneyness(start, Math.Exp(logSpot)))); 
         }
         private void StepSchedule(DateTime start, DateTime end, EquityModel model,
             out DateTime[] dates, out bool[] isDivDate, out DiscreteLocalDividend[] dividends)
@@ -75,7 +77,10 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
             
             var horizonDiscount = assetDiscount.Zc(horizon);
             var discounts = dividends.Map(div => horizonDiscount / assetDiscount.Zc(div.Date));
-            var localVols = dates.Map(d => LocalVol(d, model));
+
+            var localVols = EnumerableUtils.For(0, dates.Length,
+                i => StepLocalVol(i > 0 ? dates[i - 1] : start, dates[i], model));
+            
             var step = RealInterval.Compact(model.Time[start], model.Time[end]);
             return new LocalVolSimulatorStepDatas(step, dates.Map(d => model.Time[d]), isDivDate, dividends, discounts, localVols);
         }

@@ -49,7 +49,7 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
     public class LocalVariance
     {
         #region private fields
-        private static readonly RrFunction Y = RrFunctions.Affine(1.0, 0.0);
+        private static readonly RrFunction m = RrFunctions.Affine(1.0, 0.0);
         private readonly StepSearcher maturityStepSearcher;
         private readonly double[] maturities;
         private readonly RrFunction[] vs;
@@ -57,8 +57,32 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
         private readonly RrFunction[] d2Vd2Ys;
         private readonly RrFunction[] dVdTs;
         private readonly RrFunction shortLocalVar;
+        private readonly RrFunction[] pillarStepIntegrals;
         #endregion
         #region private methods
+        private RrFunction StepQuadrature(double start, double end)
+        {
+            var dt = (end - start);
+            if (dt > 0.0)
+            {
+                //2 points Gauss-Legendre
+                return (0.5 * dt) * (TimeSlice(start + dt * 0.211324865405187) + TimeSlice(start + dt * 0.788675134594813));
+                //return (0.5 * dt) * (TimeSlice(start * (1.0 + 1e-12)) + TimeSlice(end * (1.0 - 1e-12)));
+            }
+            return RrFunctions.Zero;
+        }
+        private RrFunction GetPillarStepQuadrature(int index)
+        {
+            if (pillarStepIntegrals[index] != null)
+                return pillarStepIntegrals[index];
+
+            if (index == maturities.Length - 1)
+                throw new Exception("should never get there !");
+
+            var stepAvg = StepQuadrature(maturities[index], maturities[index + 1]);
+            pillarStepIntegrals[index] = stepAvg;
+            return stepAvg;
+        }
         private LocalVariance(double[] maturities, RrFunction[] vs, RrFunction[] dVdYs, RrFunction[] d2Vd2Ys, RrFunction[] dVdTs)
         {
             Contract.Requires(maturities.All(t => t > 0.0));
@@ -69,12 +93,13 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
             this.d2Vd2Ys = d2Vd2Ys;
             this.dVdTs = dVdTs;
             maturityStepSearcher = new StepSearcher(maturities);
+            pillarStepIntegrals = new RrFunction[maturities.Length - 1];
             
             //                                  sigma^2
             // short local variance = -------------------------------------------
             //                         (y * (dsigma^2/dy) / (2 * sigma^2) - 1)^2 
             var sigma2 = vs[0] / maturities[0];
-            shortLocalVar = 0.5 * Y * sigma2.Derivative() / sigma2 - 1.0;
+            shortLocalVar = 0.5 * m * sigma2.Derivative() / sigma2 - 1.0;
             shortLocalVar = sigma2 / (shortLocalVar * shortLocalVar);
         }
         #endregion
@@ -173,10 +198,28 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
             //                                                  dv/dt 
             // local variance = ------------------------------------------------------------------------------------
             //                   (y * (dv/dy) / (2 * v) - 1)^2 + 1/2 * (d^2 v/dy^2) - 1/4 * (1/4 + 1/v) * (dv/dy)^2
-            var localVar = 0.5 * Y * dVdY / v - 1.0;
+            var localVar = 0.5 * m * dVdY / v - 1.0;
             localVar = localVar * localVar + 0.5 * d2Vd2Y - 0.25 * (0.25 + 1.0 / v) * dVdY * dVdY;
             localVar = dVdT / localVar;
             return localVar;
+        }
+        public RrFunction TimeAverage(double start, double end)
+        {
+            if (start > end)
+                throw new Exception("LocalVariance.TimeAverage : start must be lower than end");
+
+            int startIndex = maturityStepSearcher.LocateLeftIndex(start);
+            int endIndex = maturityStepSearcher.LocateLeftIndex(end);
+
+            if (startIndex == endIndex)
+                return StepQuadrature(start, end) / (end - start);
+
+            var average = StepQuadrature(start, maturities[startIndex + 1]);
+            for (int i = startIndex + 1; i < endIndex; i++)
+                average += GetPillarStepQuadrature(i);
+            average += StepQuadrature(maturities[endIndex], end);
+            average /= (end - start);
+            return average;
         }
     }
 
