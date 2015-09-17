@@ -116,11 +116,14 @@ namespace pragmatic_quant_model.Maths
     {
         public static Polynomial Add(Polynomial left, Polynomial right)
         {
-            var maxDegree = Math.Max(left.Coeffs.Length, right.Coeffs.Length);
-            var result = new double[maxDegree];
-            left.Coeffs.CopyTo(result, 0);
-            for (int i = 0; i < right.Coeffs.Length; i++)
-                result[i] += right.Coeffs[i];
+            double[] rightCoeffs = right.Coeffs;
+            double[] leftCoeffs = left.Coeffs;
+
+            var result = new double[Math.Max(leftCoeffs.Length, rightCoeffs.Length)];
+            leftCoeffs.CopyTo(result, 0);
+            for (int i = 0; i < rightCoeffs.Length; i++)
+                result[i] += rightCoeffs[i];
+
             return new Polynomial(true, result);
         }
         public static Polynomial Sub(Polynomial left, Polynomial right)
@@ -175,21 +178,24 @@ namespace pragmatic_quant_model.Maths
         }
         public static Polynomial TaylorDev(this Polynomial p, double x)
         {
-            var coeffs = new double[p.Degree + 1];
-            coeffs[0] = p.Eval(x);
+            double[] c = p.Coeffs;
+            var taylor = new double[c.Length];
+            int nc = c.Length - 1, nd = taylor.Length - 1;
 
-            Polynomial deriv = p;
-            double factorial = 1;
-            for (int i = 1; i < coeffs.Length; i++)
+            taylor[0] = c[nc];
+            for (int j = 1; j < nd + 1; j++)
+                taylor[j] = 0.0;
+
+            for (int i = nc - 1; i >= 0; i--)
             {
-                deriv = deriv.Derivative();
-                factorial *= i;
-
-                coeffs[i] = deriv.Eval(x) / factorial;
+                int nnd = (nd < (nc - i) ? nd : nc - i);
+                for (int j = nnd; j > 0; j--)
+                    taylor[j] = taylor[j] * x + taylor[j - 1];
+                taylor[0] = taylor[0] * x + c[i];
             }
-            return new Polynomial(coeffs);
+            return new Polynomial(taylor);
         }
-
+        
         public static bool IsZero(this Polynomial p)
         {
             return p.Coeffs.All(DoubleUtils.EqualZero);

@@ -85,7 +85,10 @@ namespace test.Maths
             var squareTaylor = (x * x).TaylorDev(1.0);
             var squareTaylorRef = 1.0 + 2.0 * x + x * x;
             Assert.IsTrue((squareTaylor - squareTaylorRef).IsZero());
-            
+
+            var fourTaylor = ((x - 0.5) * (x - 0.5) * (x - 0.5) * (x - 0.5)).TaylorDev(0.5);
+            Assert.IsTrue((fourTaylor - x * x * x * x).IsZero());
+
             var p = 0.25 * x * x * x * x + x * x * x + 3.0 * x * x + 4.0 * x - 17.0;
             var taylorZero = p.TaylorDev(0.0);
             Assert.IsTrue((taylorZero - p).IsZero());
