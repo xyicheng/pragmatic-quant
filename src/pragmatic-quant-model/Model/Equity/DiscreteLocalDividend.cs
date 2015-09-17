@@ -58,8 +58,8 @@ namespace pragmatic_quant_model.Model.Equity
         //private readonly StepFunction squareTimeWeightedCash;
         #endregion
         public AffineDivCurveUtils(DividendQuote[] dividends,
-                                   DiscountCurve discountCurve,
-                                   ITimeMeasure time)
+            DiscountCurve discountCurve,
+            ITimeMeasure time)
         {
             Contract.Requires(EnumerableUtils.IsSorted(dividends.Select(div => div.Date)));
 
@@ -97,7 +97,9 @@ namespace pragmatic_quant_model.Model.Equity
         }
         public double CashBpvAverage(double start, double end)
         {
-            return (cashBpvIntegral.Eval(end) - cashBpvIntegral.Eval(start)) / (end - start);
+            if (end > start)
+                return (cashBpvIntegral.Eval(end) - cashBpvIntegral.Eval(start)) / (end - start);
+            return cashBpvIntegral.Eval(start);
         }
         public double CashBpvTimeWeightedAverage(double t)
         {

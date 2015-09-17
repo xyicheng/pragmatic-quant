@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using pragmatic_quant_model.Basic;
@@ -6,6 +7,8 @@ using pragmatic_quant_model.Maths.Function;
 
 namespace pragmatic_quant_model.Maths.Interpolation
 {
+    using FracBinaryOp = Func<RationalFraction, RationalFraction, RationalFraction>;
+
     public class SplineInterpoler : RrFunction
     {
         #region private fields
@@ -93,22 +96,21 @@ namespace pragmatic_quant_model.Maths.Interpolation
 
             return basedNum / basedDenom;
         }
-        private static RrFunction BinaryOp(SplineInterpoler left, SplineInterpoler right,
-            Func<RationalFraction, RationalFraction, RationalFraction> binaryOp)
+        private static RrFunction BinaryOp(SplineInterpoler left, SplineInterpoler right, FracBinaryOp binaryOp)
         {
-            var mergedPillars = left.pillars.Union(right.pillars).OrderBy(p => p).ToArray();
+            double[] mergedPillars = ArrayUtils.MergeSortedArray(left.pillars, right.pillars);
             var binOpElems = mergedPillars.Select(p =>
             {
-                var leftElem = BasedSpline(left.stepSplines, p);
-                var rightElem = BasedSpline(right.stepSplines, p);
+                RationalFraction leftElem = BasedSpline(left.stepSplines, p);
+                RationalFraction rightElem = BasedSpline(right.stepSplines, p);
                 return binaryOp(leftElem, rightElem);
             }).ToArray();
 
-            var leftExtrapol = BasedExtrapol(left.stepSplines, mergedPillars.First());
-            var rightExtrapol = BasedExtrapol(right.stepSplines, mergedPillars.First());
-            var binOpExtrapol = binaryOp(leftExtrapol, rightExtrapol);
+            RationalFraction leftExtrapol = BasedExtrapol(left.stepSplines, mergedPillars.First());
+            RationalFraction rightExtrapol = BasedExtrapol(right.stepSplines, mergedPillars.First());
+            RationalFraction binOpExtrapol = binaryOp(leftExtrapol, rightExtrapol);
 
-            var stepSplines= new StepFunction<RationalFraction>(mergedPillars, binOpElems, binOpExtrapol);
+            var stepSplines = new StepFunction<RationalFraction>(mergedPillars, binOpElems, binOpExtrapol);
             return new SplineInterpoler(stepSplines);
         }
         #endregion

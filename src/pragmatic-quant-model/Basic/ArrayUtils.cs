@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace pragmatic_quant_model.Basic
@@ -121,6 +122,61 @@ namespace pragmatic_quant_model.Basic
         public static int FindIndex<T>(this T[] array, T element)
         {
             return array.ToList().FindIndex(e => e.Equals(element));
+        }
+
+        public static double[] MergeSortedArray(double[] a, double[] b)
+        {
+            var result = new List<double>();
+
+            int i = 0, j = 0;
+            double current = double.NegativeInfinity;
+            while (i < a.Length && j < b.Length)
+            {
+                double a_i = a[i];
+                double b_j = b[j];
+                if (a_i < b_j)
+                {
+                    if (a_i > current)
+                    {
+                        result.Add(a_i);
+                        current = a_i;
+                    }
+                    i++;
+                }
+                else
+                {
+                    if (b_j > current)
+                    {
+                        result.Add(b_j);
+                        current = b_j;
+                    }
+                    j++;
+                }
+            }
+
+            while (i < a.Length)
+            {
+                double a_i = a[i];
+                if (a_i > current)
+                {
+                    result.Add(a_i);
+                    current = a_i;
+                }
+                i++;
+            }
+
+            while (j < b.Length)
+            {
+                double b_j = b[j];
+                if (b_j > current)
+                {
+                    result.Add(b_j);
+                    current = b_j;
+                }
+                j++;
+            }
+
+            return result.ToArray();
         }
     }
 }

@@ -2,7 +2,6 @@
 using NUnit.Framework;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Maths;
-using pragmatic_quant_model.Maths.Interpolation;
 
 namespace test.Maths
 {
@@ -12,7 +11,7 @@ namespace test.Maths
         [Test]
         public void Constructor()
         {
-            var p = new Polynomial(0.0, 1.0, 0.0, 0.0, 0.0);
+            var p = new Polynomial(true, 0.0, 1.0, 0.0, 0.0, 0.0);
             Assert.AreEqual(p.Degree, 1);
             Assert.AreEqual(p.Coeffs[0], 0.0);
             Assert.AreEqual(p.Coeffs[1], 1.0);
@@ -21,7 +20,7 @@ namespace test.Maths
             Assert.AreEqual(zero.Degree, 0);
             Assert.AreEqual(zero.Coeffs[0], 0.0);
 
-            var zero2 = new Polynomial(0.0, 0.0);
+            var zero2 = new Polynomial(true, 0.0, 0.0);
             Assert.AreEqual(zero2.Degree, 0);
             Assert.AreEqual(zero2.Coeffs[0], 0.0);
 

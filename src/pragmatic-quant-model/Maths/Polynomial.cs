@@ -12,10 +12,27 @@ namespace pragmatic_quant_model.Maths
     public class Polynomial
     {
         public Polynomial(params double[] coeffs)
+            : this(false, coeffs) { }
+        public Polynomial(bool simplify, params double[] coeffs)
         {
             Contract.Requires(coeffs.Length > 0);
-            var cleanedNonConstantCoeffs = coeffs.Skip(1).Reverse().SkipWhile(DoubleUtils.EqualZero).Reverse();
-            Coeffs = new[] {coeffs[0]}.Concat(cleanedNonConstantCoeffs).ToArray();
+
+            if (simplify)
+            {
+                int degree = coeffs.Length - 1;
+                while (degree > 0)
+                {
+                    if (!DoubleUtils.EqualZero(coeffs[degree]))
+                        break;
+                    --degree;
+                }
+                Coeffs = new double[degree + 1];
+                Array.Copy(coeffs, Coeffs, Coeffs.Length);
+            }
+            else
+            {
+                Coeffs = coeffs;
+            }
         }
         public readonly double[] Coeffs;
         public int Degree { get { return Coeffs.Length - 1; } }
@@ -104,7 +121,7 @@ namespace pragmatic_quant_model.Maths
             left.Coeffs.CopyTo(result, 0);
             for (int i = 0; i < right.Coeffs.Length; i++)
                 result[i] += right.Coeffs[i];
-            return new Polynomial(result);
+            return new Polynomial(true, result);
         }
         public static Polynomial Sub(Polynomial left, Polynomial right)
         {
@@ -113,22 +130,26 @@ namespace pragmatic_quant_model.Maths
             left.Coeffs.CopyTo(result, 0);
             for (int i = 0; i < right.Coeffs.Length; i++)
                 result[i] -= right.Coeffs[i];
-            return new Polynomial(result);
+            return new Polynomial(true, result);
         }
         public static Polynomial Mult(Polynomial left, Polynomial right)
         {
-            var maxDegree = left.Coeffs.Length + right.Coeffs.Length - 1;
+            var leftCoeffs = left.Coeffs;
+            var rightCoeffs = right.Coeffs;
+            var maxDegree = leftCoeffs.Length + rightCoeffs.Length - 1;
             var result = new double[maxDegree];
-            for (int i = 0; i < left.Coeffs.Length; i++)
+            for (int i = 0; i < leftCoeffs.Length; i++)
             {
-                for (int j = 0; j < right.Coeffs.Length; j++)
+                var ithLeftCoeffs = leftCoeffs[i];
+                for (int j = 0; j < rightCoeffs.Length; j++)
                 {
-                    result[i + j] += left.Coeffs[i] * right.Coeffs[j];
+                    result[i + j] += ithLeftCoeffs * rightCoeffs[j];
                 }
+
             }
             return new Polynomial(result);
         }
-
+        
         public static double Eval(this Polynomial p, double x)
         {
             var coeffs = p.Coeffs;
@@ -144,8 +165,12 @@ namespace pragmatic_quant_model.Maths
             if (p.Degree == 0)
                 return Polynomial.Zero;
 
-            var c = p.Coeffs;
-            var derivCoeffs = Enumerable.Range(0, c.Length - 1).Map(i => (i + 1) * c[i + 1]);
+            double[] c = p.Coeffs;
+            var derivCoeffs = new double[c.Length - 1];
+            for (int i = 0; i <derivCoeffs.Length; ++i)
+            {
+                derivCoeffs[i] = (i + 1) * c[i + 1];
+            }
             return new Polynomial(derivCoeffs);
         }
         public static Polynomial TaylorDev(this Polynomial p, double x)
