@@ -219,12 +219,9 @@ namespace pragmatic_quant_model.MarketDatas
     public abstract class MoneynessProvider
     {
         public abstract double Moneyness(double maturity, double strike);
+        public abstract Func<double, double> Moneyness(double maturity);
         public abstract double Strike(double maturity, double moneyness);
-
-        public static MoneynessProvider FromFwdCurve(AssetForwardCurve assetFwd)
-        {
-            return new ForwardMoneynessProvider(assetFwd);
-        }
+        
         public static MoneynessProvider DivAdjusted(double spot,
                                                     DividendQuote[] dividends,
                                                     DiscountCurve discountCurve,
@@ -234,23 +231,6 @@ namespace pragmatic_quant_model.MarketDatas
         }
 
         #region private class
-        private sealed class ForwardMoneynessProvider : MoneynessProvider
-        {
-            private readonly AssetForwardCurve assetFwd;
-            public ForwardMoneynessProvider(AssetForwardCurve assetFwd)
-            {
-                this.assetFwd = assetFwd;
-            }
-            public override double Moneyness(double maturity, double strike)
-            {
-                return Math.Log((strike / assetFwd.AssetGrowth(maturity) + assetFwd.CumulatedDividends(maturity)) / assetFwd.Spot);
-            }
-            public override double Strike(double maturity, double moneyness)
-            {
-                return (Math.Exp(moneyness) * assetFwd.Spot - assetFwd.CumulatedDividends(maturity)) * assetFwd.AssetGrowth(maturity);
-            }
-        }
-
         private sealed class DivAdjustedMoneyness : MoneynessProvider
         {
             private readonly double spot;
@@ -268,6 +248,14 @@ namespace pragmatic_quant_model.MarketDatas
                 var dk = g * (c - cAverage);
 
                 return Math.Log((strike + dk) / (g * (spot + cAverage)));
+            }
+            public override Func<double, double> Moneyness(double maturity)
+            {
+                var c = affineDivCurveUtils.CashDivBpv(maturity);
+                var cAverage = affineDivCurveUtils.CashBpvAverage(0.0, maturity);
+                var g = affineDivCurveUtils.AssetGrowth(maturity);
+                var dk = g * (c - cAverage);
+                return strike => Math.Log((strike + dk) / (g * (spot + cAverage)));
             }
             public override double Strike(double maturity, double moneyness)
             {
