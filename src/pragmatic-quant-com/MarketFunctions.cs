@@ -185,5 +185,41 @@ namespace pragmatic_quant_com
                 return string.Format("FAILURE '{0}'", e.Message);
             }
         }
+
+        [ExcelFunction(Description = "Equity vanilla option implied volatility",
+                       Category = "PragmaticQuant_ModelFunctions")]
+        public static object EquityImpliedVol(object mktObj, string assetName, object maturity, double strike, double price, string optionType)
+        {
+            try
+            {
+                Market market = MarketManager.Instance.GetMarket(mktObj);
+                AssetMarket assetMkt = market.AssetMarketFromName(assetName);
+                var pricer = BlackScholesWithDividendOption.Build(assetMkt.Spot,
+                                                                  assetMkt.Dividends,
+                                                                  assetMkt.RiskFreeDiscount,
+                                                                  assetMkt.Time);
+                double q;
+                switch (optionType.Trim().ToLower())
+                {
+                    case "call":
+                        q = 1.0;
+                        break;
+                    case "put":
+                        q = -1.0;
+                        break;
+                    default:
+                        throw new Exception(string.Format("Unknow option type : {0}", optionType));
+                }
+
+                var matAsDate = DateAndDurationConverter.ConvertDateOrDuration(maturity)
+                                                  .ToDate(assetMkt.RefDate);
+                return pricer.ImpliedVol(assetMkt.Time[matAsDate], strike, price, q);
+            }
+            catch (Exception e)
+            {
+                return string.Format("FAILURE '{0}'", e.Message);
+            }
+        }
+
     }
 }

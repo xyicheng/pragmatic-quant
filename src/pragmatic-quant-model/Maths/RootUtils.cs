@@ -120,7 +120,7 @@ namespace pragmatic_quant_model.Maths
         /// <param name="maxIter"></param>
         /// <returns></returns>
         public static double Brenth(Func<double, double> f, double xa, double xb,
-                                    double xtol, double rtol, int maxIter)
+                                    double xtol, double rtol, int maxIter = 100)
         {
             int funcalls, iterations;
             return Brenth(f, xa, xb, xtol, rtol, maxIter, out funcalls, out iterations);

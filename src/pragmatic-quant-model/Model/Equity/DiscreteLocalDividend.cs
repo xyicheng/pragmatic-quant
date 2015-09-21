@@ -193,18 +193,18 @@ namespace pragmatic_quant_model.Model.Equity
             //Proxy using Lehman Formula
             double proxyFwd, proxyDk;
             affineDivUtils.LehmanProxy(maturity, spot, out proxyFwd, out proxyDk);
-            var v1 = BlackScholesOption.ImpliedVol(price, proxyFwd, strike + proxyDk, maturity, q);
+            double v1 = BlackScholesOption.ImpliedVol(price, proxyFwd, strike + proxyDk, maturity, q);
 
             //Second Guess
             double gamma, theta, vega, vanna, vomma;
             BlackScholesOption.Greeks(proxyFwd, strike + proxyDk, maturity, v1,
                 out gamma, out theta, out vega, out vanna, out vomma);
-            var v2 = v1 - volToError(v1) / vega;
+            double v2 = v1 - volToError(v1) / vega;
             
             //Bracket & Solve
             if (!RootUtils.Bracket(volToError, v1, v2, out v1, out v2))
                 throw new Exception("Failed to inverse vol");
-            var impliedVol = RootUtils.Brenth(volToError, v1, v2, 1.0e-10, DoubleUtils.MachineEpsilon, 10);
+            var impliedVol = RootUtils.Brenth(volToError, v1, v2, 1.0e-10, 2.0 * DoubleUtils.MachineEpsilon, 10);
             return impliedVol;
         }
 
