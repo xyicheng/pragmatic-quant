@@ -158,12 +158,11 @@ namespace pragmatic_quant_com
             try
             {
                 Market market = MarketManager.Instance.GetMarket(mktObj);
-                AssetMarket assetMarket = market.AssetMarketFromName(assetName);
-                
-                var pricer = new BlackScholesWithDividendOption(assetMarket.Spot,
-                    new AffineDivCurveUtils(assetMarket.Dividends, assetMarket.RiskFreeDiscount, assetMarket.Time)
-                    , 11);
-                
+                AssetMarket assetMkt = market.AssetMarketFromName(assetName);
+                var pricer = BlackScholesWithDividendOption.Build(assetMkt.Spot,
+                                                                  assetMkt.Dividends,
+                                                                  assetMkt.RiskFreeDiscount,
+                                                                  assetMkt.Time);
                 double q;
                 switch (optionType.Trim().ToLower())
                 {
@@ -178,8 +177,8 @@ namespace pragmatic_quant_com
                 }
 
                 var matAsDate = DateAndDurationConverter.ConvertDateOrDuration(maturity)
-                                                  .ToDate(assetMarket.RefDate);
-                return pricer.Price(assetMarket.Time[matAsDate], strike, vol, q);
+                                                  .ToDate(assetMkt.RefDate);
+                return pricer.Price(assetMkt.Time[matAsDate], strike, vol, q);
             }
             catch (Exception e)
             {

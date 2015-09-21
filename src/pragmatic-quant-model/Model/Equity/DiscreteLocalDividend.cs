@@ -58,8 +58,8 @@ namespace pragmatic_quant_model.Model.Equity
         //private readonly StepFunction squareTimeWeightedCash;
         #endregion
         public AffineDivCurveUtils(DividendQuote[] dividends,
-            DiscountCurve discountCurve,
-            ITimeMeasure time)
+                                   DiscountCurve discountCurve,
+                                   ITimeMeasure time)
         {
             Contract.Requires(EnumerableUtils.IsSorted(dividends.Select(div => div.Date)));
 
@@ -106,10 +106,20 @@ namespace pragmatic_quant_model.Model.Equity
             throw new NotImplementedException("todo");
             //return cashDivBpv.Eval(t) - squareTimeWeightedCash.Eval(t) / (t * t );
         }
+
+        public void LehmanProxy(double maturity, double spot,
+                                out double effectiveForward, out double strikeShift)
+        {
+            var growth = AssetGrowth(maturity);
+            var cashBpvAvg = CashBpvAverage(0.0, maturity);
+
+            effectiveForward = (spot - cashBpvAvg) * growth;
+            strikeShift = growth * (CashDivBpv(maturity) - cashBpvAvg);
+        }
     }
 
     /// <summary>
-    /// Pricer for vanilla with constant Black-Scholes model with dividends.
+    /// Vanilla option pricer for Black-Scholes model with dividends.
     /// </summary>
     public class BlackScholesWithDividendOption
     {
@@ -119,17 +129,29 @@ namespace pragmatic_quant_model.Model.Equity
         private readonly double[] quadPoints;
         private readonly double[] quadWeights;
         #endregion
-        public BlackScholesWithDividendOption(double spot, AffineDivCurveUtils affineDivUtils, int quadratureNbPoints)
+        public BlackScholesWithDividendOption(double spot, AffineDivCurveUtils affineDivUtils, int quadratureNbPoints = 10)
         {
             this.affineDivUtils = affineDivUtils;
             this.spot = spot;
             GaussHermite.GetQuadrature(quadratureNbPoints, out quadPoints, out quadWeights);
         }
+
+        public static BlackScholesWithDividendOption Build(double spot,
+                                                           DividendQuote[] dividends,
+                                                           DiscountCurve discountCurve,
+                                                           ITimeMeasure time)
+        {
+            var divUtils = new AffineDivCurveUtils(dividends, discountCurve, time);
+            return new BlackScholesWithDividendOption(spot, divUtils);
+        }
         
-        /// <param name="maturity">maturity</param>
-        /// <param name="strike">strike</param>
+        /// <summary>
+        /// Price option using a two step quadrature.
+        /// </summary>
+        /// <param name="maturity">option maturity</param>
+        /// <param name="strike">option strike</param>
         /// <param name="vol">volatility</param>
-        /// <param name="q"> 1 for call, -1 for put </param>
+        /// <param name="q">option type : 1 for call, -1 for put</param>
         /// <returns></returns>
         public double Price(double maturity, double strike, double vol, double q)
         {
@@ -156,16 +178,51 @@ namespace pragmatic_quant_model.Model.Equity
             return price;
         }
 
-        public double PriceLehman(double maturity, double strike, double vol, double q)
+        /// <summary>
+        /// Implied volatility from option price. (Inversion of the two step quadrature formula.)
+        /// </summary>
+        /// <param name="maturity">option maturity</param>
+        /// <param name="strike">option strike</param>
+        /// <param name="price">option price </param>
+        /// <param name="q">option type : 1 for call, -1 for put</param>
+        /// <returns></returns>
+        public double ImpliedVol(double maturity, double strike, double price, double q)
         {
-            var growth = affineDivUtils.AssetGrowth(maturity);
-            var cashBpvAvg = affineDivUtils.CashBpvAverage(0.0, maturity);
+            Func<double, double> volToError = v => Price(maturity, strike, v, q) - price;
 
-            var formulaForward = (spot - cashBpvAvg) * growth;
-            var formulaStrike = strike + growth * (affineDivUtils.CashDivBpv(maturity) - cashBpvAvg);
-            return BlackScholesOption.Price(formulaForward, formulaStrike, vol, maturity, q);
+            //Proxy using Lehman Formula
+            double proxyFwd, proxyDk;
+            affineDivUtils.LehmanProxy(maturity, spot, out proxyFwd, out proxyDk);
+            var v1 = BlackScholesOption.ImpliedVol(price, proxyFwd, strike + proxyDk, maturity, q);
+
+            //Second Guess
+            double gamma, theta, vega, vanna, vomma;
+            BlackScholesOption.Greeks(proxyFwd, strike + proxyDk, maturity, v1,
+                out gamma, out theta, out vega, out vanna, out vomma);
+            var v2 = v1 - volToError(v1) / vega;
+            
+            //Bracket & Solve
+            if (!RootUtils.Bracket(volToError, v1, v2, out v1, out v2))
+                throw new Exception("Failed to inverse vol");
+            var impliedVol = RootUtils.Brenth(volToError, v1, v2, 1.0e-10, DoubleUtils.MachineEpsilon, 10);
+            return impliedVol;
         }
 
+        /// <summary>
+        /// Price option using Lehman Brother proxy.
+        /// </summary>
+        /// <param name="maturity">option maturity</param>
+        /// <param name="strike">option strike</param>
+        /// <param name="vol">volatility</param>
+        /// <param name="q">option type : 1 for call, -1 for put</param>
+        /// <returns></returns>
+        public double PriceLehman(double maturity, double strike, double vol, double q)
+        {
+            double effectiveForward, strikeShift;
+            affineDivUtils.LehmanProxy(maturity, spot, out effectiveForward, out strikeShift);
+            return BlackScholesOption.Price(effectiveForward, strike + strikeShift, vol, maturity, q);
+        }
+        
         public double PriceProxy(double maturity, double strike, double vol, double q)
         {
             var growth = affineDivUtils.AssetGrowth(maturity);

@@ -4,7 +4,6 @@ using System.Diagnostics.Contracts;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Maths;
-using pragmatic_quant_model.Maths.Function;
 using pragmatic_quant_model.Maths.Interpolation;
 using pragmatic_quant_model.Model.Equity;
 using pragmatic_quant_model.Model.Equity.LocalVolatility;
@@ -79,34 +78,20 @@ namespace pragmatic_quant_model.MarketDatas
         public double Yield { get; private set; }
     }
     
-    //TODO use AffineDivCurveUtils
     public class AssetForwardCurve
     {
         #region private fields
         private readonly ITimeMeasure time;
-        private readonly DiscountCurve assetFinancingCurve;
-
-        private readonly StepFunction yieldGrowthFunc;
-        private readonly StepFunction cumulatedDividendFunc;
+        private readonly AffineDivCurveUtils divCurveUtils;
         #endregion
         
         public AssetForwardCurve(double spot, DividendQuote[] dividends, DiscountCurve assetFinancingCurve,
             ITimeMeasure time)
         {
             Contract.Requires(EnumerableUtils.IsSorted(dividends.Select(div => div.Date)));
-
-            Spot = spot;
-            this.assetFinancingCurve = assetFinancingCurve;
             this.time = time;
-
-            double[] yieldGrowths = dividends.Scan(1.0, (prev, div) => prev * (1.0 - div.Yield));
-            double[] discountedDivCash = dividends.ZipWith(yieldGrowths,
-                (div, yGrowth) => div.Cash / yGrowth * assetFinancingCurve.Zc(div.Date));
-            double[] cumulatedDividends = discountedDivCash.Scan(0.0, (prev, c) => prev + c);
-            var divDates = time[dividends.Select(d => d.Date).ToArray()];
-
-            yieldGrowthFunc = new StepFunction(divDates, yieldGrowths, 1.0);
-            cumulatedDividendFunc = new StepFunction(divDates, cumulatedDividends, 0.0);
+            Spot = spot;
+            divCurveUtils = new AffineDivCurveUtils(dividends, assetFinancingCurve, time);
         }
 
         public DateTime RefDate
@@ -116,26 +101,9 @@ namespace pragmatic_quant_model.MarketDatas
         public double Spot { get; private set; }
         public double Fwd(DateTime d)
         {
-            return (Spot - CumulatedDividends(d)) * AssetGrowth(d);
+            double t = time[d];
+            return (Spot - divCurveUtils.CashDivBpv(t)) * divCurveUtils.AssetGrowth(t);
         }
-
-        public double AssetGrowth(DateTime date)
-        {
-            return AssetGrowth(time[date]);
-        }
-        public double AssetGrowth(double d)
-        {
-            return yieldGrowthFunc.Eval(d) / assetFinancingCurve.Zc(d);
-        }
-
-        public double CumulatedDividends(DateTime date)
-        {
-            return CumulatedDividends(time[date]);
-        }
-        public double CumulatedDividends(double d)
-        {
-            return cumulatedDividendFunc.Eval(d);
-        } 
     }
 
     public class VolatilityMatrix

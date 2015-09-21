@@ -155,6 +155,7 @@
     <Compile Include="MarketDatas\Market.cs" />
     <Compile Include="Maths\BachelierOption.cs" />
     <Compile Include="Maths\BlackScholesOption.cs" />
+    <Compile Include="Maths\RootUtils.cs" />
     <Compile Include="Maths\FiniteDifferenceUtils.cs" />
     <Compile Include="Model\Equity\EquityModel.cs" />
     <Compile Include="Model\Equity\LocalVolatility\LocalVolatilityModel.cs" />
