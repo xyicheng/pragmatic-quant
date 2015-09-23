@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using pragmatic_quant_model.Basic;
-using pragmatic_quant_model.Maths;
+using pragmatic_quant_model.Maths.Function;
 
 namespace pragmatic_quant_model.Model.Equity.LocalVolatility
 {

@@ -178,7 +178,7 @@
     <Compile Include="Maths\Sobol\KuoDirections.cs" />
     <Compile Include="Maths\Sobol\PrimitivePolynomials.cs" />
     <Compile Include="Maths\RationalCubic.cs" />
-    <Compile Include="Maths\RrFunction.cs" />
+    <Compile Include="Maths\Function\RrFunction.cs" />
     <Compile Include="Basic\StepSearcher.cs" />
     <Compile Include="Maths\Sobol\SobolRsg.cs" />
     <Compile Include="Maths\Sobol\sobolrsg2.cs" />

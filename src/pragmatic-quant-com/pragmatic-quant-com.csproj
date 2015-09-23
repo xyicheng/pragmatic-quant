@@ -76,10 +76,8 @@
     <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ExcelDna.Integration, Version=0.32.5236.31783, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\ExcelDna.Integration.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="ExcelDna.Integration">
+      <HintPath>..\..\libraries\ExcelDna\ExcelDna.Integration.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

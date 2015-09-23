@@ -5,7 +5,7 @@ using System.Linq;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.MarketDatas;
-using pragmatic_quant_model.Maths;
+using pragmatic_quant_model.Maths.Function;
 using pragmatic_quant_model.Maths.Stochastic;
 using pragmatic_quant_model.Product;
 

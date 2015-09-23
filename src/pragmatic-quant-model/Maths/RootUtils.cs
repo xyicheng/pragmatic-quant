@@ -21,21 +21,20 @@ namespace pragmatic_quant_model.Maths
                                     double xtol, double rtol, int maxIter,
                                     out int funcalls, out int iterations)
         {
-            double xpre = xa, xcur = xb;
-            double xblk = 0.0, fblk = 0.0, spre = 0.0, scur = 0.0;
-
+            double xpre = xa;
+            double xcur = xb;
             double fpre = f(xpre);
             double fcur = f(xcur);
             funcalls = 2;
             iterations = 0;
 
             if (fpre * fcur > 0)
-            {
                 throw new Exception("Brent : root must be bracketed");
-            }
+            
             if (DoubleUtils.EqualZero(fpre)) return xpre;
             if (DoubleUtils.EqualZero(fcur)) return xcur;
 
+            double xblk = 0.0, fblk = 0.0, spre = 0.0, scur = 0.0;
             for (int i = 0; i < maxIter; i++)
             {
                 iterations++;

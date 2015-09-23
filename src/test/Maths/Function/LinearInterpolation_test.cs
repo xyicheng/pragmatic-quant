@@ -2,7 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using pragmatic_quant_model.Basic;
-using pragmatic_quant_model.Maths;
+using pragmatic_quant_model.Maths.Function;
 using pragmatic_quant_model.Maths.Interpolation;
 
 namespace test.Maths.Function

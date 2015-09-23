@@ -1,6 +1,6 @@
 ﻿using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.MarketDatas;
-using pragmatic_quant_model.Maths;
+using pragmatic_quant_model.Maths.Function;
 
 namespace pragmatic_quant_model.Model.Equity.BlackScholes
 {

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Linq;
 using pragmatic_quant_model.Basic;
-using pragmatic_quant_model.Maths.Function;
 using pragmatic_quant_model.Maths.Interpolation;
 
-namespace pragmatic_quant_model.Maths
+namespace pragmatic_quant_model.Maths.Function
 {
     public abstract class RrFunction
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
-using pragmatic_quant_model.Maths;
+using pragmatic_quant_model.Maths.Function;
 
 namespace pragmatic_quant_model.MarketDatas
 {

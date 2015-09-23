@@ -1,4 +1,6 @@
 
+using pragmatic_quant_model.Maths.Function;
+
 namespace pragmatic_quant_model.Maths.Stochastic
 {
     public class OrnsteinUhlenbeck
