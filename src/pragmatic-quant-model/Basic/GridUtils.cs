@@ -27,5 +27,16 @@ namespace pragmatic_quant_model.Basic
             grid[size - 1] = end;
             return grid;
         }
+
+        /// <summary>
+        /// Build a regular grid with endpoints {start, end}.
+        /// </summary>
+        /// <param name="interval">grid support</param>
+        /// <param name="size">grid size (should be > 1) </param>
+        /// <returns></returns>
+        public static double[] RegularGrid(RealInterval interval, int size)
+        {
+            return RegularGrid(interval.Inf, interval.Sup, size);
+        }
     }
 }

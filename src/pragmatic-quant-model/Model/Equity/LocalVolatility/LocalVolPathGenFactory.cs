@@ -17,16 +17,36 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
         private readonly MonteCarloConfig mcConfig;
         #endregion
         #region private methods
+        private static RealInterval GridSupport(double gridQuantile, VolatilitySurface volSurface, double t)
+        {
+            var impliedVar = volSurface.VarianceInterpoler.TimeSlice(t) / t;
+            Func<double, double> vol = k => Math.Sqrt(impliedVar.Eval(Math.Log(k)));
+            var mInf = Math.Log(SmileLawUtils.ComputeQuantile(1.0, t, vol, gridQuantile));
+            var mSup = Math.Log(SmileLawUtils.ComputeQuantile(1.0, t, vol, 1.0 - gridQuantile));
+            return RealInterval.Compact(mInf, mSup);
+        }
+        private static RegularGridAffineInterpol LocalVolDiscretization(Func<double, double> localVol, VolatilitySurface volSurface, double t)
+        {
+            const double gridQuantile = 1.0e-6;
+            const int gridSize = 250;
+            RealInterval gridSupport = GridSupport(gridQuantile, volSurface, t);
+            double[] localVolGridValues = GridUtils.RegularGrid(gridSupport, gridSize).Map(localVol);
+            var gridLocalVol = new RegularGridAffineInterpol(gridSupport, gridSize, localVolGridValues);
+            return gridLocalVol;
+        }
         private static Func<double, double> StepLocalVol(DateTime startDate, DateTime endDate, LocalVolatilityModel model)
         {
             var time = model.Time;
             double start = time[startDate];
             double end = time[endDate];
-            RrFunction stepLocalVariance = model.LocalVariance.TimeAverage(start, end);
-            var moneyness = model.Moneyness.Moneyness(start);
 
-            //TODO very slow !!!
-            return logSpot => Math.Sqrt(stepLocalVariance.Eval(moneyness(Math.Exp(logSpot))));
+            VolatilitySurface volSurface = model.VolSurface;
+            RrFunction stepLocalVariance = volSurface.LocalVariance.TimeAverage(start, end);
+            var moneyness = model.Moneyness.Moneyness(start);
+            Func<double, double> localVol = logSpot => Math.Sqrt(stepLocalVariance.Eval(moneyness(Math.Exp(logSpot))));
+            
+            var gridLocalVol = LocalVolDiscretization(localVol, volSurface, 0.5 * (start + end));
+            return gridLocalVol.Eval;
         }
         private void StepSchedule(DateTime start, DateTime end, EquityModel model,
             out DateTime[] dates, out bool[] isDivDate, out DiscreteLocalDividend[] dividends)
@@ -109,6 +129,38 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
                                   model, assetDiscount, probaMeasure.Date));
 
             return new LocalVolEquityPathGenerator(stepSimulDatas, forward);
+        }
+    }
+    
+    public class RegularGridAffineInterpol
+    {
+        #region private fields
+        private readonly double inf;
+        private readonly double step;
+        private readonly double[] f;
+        private readonly double[] df;
+        #endregion
+        public RegularGridAffineInterpol(RealInterval support, int size, double[] f)
+        {
+            Contract.Requires(f.Length == size);
+            this.f = f;
+            inf = support.Inf;
+            step = support.Length / (f.Length - 1);
+            df = EnumerableUtils.For(0, f.Length - 1, i => f[i + 1] - f[i]);
+        }
+             
+        public double Eval(double x)
+        {
+            double ratio = (x - inf) / step;
+            int index = (int) ratio;
+            
+            if (index < 0)
+                return f[0];
+            
+            if (index >= f.Length - 1)
+                return f[f.Length - 1];
+
+            return f[index] + (ratio - index) * df[index];
         }
     }
 

@@ -6,14 +6,14 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
 {
     public class LocalVolatilityModel : EquityModel
     {
-        public LocalVolatilityModel(ITimeMeasure time, AssetId asset, LocalVariance localVariance,  MoneynessProvider moneyness, DiscreteLocalDividend[] dividends)
+        public LocalVolatilityModel(ITimeMeasure time, AssetId asset, VolatilitySurface volSurface, MoneynessProvider moneyness, DiscreteLocalDividend[] dividends)
             : base(asset, dividends, time)
         {
-            LocalVariance = localVariance;
+            VolSurface = volSurface;
             Moneyness = moneyness;
         }
 
-        public LocalVariance LocalVariance { get; private set; }
+        public VolatilitySurface VolSurface { get; private set; }
         public MoneynessProvider Moneyness { get; private set; }
     }
 
@@ -43,7 +43,7 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
             
             VolatilitySurface volSurface = VolatilitySurface.BuildInterpol(lv.VolMatrix, assetMkt.Moneyness);
 
-            return new LocalVolatilityModel(lv.VolMatrix.Time, assetMkt.Asset, volSurface.LocalVariance, assetMkt.Moneyness, localDividends);
+            return new LocalVolatilityModel(lv.VolMatrix.Time, assetMkt.Asset, volSurface, assetMkt.Moneyness, localDividends);
         }
     }
 

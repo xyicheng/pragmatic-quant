@@ -25,6 +25,30 @@ namespace pragmatic_quant_model.Maths
         }
 
         /// <summary>
+        /// Black-Scholes formulae for digital call and put option
+        /// </summary>
+        /// <param name="f">forward</param>
+        /// <param name="k">strike</param>
+        /// <param name="vol">volatility</param>
+        /// <param name="t">maturity</param>
+        /// <param name="q">1 for digit call, -1 for digit pu</param>
+        /// <param name="skew">(optional) derivative of volatility relative to strike</param>
+        /// <returns></returns>
+        public static double PriceDigit(double f, double k, double vol, double t, double q, double skew = 0.0)
+        {
+            double x = Math.Log(f / k);
+            double s = vol * Math.Sqrt(t);
+            double digit = JaeckelBlackFormula.NormalisedDigit(x, s, q);
+            if (!DoubleUtils.EqualZero(skew))
+            {
+                double vega, temp;
+                Greeks(f, k, t, vol, out temp, out temp, out vega, out temp, out temp);
+                digit += (q > 0.0 ? -1.0 : 1.0) * skew * vega;
+            }
+            return digit;
+        }
+        
+        /// <summary>
         /// Black implied volatility from a given price
         /// </summary>
         /// <param name="price"> option price </param>
@@ -54,7 +78,7 @@ namespace pragmatic_quant_model.Maths
                     price / Math.Sqrt(f * k), x, q, n) /
                 Math.Sqrt(t);
         }
-
+        
         /// <summary>
         /// Black model second order greeks
         /// Gamma : d^2P / df^2
@@ -498,6 +522,12 @@ namespace pragmatic_quant_model.Maths
                 ? MathConsts.InvSqrtTwoPi * Math.Exp(-0.125 * s * s)
                 : ((s <= 0 || s <= ax * SqrtDblMin) ? 0 : MathConsts.InvSqrtTwoPi * Math.Exp(-0.5 * ((x * x / (s * s)) + (0.25 * s * s))));
         }
+
+        public static double NormalisedDigit(double x, double s, double q)
+        {
+            double d2 = x / s - 0.5 * s;
+            return NormalDistribution.Cumulative(q > 0.0 ? d2 : -d2);
+        }
         
         #region private methods
         private static double householder_factor(double newton, double halley, double hh3)
@@ -567,8 +597,7 @@ namespace pragmatic_quant_model.Maths
         //
         // NOTE that this function returns 0 when beta<intrinsic without any safety checks.
         //
-        public static double UncheckedNormalisedImpliedVolatility(double beta, double x,
-            double q /* q=±1 */, int n)
+        public static double UncheckedNormalisedImpliedVolatility(double beta, double x, double q, int n)
         {
             // Subtract intrinsic.
             if (q * x > 0.0)
