@@ -60,14 +60,13 @@ namespace pragmatic_quant_com.Factories
         public static bool Has(this object[,] bag, string name, out int row, out int col)
         {
             var loweredName = name.ToLowerInvariant().Trim();
-
             for (col = bag.GetLowerBound(1); col <= bag.GetUpperBound(1); ++col)
             {
                 for (row = bag.GetLowerBound(0); row <= bag.GetUpperBound(0); ++row)
                 {
                     var val = bag[row, col];
                     var valAsString = val as string;
-                    if (valAsString != null && valAsString.ToLowerInvariant().Trim().Equals(loweredName))
+                    if (valAsString != null && valAsString.Trim().Equals(loweredName, StringComparison.OrdinalIgnoreCase))
                         return true;
                 }
             }
