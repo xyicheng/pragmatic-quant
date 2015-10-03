@@ -1,24 +1,30 @@
 using System.Runtime.InteropServices;
+using System.Threading;
 using ExcelDna.Integration;
 
 namespace pragmatic_quant_com
 {
     [ComVisible(false)]
-    class PragmaticQuantAddin : IExcelAddIn
+    internal class PragmaticQuantAddin : IExcelAddIn
     {
-        private LoggerForm loggerForm;
+        private Thread loggerThread;
         public void AutoOpen()
         {
-            //ComServer.DllRegisterServer();
-
-            loggerForm = new LoggerForm();
-            loggerForm.Show();
+            if (loggerThread == null)
+            {
+                loggerThread = new Thread(() =>
+                {
+                    var loggerForm = new LoggerForm();
+                    loggerForm.Show();
+                    System.Windows.Forms.Application.Run(loggerForm);
+                });
+                loggerThread.Start();
+            }
         }
         public void AutoClose()
         {
-            //ComServer.DllUnregisterServer();
-
-            loggerForm.Close();
+            if (loggerThread != null)
+                loggerThread.Abort();
         }
     }
 }
