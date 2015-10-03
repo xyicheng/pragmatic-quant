@@ -18,7 +18,7 @@ namespace pragmatic_quant_com
         }
         public MarketManager()
         {
-            marketByIds= new Dictionary<string, Market>();
+            marketByIds = new Dictionary<string, Market>();
         }
         #endregion
         

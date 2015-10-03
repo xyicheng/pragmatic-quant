@@ -16,7 +16,7 @@ namespace pragmatic_quant_com
             Category = "PragmaticQuant_PricingFunctions")]
         public static object Price(object requestObj, object[,] productBag, object mktObj, object[,] modelBag, object[,] algorithmBag)
         {
-            try
+            return XlFunctionRunner.Run("Price", () =>
             {
                 Trace.WriteLine("Start pricing preparation...");
                 var timer = new Stopwatch();
@@ -29,7 +29,7 @@ namespace pragmatic_quant_com
 
                 timer.Stop();
                 Trace.WriteLine(String.Format("Pricing preparation done in {0} min {1} s {2} ms",
-                                    timer.Elapsed.Minutes, timer.Elapsed.Seconds, timer.Elapsed.Milliseconds));
+                    timer.Elapsed.Minutes, timer.Elapsed.Seconds, timer.Elapsed.Milliseconds));
 
                 Trace.WriteLine("Start model calibration...");
                 timer.Restart();
@@ -39,7 +39,7 @@ namespace pragmatic_quant_com
 
                 timer.Stop();
                 Trace.WriteLine(String.Format("Model calibration done in {0} min {1} s {2} ms",
-                                    timer.Elapsed.Minutes, timer.Elapsed.Seconds, timer.Elapsed.Milliseconds));
+                    timer.Elapsed.Minutes, timer.Elapsed.Seconds, timer.Elapsed.Milliseconds));
 
                 Trace.WriteLine("Start Monte-Carlo simulation...");
                 timer.Restart();
@@ -49,18 +49,13 @@ namespace pragmatic_quant_com
 
                 timer.Stop();
                 Trace.WriteLine(String.Format("Monte-Carlo simulation done in {0} min {1} s {2} ms",
-                                    timer.Elapsed.Minutes, timer.Elapsed.Seconds, timer.Elapsed.Milliseconds));
+                    timer.Elapsed.Minutes, timer.Elapsed.Seconds, timer.Elapsed.Milliseconds));
                 Trace.WriteLine("");
 
                 return PriceResultPublisher.Instance.Publish(priceResult);
-            }
-            catch (Exception e)
-            {
-                var error = new object[1, 1];
-                error[0, 0] = string.Format("ERROR, {0}", e.Message);
-                return error;
-            }
+            });
         }
     }
-
+    
+    
 }

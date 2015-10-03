@@ -12,7 +12,7 @@ namespace pragmatic_quant_com
         public static object Sobol(string directionType, int dimension, int nbPaths,
             int nbSkippedPaths, object startDimIndexDisplay)
         {
-            try
+            return XlFunctionRunner.Run("CubicSpline", () =>
             {
                 SobolDirection direction;
                 if (!Enum.TryParse(directionType, true, out direction))
@@ -37,17 +37,13 @@ namespace pragmatic_quant_com
                         result[i, j] = sample[startIndex + j];
                 }
                 return result;
-            }
-            catch (Exception e)
-            {
-                return string.Format("FAILURE '{0}'", e.Message);
-            }
+            });
         }
 
         [ExcelFunction(Description = "Cubic spline interpolation", Category = "PragmaticQuant_Math")]
         public static object CubicSpline(double[] abscissae, double[] values, double[] points)
         {
-            try
+            return XlFunctionRunner.Run("CubicSpline", () =>
             {
                 var interpoler = SplineInterpoler.BuildCubicSpline(abscissae, values);
 
@@ -57,11 +53,7 @@ namespace pragmatic_quant_com
                     result[i, 0] = interpoler.Eval(points[i]);
                 }
                 return result;
-            }
-            catch (Exception e)
-            {
-                return string.Format("FAILURE '{0}'", e.Message);
-            }
+            });
         }
     }
 }

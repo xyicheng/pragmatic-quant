@@ -10,7 +10,7 @@ namespace pragmatic_quant_com
         [ExcelFunction(Description = "Compute vanilla option price within Bachelier model", Category = "PragmaticQuant_VanillaOption")]
         public static object BachelierOption(double forward, double strike, double maturity, double vol, string optionType)
         {
-            try
+            return XlFunctionRunner.Run("BachelierOption", () =>
             {
                 double q;
                 switch (optionType.Trim().ToLower())
@@ -25,17 +25,13 @@ namespace pragmatic_quant_com
                         throw new Exception(string.Format("Unknow option type : {0}", optionType));
                 }
                 return Bachelier.Price(forward, strike, vol, maturity, q);
-            }
-            catch (Exception e)
-            {
-                return string.Format("FAILURE '{0}'", e.Message);
-            }
+            });
         }
 
         [ExcelFunction(Description = "Compute vanilla option implied vol within Bachelier model", Category = "PragmaticQuant_VanillaOption")]
         public static object BachelierImpliedVol(double forward, double strike, double maturity, double price, string optionType)
         {
-            try
+            return XlFunctionRunner.Run("BachelierImpliedVol", () =>
             {
                 double q;
                 switch (optionType.Trim().ToLower())
@@ -50,17 +46,13 @@ namespace pragmatic_quant_com
                         throw new Exception(string.Format("Unknow option type : {0}", optionType));
                 }
                 return Bachelier.ImpliedVol(price, forward, strike, maturity, q);
-            }
-            catch (Exception e)
-            {
-                return string.Format("FAILURE '{0}'", e.Message);
-            }
+            });
         }
 
         [ExcelFunction(Description = "Compute vanilla option greek within Bachelier model", Category = "PragmaticQuant_VanillaOption")]
         public static object BachelierGreek(double fwd, double strike, double maturity, double vol, string request)
         {
-            try
+            return XlFunctionRunner.Run("BachelierGreek", () =>
             {
                 double gamma, theta, vega, vanna, vomma;
                 Bachelier.Greeks(fwd, strike, maturity, vol,
@@ -80,17 +72,13 @@ namespace pragmatic_quant_com
                     default:
                         throw new Exception(string.Format("Unknow greek : {0}", request));
                 }
-            }
-            catch (Exception e)
-            {
-                return string.Format("FAILURE '{0}'", e.Message);
-            }
+            });
         }
 
         [ExcelFunction(Description = "Compute vanilla option price within Black-Scholes model", Category = "PragmaticQuant_VanillaOption")]
         public static object BlackOption(double forward, double strike, double maturity, double vol, string optionType)
         {
-            try
+            return XlFunctionRunner.Run("BlackOption", () =>
             {
                 double q;
                 switch (optionType.Trim().ToLower())
@@ -106,17 +94,13 @@ namespace pragmatic_quant_com
                 }
 
                 return BlackScholesOption.Price(forward, strike, vol, maturity, q);
-            }
-            catch (Exception e)
-            {
-                return string.Format("FAILURE '{0}'", e.Message);
-            }
+            });
         }
 
         [ExcelFunction(Description = "Compute vanilla option implied vol within Black-Scholes model", Category = "PragmaticQuant_VanillaOption")]
         public static object BlackImpliedVol(double forward, double strike, double maturity, double price, string optionType)
         {
-            try
+            return XlFunctionRunner.Run("BlackImpliedVol", () =>
             {
                 double q;
                 switch (optionType.Trim().ToLower())
@@ -131,17 +115,13 @@ namespace pragmatic_quant_com
                         throw new Exception(string.Format("Unknow option type : {0}", optionType));
                 }
                 return BlackScholesOption.ImpliedVol(price, forward, strike, maturity, q);
-            }
-            catch (Exception e)
-            {
-                return string.Format("FAILURE '{0}'", e.Message);
-            }
+            });
         }
 
         [ExcelFunction(Description = "Compute vanilla option greek within Black-Scholes model", Category = "PragmaticQuant_VanillaOption")]
         public static object BlackGreek(double fwd, double strike, double maturity, double vol, string request)
         {
-            try
+            return XlFunctionRunner.Run("BlackGreek", () =>
             {
                 double gamma, theta, vega, vanna, vomma;
                 BlackScholesOption.Greeks(fwd, strike, maturity, vol,
@@ -161,11 +141,7 @@ namespace pragmatic_quant_com
                     default:
                         throw new Exception(string.Format("Unknow greek : {0}", request));
                 }
-            }
-            catch (Exception e)
-            {
-                return string.Format("FAILURE '{0}'", e.Message);
-            }
+            });
         }
     }
 }
