@@ -24,15 +24,15 @@ namespace pragmatic_quant_model.Model
         {
             var result = new Dictionary<Type, IFactorRepresentationFactory>
             {
-                {typeof (Hw1ModelDescription), Hw1FactorRepresentationFactory.Instance},
-                {typeof (BlackScholesModelDescription), EquityFactorRepresentationFactory.Instance},
-                {typeof (LocalVolModelDescription), EquityFactorRepresentationFactory.Instance}
+                {typeof (Hw1Model), Hw1FactorRepresentationFactory.Instance},
+                {typeof (BlackScholesModel), EquityFactorRepresentationFactory.Instance},
+                {typeof (LocalVolatilityModel), EquityFactorRepresentationFactory.Instance}
             };
             return result;
         }
         #endregion
 
-        public static IFactorRepresentationFactory For(IModelDescription model)
+        public static IFactorRepresentationFactory For(IModel model)
         {
             IFactorRepresentationFactory factorRepresentationFactory;
             if (factories.TryGetValue(model.GetType(), out factorRepresentationFactory))

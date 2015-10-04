@@ -12,7 +12,7 @@ namespace pragmatic_quant_model.Pricing
     {
         #region private fields
         private readonly McModelFactory mcModelFactory;
-        private readonly MonteCarloConfig mcConfig;
+        private readonly int nbPaths;
         #endregion
         #region private methods
         private McEngine<PathFlows<double, PaymentInfo>, PathFlows<double, PaymentInfo>> McEngine(IProduct product, McModel mcModel)
@@ -24,19 +24,10 @@ namespace pragmatic_quant_model.Pricing
                 (mcModel.RandomGenerator, processPathFlowGen, PriceFlowsAggregator.Value);
         }
         #endregion
-        public McPricer(McModelFactory mcModelFactory, MonteCarloConfig mcConfig)
+        public McPricer(MonteCarloConfig mcConfig)
         {
-            this.mcModelFactory = mcModelFactory;
-            this.mcConfig = mcConfig;
-        }
-
-        public static McPricer For(IModelDescription modelDescription, MonteCarloConfig mcConfig)
-        {
-            var mcModelFactory = new McModelFactory(
-                FactorRepresentationFactories.For(modelDescription),
-                ModelPathGeneratorFactories.For(modelDescription, mcConfig),
-                mcConfig.RandomGenerator);
-            return new McPricer(mcModelFactory, mcConfig);
+            mcModelFactory = new McModelFactory(mcConfig);
+            nbPaths = mcConfig.NbPaths;
         }
 
         public PriceResult Price(IProduct product, IModel model, Market market)
@@ -45,7 +36,7 @@ namespace pragmatic_quant_model.Pricing
             McModel mcModel = mcModelFactory.Build(model, market, simulatedDates);
             var mcEngine = McEngine(product, mcModel);
             
-            PathFlows<double, PaymentInfo> result = mcEngine.Run(mcConfig.NbPaths);
+            PathFlows<double, PaymentInfo> result = mcEngine.Run(nbPaths);
             
             var refCurrency = product.Financing.Currency;
             var priceDetails = new Dictionary<PaymentInfo, Price>();

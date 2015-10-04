@@ -44,7 +44,7 @@ namespace pragmatic_quant_com
                 Trace.WriteLine("Start Monte-Carlo simulation...");
                 timer.Restart();
 
-                IPricer pricer = McPricer.For(modelDesc, algorithm as MonteCarloConfig);
+                IPricer pricer = new McPricer(algorithm as MonteCarloConfig);
                 PriceResult priceResult = pricer.Price(product, model, market);
 
                 timer.Stop();

@@ -9,11 +9,11 @@ namespace pragmatic_quant_model.MonteCarlo
     public class McModel
     {
         public McModel(IFactorModelRepresentation factorRepresentation,
-            DateTime[] simulatedDates,
-            IRandomGenerator randomGenerator,
-            BrownianBridge brownianBridge,
-            IProcessPathGenerator processPathGen,
-            PaymentInfo probaMeasure, double numeraire0)
+                       DateTime[] simulatedDates,
+                       IRandomGenerator randomGenerator,
+                       BrownianBridge brownianBridge,
+                       IProcessPathGenerator processPathGen,
+                       PaymentInfo probaMeasure, double numeraire0)
         {
             Numeraire0 = numeraire0;
             ProbaMeasure = probaMeasure;

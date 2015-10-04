@@ -49,15 +49,13 @@ namespace test.Model
             var zeroVol = new MapRawDatas<DateOrDuration, double>(new[] {new DateOrDuration(assetMkt.RefDate)}, new[] {0.0});
             var blackScholesDesc = new BlackScholesModelDescription(assetMkt.Asset.Name, zeroVol, true);
             var mcConfig = new MonteCarloConfig(1, RandomGenerators.GaussianSobol(SobolDirection.Kuo3));
-
             var blackScholesModel = ModelFactories.For(blackScholesDesc).Build(blackScholesDesc, market);
-            var mcPricer = McPricer.For(blackScholesDesc, mcConfig);
-
+            
             var fwdDates = new[] {Duration.Month, 6 * Duration.Month, Duration.Year, 2 * Duration.Year, 5 * Duration.Year}
                                 .Map(d => assetMkt.RefDate + d);
 
             IProduct fwdLeg = ForwardLeg(fwdDates);
-            PriceResult priceResult = mcPricer.Price(fwdLeg, blackScholesModel, market);
+            PriceResult priceResult = new McPricer(mcConfig).Price(fwdLeg, blackScholesModel, market);
             double[] fwds = priceResult.Details.Map(kv => kv.Value.Value);
 
             var assetFwdCurve = assetMkt.Forward();

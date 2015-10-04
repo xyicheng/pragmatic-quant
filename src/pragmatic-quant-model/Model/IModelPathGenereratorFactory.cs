@@ -25,15 +25,15 @@ namespace pragmatic_quant_model.Model
         {
             var result = new Dictionary<Type, Func<MonteCarloConfig, IModelPathGenereratorFactory>>
             {
-                {typeof (Hw1ModelDescription), mcConfig => new Hw1ModelPathGeneratorFactory(mcConfig)},
-                {typeof (BlackScholesModelDescription), mcConfig => new BlackScholesEqtyPathGenFactory(mcConfig)},
-                {typeof (LocalVolModelDescription), mcConfig => new LocalVolPathGenFactory(mcConfig)}
+                {typeof (Hw1Model), mcConfig => new Hw1ModelPathGeneratorFactory(mcConfig)},
+                {typeof (BlackScholesModel), mcConfig => new BlackScholesEqtyPathGenFactory(mcConfig)},
+                {typeof (LocalVolatilityModel), mcConfig => new LocalVolPathGenFactory(mcConfig)}
             };
             return result;
         }
         #endregion
 
-        public static IModelPathGenereratorFactory For(IModelDescription model, MonteCarloConfig mcConfig)
+        public static IModelPathGenereratorFactory For(IModel model, MonteCarloConfig mcConfig)
         {
             Func<MonteCarloConfig, IModelPathGenereratorFactory> modelPathGenfactory;
             if (factories.TryGetValue(model.GetType(), out modelPathGenfactory))

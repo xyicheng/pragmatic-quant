@@ -12,9 +12,7 @@ namespace pragmatic_quant_model.MonteCarlo
     public class McModelFactory
     {
         #region private fields
-        private readonly IFactorRepresentationFactory factorRepresentationFactory;
-        private readonly IModelPathGenereratorFactory modelPathGenFactory;
-        private readonly IRandomGeneratorFactory randGeneratorFactory;
+        private readonly MonteCarloConfig mcConfig;
         #endregion
         #region private methods
         private PaymentInfo ProbaMeasure(IEnumerable<DateTime> simulatedDates, IModel model)
@@ -23,26 +21,24 @@ namespace pragmatic_quant_model.MonteCarlo
             return new PaymentInfo(model.PivotCurrency, horizon);
         }
         #endregion
-
-        public McModelFactory(IFactorRepresentationFactory factorRepresentationFactory, 
-            IModelPathGenereratorFactory modelPathGenFactory, 
-            IRandomGeneratorFactory randGeneratorFactory)
+        public McModelFactory(MonteCarloConfig mcConfig)
         {
-            this.factorRepresentationFactory = factorRepresentationFactory;
-            this.modelPathGenFactory = modelPathGenFactory;
-            this.randGeneratorFactory = randGeneratorFactory;
+            this.mcConfig = mcConfig;
         }
 
         public McModel Build(IModel model, Market market, DateTime[] simulatedDates)
         {
             PaymentInfo probaMeasure = ProbaMeasure(simulatedDates, model);
-            
+
+            var factorRepresentationFactory = FactorRepresentationFactories.For(model);
             IFactorModelRepresentation factorRepresentation = factorRepresentationFactory.Build(model, market, probaMeasure);
+
+            var modelPathGenFactory = ModelPathGeneratorFactories.For(model, mcConfig);
             IProcessPathGenerator processPathGenerator = modelPathGenFactory.Build(model, market, probaMeasure, simulatedDates);
 
             BrownianBridge brownianBridge = BrownianBridge.Create(processPathGenerator.AllSimulatedDates);
             int randomDim = brownianBridge.GaussianSize(processPathGenerator.ProcessDim);
-            IRandomGenerator randomGenerator = randGeneratorFactory.Build(randomDim);
+            IRandomGenerator randomGenerator = mcConfig.RandomGenerator.Build(randomDim);
             double numeraire0 = market.DiscountCurve(probaMeasure.Financing).Zc(probaMeasure.Date);
             
             return new McModel(factorRepresentation, simulatedDates, 

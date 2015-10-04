@@ -52,12 +52,8 @@ namespace test.MonteCarlo
             var hw1 = new Hw1Model(TimeMeasure.Act365(market.RefDate), Currency.Eur, lambda, sigma);
             var mcConfig = new MonteCarloConfig(20000,
                 RandomGenerators.GaussianSobol(SobolDirection.JoeKuoD5));
-
-            var mcModelFactory = new McModelFactory(
-                Hw1FactorRepresentationFactory.Instance,
-                new Hw1ModelPathGeneratorFactory(),
-                mcConfig.RandomGenerator);
-            var mcPricer = new McPricer(mcModelFactory, mcConfig);
+            
+            var mcPricer = new McPricer(mcConfig);
 
             var fixedLeg = Leg(market.RefDate);
             var mcPriceResult = mcPricer.Price(fixedLeg, hw1, market);
