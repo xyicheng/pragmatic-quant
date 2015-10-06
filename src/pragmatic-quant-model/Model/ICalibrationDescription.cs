@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Model.Equity.BlackScholes;
 using pragmatic_quant_model.Model.Equity.LocalVolatility;
@@ -15,7 +16,7 @@ namespace pragmatic_quant_model.Model
         IModelDescription Calibrate(ICalibrationDescription calibDescription, Market market);
     }
 
-    public static class ModelCalibrations
+    public class ModelCalibration : Singleton<ModelCalibration>, IModelCalibration
     {
         #region private fields
         private static readonly IDictionary<Type, IModelCalibration> factories = GetFactories();
@@ -36,11 +37,11 @@ namespace pragmatic_quant_model.Model
         }
         #endregion
 
-        public static IModelCalibration For(ICalibrationDescription calibDescription)
+        public IModelDescription Calibrate(ICalibrationDescription calibDescription, Market market)
         {
             IModelCalibration modelfactory;
             if (factories.TryGetValue(calibDescription.GetType(), out modelfactory))
-                return modelfactory;
+                return modelfactory.Calibrate(calibDescription, market);
             throw new ArgumentException(string.Format("Missing Model Calibration for {0}", calibDescription));
         }
     }

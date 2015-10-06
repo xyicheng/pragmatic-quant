@@ -28,6 +28,7 @@ namespace pragmatic_quant_model.MonteCarlo
                 var randoms = randomGenerator.Next();
                 pathGenerator.ComputePath(ref pathResults[i], randoms);
             }
+            
             var result = pathResultAggregator.Aggregate(pathResults);
             return result;
         }

@@ -5,7 +5,6 @@ using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.MarketDatas;
-using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Function;
 using pragmatic_quant_model.Model.Equity;
 using pragmatic_quant_model.Model.Equity.BlackScholes;
@@ -21,7 +20,7 @@ namespace pragmatic_quant_model.Model
         IModel Build(IModelDescription modelDescription, Market market);
     }
 
-    public static class ModelFactories
+    public class ModelFactory : Singleton<ModelFactory>, IModelFactory
     {
         #region private fields
         private static readonly IDictionary<Type, IModelFactory> factories = GetFactories();
@@ -39,11 +38,11 @@ namespace pragmatic_quant_model.Model
         }
         #endregion
 
-        public static IModelFactory For(IModelDescription modelDescription)
+        public IModel Build(IModelDescription modelDescription, Market market)
         {
             IModelFactory modelfactory;
             if (factories.TryGetValue(modelDescription.GetType(), out modelfactory))
-                return modelfactory;
+                return modelfactory.Build(modelDescription, market);
             throw new ArgumentException(string.Format("Missing Model Factory for {0}", modelDescription));
         }
     }

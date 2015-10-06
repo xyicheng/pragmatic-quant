@@ -1,8 +1,11 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using ExcelDna.Integration;
+using pragmatic_quant_model.Basic;
 
 namespace pragmatic_quant_com
 {
@@ -40,9 +43,46 @@ namespace pragmatic_quant_com
             }
             catch (Exception e)
             {
-                Trace.TraceError(e.Message);
+                var aggregateException = e as AggregateException;
+                if (aggregateException != null)
+                {
+                    foreach (var exception in aggregateException.InnerExceptions)
+                        Trace.TraceError(exception.Message);
+                }
+                else
+                {
+                    Trace.TraceError(e.Message);
+                }
+                
                 return string.Format("ERROR while running {0}", functionName);
             }
         }
+
+        public static Task<T> ComputationTaskWithLog<T>(this TaskFactory taskFactory, string computationName, Func<T> computation, params Task[] requiredTasks)
+        {
+            Func<T> taskActionWithLog = () =>
+            {
+                var tasksFailures = requiredTasks.Where(t => t.IsFaulted && t.Exception != null)
+                                               .Map(t => t.Exception);
+                if (tasksFailures.Any())
+                    throw tasksFailures.First();
+                
+                var timer = new Stopwatch();
+                Trace.WriteLine(string.Format("Start {0}...", computationName));
+                timer.Restart();
+
+                var result = computation();
+
+                timer.Stop();
+                Trace.WriteLine(String.Format("{3} done in {0} min {1} s {2} ms",
+                    timer.Elapsed.Minutes, timer.Elapsed.Seconds, timer.Elapsed.Milliseconds, computationName));
+                return result;
+            };
+
+            if (requiredTasks.Length > 0)
+                return taskFactory.ContinueWhenAll(requiredTasks, r => taskActionWithLog());
+            return taskFactory.StartNew(() => taskActionWithLog());
+        }
+
     }
 }

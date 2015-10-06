@@ -49,7 +49,7 @@ namespace test.Model
             var zeroVol = new MapRawDatas<DateOrDuration, double>(new[] {new DateOrDuration(assetMkt.RefDate)}, new[] {0.0});
             var blackScholesDesc = new BlackScholesModelDescription(assetMkt.Asset.Name, zeroVol, true);
             var mcConfig = new MonteCarloConfig(1, RandomGenerators.GaussianSobol(SobolDirection.Kuo3));
-            var blackScholesModel = ModelFactories.For(blackScholesDesc).Build(blackScholesDesc, market);
+            var blackScholesModel = ModelFactory.Instance.Build(blackScholesDesc, market);
             
             var fwdDates = new[] {Duration.Month, 6 * Duration.Month, Duration.Year, 2 * Duration.Year, 5 * Duration.Year}
                                 .Map(d => assetMkt.RefDate + d);

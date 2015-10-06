@@ -123,11 +123,11 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
             var numeraireDiscount = market.DiscountCurve(probaMeasure.Financing);
             DiscountCurve assetDiscount = assetMkt.AssetFinancingCurve(numeraireDiscount);
             double forward = assetMkt.Spot / assetDiscount.Zc(probaMeasure.Date);
-
+            
             LocalVolSimulatorStepDatas[] stepSimulDatas = EnumerableUtils.For(0, simulatedDates.Length,
                 i => StepSimulDatas(i > 0 ? simulatedDates[i - 1] : market.RefDate, simulatedDates[i],
                                   model, assetDiscount, probaMeasure.Date));
-
+            
             return new LocalVolEquityPathGenerator(stepSimulDatas, forward);
         }
     }

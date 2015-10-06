@@ -26,7 +26,7 @@ namespace pragmatic_quant_com
                 Market market = MarketManager.Instance.GetMarket(mktObj);
                 ICalibrationDescription modelCalibDesc = ModelCalibrationFactory.Instance.Build(modelBag);
                 INumericalMethodConfig algorithm = AlgorithmFactory.Instance.Build(algorithmBag);
-
+                
                 timer.Stop();
                 Trace.WriteLine(String.Format("Pricing preparation done in {0} min {1} s {2} ms",
                     timer.Elapsed.Minutes, timer.Elapsed.Seconds, timer.Elapsed.Milliseconds));
@@ -34,8 +34,8 @@ namespace pragmatic_quant_com
                 Trace.WriteLine("Start model calibration...");
                 timer.Restart();
 
-                IModelDescription modelDesc = ModelCalibrations.For(modelCalibDesc).Calibrate(modelCalibDesc, market);
-                IModel model = ModelFactories.For(modelDesc).Build(modelDesc, market);
+                IModelDescription modelDesc = ModelCalibration.Instance.Calibrate(modelCalibDesc, market);
+                IModel model = ModelFactory.Instance.Build(modelDesc, market);
 
                 timer.Stop();
                 Trace.WriteLine(String.Format("Model calibration done in {0} min {1} s {2} ms",
@@ -55,6 +55,43 @@ namespace pragmatic_quant_com
                 return PriceResultPublisher.Instance.Publish(priceResult);
             });
         }
+
+        #region work in progress
+        /*
+        [ExcelFunction(Description = "Exotic product pricing function",
+            Category = "PragmaticQuant_PricingFunctions")]
+        public static object Price(object requestObj, object[,] productBag, object mktObj, object[,] modelBag, object[,] algorithmBag)
+        {
+            return XlFunctionRunner.Run("Price", () =>
+            {
+                Trace.WriteLine("");
+                TaskFactory f = Task.Factory;
+                var market = f.ComputationTaskWithLog("market preparation", () => MarketManager.Instance.GetMarket(mktObj));
+                var modelCalibDesc = f.ComputationTaskWithLog("model preparation", () => ModelCalibrationFactory.Instance.Build(modelBag));
+                var pricer = f.ComputationTaskWithLog("pricer preparation", () =>
+                {
+                    var algorithm = AlgorithmFactory.Instance.Build(algorithmBag);
+                    return new McPricer(algorithm as MonteCarloConfig);
+                });
+                
+                var product = f.ComputationTaskWithLog("Product preparation", 
+                    () => ProductFactory.Instance.Build(productBag));
+
+                var model = f.ComputationTaskWithLog("Model calibration", () =>
+                {
+                    IModelDescription modelDesc = ModelCalibration.Instance.Calibrate(modelCalibDesc.Result, market.Result);
+                    return ModelFactory.Instance.Build(modelDesc, market.Result);
+                }, market, modelCalibDesc);
+
+                var priceResult = f.ComputationTaskWithLog("Monte-Carlo simulation",
+                    () => pricer.Result.Price(product.Result, model.Result, market.Result), product, model, market, pricer);
+                
+                Trace.WriteLine("");
+                return PriceResultPublisher.Instance.Publish(priceResult.Result);
+            });
+        }
+        */
+        #endregion
     }
     
     
