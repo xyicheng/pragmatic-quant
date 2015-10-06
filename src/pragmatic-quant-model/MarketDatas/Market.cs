@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using pragmatic_quant_model.Basic;
 
 namespace pragmatic_quant_model.MarketDatas
 {

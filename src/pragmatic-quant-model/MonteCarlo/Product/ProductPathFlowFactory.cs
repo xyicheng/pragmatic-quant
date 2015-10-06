@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using pragmatic_quant_model.Basic;
+using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Product;
 
 namespace pragmatic_quant_model.MonteCarlo.Product

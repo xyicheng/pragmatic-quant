@@ -5,7 +5,7 @@ using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Maths.Function;
 using pragmatic_quant_model.Maths.Interpolation;
-using pragmatic_quant_model.Model.Equity;
+using pragmatic_quant_model.Model.Equity.Dividends;
 using pragmatic_quant_model.Model.Equity.LocalVolatility;
 
 namespace pragmatic_quant_model.MarketDatas

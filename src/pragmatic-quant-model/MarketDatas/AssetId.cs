@@ -1,3 +1,5 @@
+using pragmatic_quant_model.Basic;
+
 namespace pragmatic_quant_model.MarketDatas
 {
     public class AssetId

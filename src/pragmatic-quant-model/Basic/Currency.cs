@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace pragmatic_quant_model.MarketDatas
+namespace pragmatic_quant_model.Basic
 {
     public class Currency
     {

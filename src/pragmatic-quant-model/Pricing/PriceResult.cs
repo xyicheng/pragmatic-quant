@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using pragmatic_quant_model.Basic;
+using pragmatic_quant_model.MarketDatas;
 
-namespace pragmatic_quant_model.Product
+namespace pragmatic_quant_model.Pricing
 {
     public class PriceResult
     {

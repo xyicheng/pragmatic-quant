@@ -4,7 +4,7 @@ using System.Linq;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Maths.Stochastic;
-using pragmatic_quant_model.Product;
+using pragmatic_quant_model.Model.Equity.Dividends;
 
 namespace pragmatic_quant_model.Model.Equity.BlackScholes
 {

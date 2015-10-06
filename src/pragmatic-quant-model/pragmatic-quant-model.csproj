@@ -151,7 +151,7 @@
     <Compile Include="Basic\Dates\TimeMeasure.cs" />
     <Compile Include="MarketDatas\AssetId.cs" />
     <Compile Include="MarketDatas\AssetMarket.cs" />
-    <Compile Include="MarketDatas\Currency.cs" />
+    <Compile Include="Basic\Currency.cs" />
     <Compile Include="MarketDatas\DiscountCurve.cs" />
     <Compile Include="MarketDatas\FinancingId.cs" />
     <Compile Include="MarketDatas\Market.cs" />
@@ -160,6 +160,7 @@
     <Compile Include="Maths\RootUtils.cs" />
     <Compile Include="Maths\FiniteDifferenceUtils.cs" />
     <Compile Include="Model\Equity\EquityModel.cs" />
+    <Compile Include="Model\Equity\LocalVolatility\LocalVariance.cs" />
     <Compile Include="Model\Equity\LocalVolatility\LocalVolatilityModel.cs" />
     <Compile Include="Model\Equity\LocalVolatility\LocalVolPathGenFactory.cs" />
     <Compile Include="Model\Equity\LocalVolatility\VarianceInterpoler.cs" />
@@ -189,7 +190,7 @@
     <Compile Include="Model\Equity\BlackScholes\BlackScholesEqtyPathGenFactory.cs" />
     <Compile Include="Model\Equity\BlackScholes\BlackScholesModel.cs" />
     <Compile Include="Model\Equity\BlackScholes\BlackScholesModelDescription.cs" />
-    <Compile Include="Model\Equity\DiscreteLocalDividend.cs" />
+    <Compile Include="Model\Equity\Dividends\DiscreteLocalDividend.cs" />
     <Compile Include="Model\ExplicitCalibration.cs" />
     <Compile Include="Model\HullWhite\Hw1Model.cs" />
     <Compile Include="Model\HullWhite\Hw1ModelZcRepresentation.cs" />
@@ -225,7 +226,7 @@
     <Compile Include="Product\CouponDsl\DslCouponCompiler.cs" />
     <Compile Include="Product\CouponDsl\DslCouponData.cs" />
     <Compile Include="Product\GenericLegFactory.cs" />
-    <Compile Include="Product\PaymentInfo.cs" />
+    <Compile Include="MarketDatas\PaymentInfo.cs" />
     <Compile Include="MonteCarlo\Product\IProductPathFlow.cs" />
     <Compile Include="MonteCarlo\Product\ProductPathFlowCalculator.cs" />
     <Compile Include="MonteCarlo\Product\ProductPathFlowFactory.cs" />
@@ -234,7 +235,7 @@
     <Compile Include="Product\Coupon.cs" />
     <Compile Include="Product\IObservation.cs" />
     <Compile Include="Product\IProduct.cs" />
-    <Compile Include="Product\PriceResult.cs" />
+    <Compile Include="Pricing\PriceResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.MarketDatas;
-using pragmatic_quant_model.Product;
 using pragmatic_quant_model.Product.CouponDsl;
 
 namespace test.Product

@@ -5,7 +5,6 @@ using pragmatic_quant_model.Model.Equity;
 using pragmatic_quant_model.Model.Equity.BlackScholes;
 using pragmatic_quant_model.Model.Equity.LocalVolatility;
 using pragmatic_quant_model.Model.HullWhite;
-using pragmatic_quant_model.Product;
 
 namespace pragmatic_quant_model.Model
 {

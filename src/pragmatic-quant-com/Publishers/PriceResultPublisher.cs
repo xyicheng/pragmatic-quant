@@ -4,7 +4,7 @@ using System.Linq;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.MarketDatas;
-using pragmatic_quant_model.Product;
+using pragmatic_quant_model.Pricing;
 
 namespace pragmatic_quant_com.Publishers
 {

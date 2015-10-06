@@ -3,7 +3,7 @@ using NUnit.Framework;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.MarketDatas;
-using pragmatic_quant_model.Model.Equity;
+using pragmatic_quant_model.Model.Equity.Dividends;
 
 namespace test.Model
 {

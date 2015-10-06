@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using pragmatic_quant_model.Basic;
@@ -8,116 +8,8 @@ using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Function;
 using pragmatic_quant_model.Maths.Integration;
 
-namespace pragmatic_quant_model.Model.Equity
+namespace pragmatic_quant_model.Model.Equity.Dividends
 {
-    public abstract class DiscreteLocalDividend
-    {
-        #region protected method
-        protected DiscreteLocalDividend(DateTime date)
-        {
-            Date = date;
-        }
-        #endregion
-
-        public static DiscreteLocalDividend AffineDividend(DateTime date, double cash, double yield)
-        {
-            return new AffineLocalDividend(date, cash, yield);
-        }
-        public static DiscreteLocalDividend ZeroDiv(DateTime date)
-        {
-            return AffineDividend(date, 0.0, 0.0);
-        }
-        public abstract double Value(double spotValue);
-        public DateTime Date { get; private set; }
-        
-        #region private class
-        private class AffineLocalDividend : DiscreteLocalDividend
-        {
-            private readonly double cash;
-            private readonly double yield;
-            public AffineLocalDividend(DateTime date, double cash, double yield)
-                : base(date)
-            {
-                this.cash = cash;
-                this.yield = yield;
-            }
-            public override double Value(double spotValue)
-            {
-                return yield * spotValue + cash;
-            }
-        }
-        #endregion
-    }
-
-    public class AffineDivCurveUtils
-    {
-        #region private fields
-        private readonly Func<double, double> assetGrowth;
-        private readonly StepFunction cashDivBpv;
-        private readonly RrFunction cashBpvIntegral;
-        //private readonly StepFunction squareTimeWeightedCash;
-        #endregion
-        public AffineDivCurveUtils(DividendQuote[] dividends,
-                                   DiscountCurve discountCurve,
-                                   ITimeMeasure time)
-        {
-            Contract.Requires(EnumerableUtils.IsSorted(dividends.Select(div => div.Date)));
-
-            if (dividends.Length > 0)
-            {
-                double[] divDates = dividends.Map(div => time[div.Date]);
-                double[] spotYieldGrowths = dividends.Scan(1.0, (prev, div) => prev * (1.0 - div.Yield));
-                var spotYieldGrowth = new StepFunction(divDates, spotYieldGrowths, 1.0);
-                assetGrowth = t => spotYieldGrowth.Eval(t) / discountCurve.Zc(t);
-
-                double[] discountedCashs = dividends.Map(div => div.Cash / assetGrowth(time[div.Date]));
-                double[] cashBpvs = discountedCashs.Scan(0.0, (prev, c) => prev + c);
-                cashDivBpv = new StepFunction(divDates, cashBpvs, 0.0);
-                cashBpvIntegral = cashDivBpv.Integral(0.0);
-
-                //double[] squareTimeWeightedCashs = discountedCashs.ZipWith(divDates, (c, t) => c * t * t);
-                //squareTimeWeightedCash = new StepFunction(divDates, squareTimeWeightedCashs, 0.0);
-            }
-            else
-            {
-                assetGrowth = t => 1.0 / discountCurve.Zc(t);
-                cashDivBpv = new StepFunction(new[] {0.0}, new[] {0.0}, double.NaN);
-                cashBpvIntegral = RrFunctions.Zero;
-                //squareTimeWeightedCash = new StepFunction(new[] { 0.0 }, new[] { 0.0 }, double.NaN);
-            }
-        }
-
-        public double AssetGrowth(double t)
-        {
-            return assetGrowth(t);
-        }
-        public double CashDivBpv(double t)
-        {
-            return cashDivBpv.Eval(t);
-        }
-        public double CashBpvAverage(double start, double end)
-        {
-            if (end > start)
-                return (cashBpvIntegral.Eval(end) - cashBpvIntegral.Eval(start)) / (end - start);
-            return cashBpvIntegral.Eval(start);
-        }
-        public double CashBpvTimeWeightedAverage(double t)
-        {
-            throw new NotImplementedException("todo");
-            //return cashDivBpv.Eval(t) - squareTimeWeightedCash.Eval(t) / (t * t );
-        }
-
-        public void LehmanProxy(double maturity, double spot,
-                                out double effectiveForward, out double strikeShift)
-        {
-            var growth = AssetGrowth(maturity);
-            var cashBpvAvg = CashBpvAverage(0.0, maturity);
-
-            effectiveForward = (spot - cashBpvAvg) * growth;
-            strikeShift = growth * (CashDivBpv(maturity) - cashBpvAvg);
-        }
-    }
-
     /// <summary>
     /// Vanilla option pricer for Black-Scholes model with dividends.
     /// </summary>
@@ -137,9 +29,9 @@ namespace pragmatic_quant_model.Model.Equity
         }
 
         public static BlackScholesWithDividendOption Build(double spot,
-                                                           DividendQuote[] dividends,
-                                                           DiscountCurve discountCurve,
-                                                           ITimeMeasure time)
+            DividendQuote[] dividends,
+            DiscountCurve discountCurve,
+            ITimeMeasure time)
         {
             var divUtils = new AffineDivCurveUtils(dividends, discountCurve, time);
             return new BlackScholesWithDividendOption(spot, divUtils);
@@ -172,7 +64,7 @@ namespace pragmatic_quant_model.Model.Equity
             {
                 double x = a * Math.Exp(stdDev * quadPoints[i]) + b;
                 double midTprice = (x > 0.0) ? BlackScholesOption.Price(x, k, vol, dT, q)
-                                             : (q > 0.0) ? 0.0 : k - x;
+                    : (q > 0.0) ? 0.0 : k - x;
                 price += quadWeights[i] * midTprice;
             }
             return price;
@@ -239,4 +131,72 @@ namespace pragmatic_quant_model.Model.Equity
         }
     }
 
+    public class AffineDivCurveUtils
+    {
+        #region private fields
+        private readonly Func<double, double> assetGrowth;
+        private readonly StepFunction cashDivBpv;
+        private readonly RrFunction cashBpvIntegral;
+        //private readonly StepFunction squareTimeWeightedCash;
+        #endregion
+        public AffineDivCurveUtils(DividendQuote[] dividends,
+                                   DiscountCurve discountCurve,
+                                   ITimeMeasure time)
+        {
+            Contract.Requires(EnumerableUtils.IsSorted(dividends.Select(div => div.Date)));
+
+            if (dividends.Length > 0)
+            {
+                double[] divDates = dividends.Map(div => time[div.Date]);
+                double[] spotYieldGrowths = dividends.Scan(1.0, (prev, div) => prev * (1.0 - div.Yield));
+                var spotYieldGrowth = new StepFunction(divDates, spotYieldGrowths, 1.0);
+                assetGrowth = t => spotYieldGrowth.Eval(t) / discountCurve.Zc(t);
+
+                double[] discountedCashs = dividends.Map(div => div.Cash / assetGrowth(time[div.Date]));
+                double[] cashBpvs = discountedCashs.Scan(0.0, (prev, c) => prev + c);
+                cashDivBpv = new StepFunction(divDates, cashBpvs, 0.0);
+                cashBpvIntegral = cashDivBpv.Integral(0.0);
+
+                //double[] squareTimeWeightedCashs = discountedCashs.ZipWith(divDates, (c, t) => c * t * t);
+                //squareTimeWeightedCash = new StepFunction(divDates, squareTimeWeightedCashs, 0.0);
+            }
+            else
+            {
+                assetGrowth = t => 1.0 / discountCurve.Zc(t);
+                cashDivBpv = new StepFunction(new[] { 0.0 }, new[] { 0.0 }, double.NaN);
+                cashBpvIntegral = RrFunctions.Zero;
+                //squareTimeWeightedCash = new StepFunction(new[] { 0.0 }, new[] { 0.0 }, double.NaN);
+            }
+        }
+
+        public double AssetGrowth(double t)
+        {
+            return assetGrowth(t);
+        }
+        public double CashDivBpv(double t)
+        {
+            return cashDivBpv.Eval(t);
+        }
+        public double CashBpvAverage(double start, double end)
+        {
+            if (end > start)
+                return (cashBpvIntegral.Eval(end) - cashBpvIntegral.Eval(start)) / (end - start);
+            return cashBpvIntegral.Eval(start);
+        }
+        public double CashBpvTimeWeightedAverage(double t)
+        {
+            throw new NotImplementedException("todo");
+            //return cashDivBpv.Eval(t) - squareTimeWeightedCash.Eval(t) / (t * t );
+        }
+
+        public void LehmanProxy(double maturity, double spot,
+                                out double effectiveForward, out double strikeShift)
+        {
+            var growth = AssetGrowth(maturity);
+            var cashBpvAvg = CashBpvAverage(0.0, maturity);
+
+            effectiveForward = (spot - cashBpvAvg) * growth;
+            strikeShift = growth * (CashDivBpv(maturity) - cashBpvAvg);
+        }
+    }
 }
