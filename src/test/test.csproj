@@ -142,7 +142,7 @@
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(SolutionDir)\pragmatic-quant-com\bin\Release\pragmatic-quant-com-AddIn.xll" "$(TargetDir)pragmatic-quant-com-AddIn.xll*" /C /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(SolutionDir)pragmatic-quant-com\bin\Release\pragmatic-quant-com-AddIn.xll" "$(TargetDir)pragmatic-quant-com-AddIn.xll*" /C /Y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,4 +1,7 @@
 <DnaLibrary Name="pragmatic-quant-com Add-In" RuntimeVersion="v4.0">
+  <Reference Path="pragmatic-quant-model.dll" Pack="true" />
+  <Reference Path="Irony.dll" Pack="true" />
+  <Reference Path="Irony.Interpreter.dll" Pack="true" />
   <ExternalLibrary Path="pragmatic-quant-com.dll"
                    ExplicitExports="true"
                    LoadFromBytes="true" 
