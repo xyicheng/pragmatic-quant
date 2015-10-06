@@ -14,6 +14,7 @@ namespace test
     public class RegressionTestRunner
     {
         #region Private Fields
+        private const string XllPath = @"pragmatic-quant-com-AddIn.xll";
         private Excel xl;
         #endregion
 
@@ -22,7 +23,7 @@ namespace test
         public void SetUp()
         {
             xl = new Excel { Visible = false };
-            var xllPath = Path.Combine(Environment.CurrentDirectory, @"pragmatic-quant.xll");
+            var xllPath = Path.Combine(Environment.CurrentDirectory, XllPath);
             xl.RegisterXLL(xllPath);
         }
 

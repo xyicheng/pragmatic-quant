@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pragmatic-quant-model", "pragmatic-quant-model\pragmatic-quant-model.csproj", "{5214E422-5A30-4613-BB5E-CA7C190A0A1F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{384A1A98-9872-4618-854E-AE1A9442D74C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pragmatic-quant-com", "pragmatic-quant-com\pragmatic-quant-com.csproj", "{4654D410-73C0-473A-9E6F-031104350E7C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{7252338D-76AC-4753-AA2D-D9D1BA616482}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
