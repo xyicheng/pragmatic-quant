@@ -9,9 +9,9 @@ using pragmatic_quant_model.Maths.Function;
 using pragmatic_quant_model.Maths.Sobol;
 using pragmatic_quant_model.Model;
 using pragmatic_quant_model.Model.HullWhite;
-using pragmatic_quant_model.MonteCarlo;
 using pragmatic_quant_model.Pricing;
 using pragmatic_quant_model.Product;
+using pragmatic_quant_model.Product.Fixings;
 
 namespace test.MonteCarlo
 {
@@ -33,12 +33,13 @@ namespace test.MonteCarlo
             var market = new Market(new[] {discountCurve}, new AssetMarket[0]);
             return market;
         }
-        private static Leg<FixedCoupon> Leg(DateTime refDate)
+        private static Leg<Coupon> FixedLeg(DateTime refDate)
         {
             const int mat = 10;
             var dates = Enumerable.Range(0, mat).Select(i => refDate + (i + 1) * Duration.Year);
-            var coupons = dates.Map(d => new FixedCoupon(new PaymentInfo(Currency.Eur, d), 1.0));
-            return new Leg<FixedCoupon>(coupons);
+            var coupons = dates.Map(d => new Coupon(new PaymentInfo(Currency.Eur, d),
+                new GenericFixingFunction(new IFixing[0], f => 1.0)));
+            return new Leg<Coupon>(coupons);
         }
         #endregion
 
@@ -55,7 +56,7 @@ namespace test.MonteCarlo
             
             var mcPricer = new McPricer(mcConfig);
 
-            var fixedLeg = Leg(market.RefDate);
+            var fixedLeg = FixedLeg(market.RefDate);
             var mcPriceResult = mcPricer.Price(fixedLeg, hw1, market);
 
             var mcCoupons = mcPriceResult.Details.Values.Map(p => p.Value);

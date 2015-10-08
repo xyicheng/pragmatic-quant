@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using pragmatic_quant_model.MarketDatas;
+using pragmatic_quant_model.Product.Fixings;
 
 namespace pragmatic_quant_model.Product
 {
@@ -14,7 +15,7 @@ namespace pragmatic_quant_model.Product
     public interface IProductVisitor<out TResult>
     {
         TResult Visit(Coupon coupon);
-        TResult Visit<TCoupon>(Leg<TCoupon> leg) where TCoupon : Coupon;
+        TResult Visit(ICouponDecomposable couponDecomposable);
     }
 
     public static class ProductUtils
@@ -39,9 +40,9 @@ namespace pragmatic_quant_model.Product
             {
                 return coupon.Fixings;
             }
-            public IFixing[] Visit<TCoupon>(Leg<TCoupon> leg) where TCoupon : Coupon
+            public IFixing[] Visit(ICouponDecomposable couponDecomposable)
             {
-                return leg.Coupons.Aggregate(new IFixing[0],
+                return couponDecomposable.Decomposition().Aggregate(new IFixing[0],
                     (allFixings, cpn) => allFixings.Union(cpn.Accept(this)).ToArray());
             }
         }
@@ -53,9 +54,9 @@ namespace pragmatic_quant_model.Product
                 var fixingsDates = coupon.Fixings.Select(f => f.Date).Distinct();
                 return fixingsDates.Union(new[] {coupon.PaymentInfo.Date}).ToArray();
             }
-            public DateTime[] Visit<TCoupon>(Leg<TCoupon> leg) where TCoupon : Coupon
+            public DateTime[] Visit(ICouponDecomposable couponDecomposable) 
             {
-                return leg.Coupons.Aggregate(new DateTime[0],
+                return couponDecomposable.Decomposition().Aggregate(new DateTime[0],
                     (allEventDates, cpn) => allEventDates.Union(cpn.Accept(this)).ToArray());
             }
         }
@@ -66,9 +67,9 @@ namespace pragmatic_quant_model.Product
             {
                 return new[] {coupon.PaymentInfo};
             }
-            public PaymentInfo[] Visit<TCoupon>(Leg<TCoupon> leg) where TCoupon : Coupon
+            public PaymentInfo[] Visit(ICouponDecomposable couponDecomposable)
             {
-                return leg.Coupons.Aggregate(new PaymentInfo[0],
+                return couponDecomposable.Decomposition().Aggregate(new PaymentInfo[0],
                     (allPayments, cpn) => allPayments.Union(cpn.Accept(this)).ToArray());
             }
         }

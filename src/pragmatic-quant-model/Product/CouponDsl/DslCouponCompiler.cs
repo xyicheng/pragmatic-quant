@@ -87,7 +87,7 @@ namespace pragmatic_quant_model.Product.CouponDsl
         }
         #endregion
 
-        public static DslCoupon[] Compile(params DslCouponData[] dslCouponDatas)
+        public static Coupon[] Compile(params DslCouponData[] dslCouponDatas)
         {
             string[] methodIds = EnumerableUtils.For(0, dslCouponDatas.Length, i => String.Format("Payoff{0}", i));
             string payoffclassName = String.Format("GeneratedDslPayoff{0}", _classIdentifier++);
@@ -105,8 +105,9 @@ namespace pragmatic_quant_model.Product.CouponDsl
 
                 var payoff = FastMethodCall<Func<object, double[], double>>
                     (payoffMethods[i], payoffClassType, typeof (double), new[] {typeof (object), typeof (double[])});
-                
-                return new DslCoupon(paymentInfo, fixings, payoff, payoffObj);
+
+                var dslPayoff = new DslPayoffFunction(fixings, payoff, payoffObj);
+                return new Coupon(paymentInfo, dslPayoff);
             });
         }
     }

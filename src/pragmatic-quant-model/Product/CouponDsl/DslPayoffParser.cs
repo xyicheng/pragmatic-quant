@@ -6,6 +6,7 @@ using Irony.Interpreter.Ast;
 using Irony.Parsing;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
+using pragmatic_quant_model.Product.Fixings;
 
 namespace pragmatic_quant_model.Product.CouponDsl
 {

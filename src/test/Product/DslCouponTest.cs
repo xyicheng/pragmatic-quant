@@ -31,7 +31,7 @@ namespace test.Product
             for (int i = 0; i < 100; i++)
             {
                 var fixingValue = 2.0 * rand.NextDouble();
-                var cpnValue = coupon.Payoff(new[] {fixingValue});
+                var cpnValue = coupon.Payoff.Value(new[] {fixingValue});
                 var refCpnValue = Math.Max(0.0, 1.2 * fixingValue - 0.95);
 
                 Assert.AreEqual(cpnValue, refCpnValue);

@@ -12,7 +12,7 @@ namespace pragmatic_quant_model.Product
 
     public static class GenericLegFactory
     {
-        public static Leg<DslCoupon> Build(GenericLegParameters legParameters, string dslCouponPayoff)
+        public static Leg<Coupon> Build(GenericLegParameters legParameters, string dslCouponPayoff)
         {
             string[] paramLabels = legParameters.ColLabels.Map(s => s.ToLowerInvariant().Trim());
 
@@ -36,7 +36,7 @@ namespace pragmatic_quant_model.Product
             }
 
             var coupons = DslCouponCompiler.Compile(couponDatas.ToArray());
-            return new Leg<DslCoupon>(coupons);
+            return new Leg<Coupon>(coupons);
         }
     }
 }

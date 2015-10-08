@@ -1,22 +1,20 @@
-using System.Linq;
-using pragmatic_quant_model.Basic;
-using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.MarketDatas;
+using pragmatic_quant_model.Product.Fixings;
 
 namespace pragmatic_quant_model.Product
 {
-    public abstract class Coupon : IProduct
+    public class Coupon : IProduct
     {
-        protected Coupon(PaymentInfo paymentInfo, params IFixing[] fixings)
+        public Coupon(PaymentInfo paymentInfo, IFixingFunction payoff)
         {
             PaymentInfo = paymentInfo;
-            Fixings = fixings;
+            Payoff = payoff;
+            Fixings = payoff.Fixings;
         }
 
-        public PaymentInfo PaymentInfo { get; private set; }
         public IFixing[] Fixings { get; private set; }
-        public abstract double Payoff(double[] fixings);
-
+        public IFixingFunction Payoff { get; private set; }
+        public PaymentInfo PaymentInfo { get; private set; }
         public FinancingId Financing { get { return PaymentInfo.Financing; } }
         
         public TResult Accept<TResult>(IProductVisitor<TResult> visitor)
@@ -24,7 +22,9 @@ namespace pragmatic_quant_model.Product
             return visitor.Visit(this);
         }
     }
+    
 
+    /* Rate coupon to be refactored
     public abstract class RateCoupon : Coupon
     {
         protected RateCoupon(FinancingId financing, Currency payCurrency, 
@@ -89,26 +89,7 @@ namespace pragmatic_quant_model.Product
         {
             return Coupon;
         }
-        
-    }
-    
-    public class Leg<TCoupon>
-        : IProduct where TCoupon : Coupon
-    {
-        public Leg(TCoupon[] coupons)
-        {
-            Coupons = coupons;
-        }
-
-        public TCoupon[] Coupons { get; private set; }
-        public FinancingId Financing
-        {
-            get { return Coupons.Select(cpn => cpn.Financing).Distinct().Single(); }
-        }
-        public TResult Accept<TResult>(IProductVisitor<TResult> visitor)
-        {
-            return visitor.Visit(this);
-        }
     }
 
+    */
 }
