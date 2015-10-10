@@ -6,10 +6,11 @@ using System.Reflection.Emit;
 using System.Text;
 using Microsoft.CSharp;
 using pragmatic_quant_model.Basic;
+using pragmatic_quant_model.Product.Fixings;
 
 namespace pragmatic_quant_model.Product.CouponDsl
 {
-    public static class DslCouponCompiler
+    public static class DslPayoffCompiler
     {
         #region private fields
         private static int _classIdentifier;
@@ -28,7 +29,7 @@ namespace pragmatic_quant_model.Product.CouponDsl
                 code.AppendLine(String.Format("     public double {0}(double[] {1})",
                     methodIds[i], expressions[i].FixingArrayId));
                 code.AppendLine("   {");
-                code.AppendLine("       return " + expressions[i].Expression + ";");
+                code.AppendLine("       return " + expressions[i].CSharpExpression + ";");
                 code.AppendLine("   }");
             }
 
@@ -87,27 +88,25 @@ namespace pragmatic_quant_model.Product.CouponDsl
         }
         #endregion
 
-        public static Coupon[] Compile(params DslCouponData[] dslCouponDatas)
+        public static IFixingFunction[] Compile(params DslPayoffExpression[] dslPayoffExpressions)
         {
-            string[] methodIds = EnumerableUtils.For(0, dslCouponDatas.Length, i => String.Format("Payoff{0}", i));
+            string[] methodIds = EnumerableUtils.For(0, dslPayoffExpressions.Length, i => String.Format("Payoff{0}", i));
             string payoffclassName = String.Format("GeneratedDslPayoff{0}", _classIdentifier++);
-            
-            string generatedCode = GenerateCode(dslCouponDatas.Map(d => d.Expression), payoffclassName, methodIds);
+
+            string generatedCode = GenerateCode(dslPayoffExpressions, payoffclassName, methodIds);
             Type payoffClassType = Compile(generatedCode, payoffclassName);
 
             object payoffObj = Activator.CreateInstance(payoffClassType);
             MethodInfo[] payoffMethods = methodIds.Map(methodId => payoffClassType.GetMethod(methodId));
 
-            return EnumerableUtils.For(0, dslCouponDatas.Length, i =>
+            return EnumerableUtils.For(0, dslPayoffExpressions.Length, i =>
             {
-                var fixings = dslCouponDatas[i].Expression.Fixings.ToArray();
-                var paymentInfo = dslCouponDatas[i].PaymentInfo;
-
+                var fixings = dslPayoffExpressions[i].Fixings.ToArray();
+                
                 var payoff = FastMethodCall<Func<object, double[], double>>
                     (payoffMethods[i], payoffClassType, typeof (double), new[] {typeof (object), typeof (double[])});
 
-                var dslPayoff = new DslPayoffFunction(fixings, payoff, payoffObj);
-                return new Coupon(paymentInfo, dslPayoff);
+                return new DslPayoffFunction(fixings, payoff, payoffObj) as IFixingFunction;
             });
         }
     }

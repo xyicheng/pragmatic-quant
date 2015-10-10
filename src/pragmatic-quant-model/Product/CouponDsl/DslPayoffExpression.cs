@@ -8,14 +8,14 @@ namespace pragmatic_quant_model.Product.CouponDsl
         public DslPayoffExpression(IFixing[] fixings, string expression, string fixingArrayId)
         {
             Fixings = fixings;
-            Expression = expression;
+            CSharpExpression = expression;
             FixingArrayId = fixingArrayId;
         }
         
         /// <summary>
         /// C# code that represent coupon payoff
         /// </summary>
-        public string Expression { get; private set; }
+        public string CSharpExpression { get; private set; }
 
         /// <summary>
         /// Identifier of fixing array used in Expression

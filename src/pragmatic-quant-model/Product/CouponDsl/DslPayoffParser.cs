@@ -18,7 +18,7 @@ namespace pragmatic_quant_model.Product.CouponDsl
         #region private methods
         private static Parser InitParser()
         {
-            var payoffLanguage = new LanguageData(new PayoffGrammar());
+            var payoffLanguage = new LanguageData(new DslPayoffGrammar());
             return new Parser(payoffLanguage);
         }
         #endregion

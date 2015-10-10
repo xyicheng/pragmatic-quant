@@ -5,6 +5,7 @@ using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Product.CouponDsl;
+using pragmatic_quant_model.Product.Fixings;
 
 namespace pragmatic_quant_model.Product
 {
@@ -12,31 +13,40 @@ namespace pragmatic_quant_model.Product
 
     public static class GenericLegFactory
     {
-        public static Leg<Coupon> Build(GenericLegParameters legParameters, string dslCouponPayoff)
+        public static IFixingFunction[] BuildDslFixingFunctions(GenericLegParameters legParameters, string[] dslCouponPayoffs)
         {
             string[] paramLabels = legParameters.ColLabels.Map(s => s.ToLowerInvariant().Trim());
-
-            if (paramLabels.Count(l => l == "paycurrency") != 1)
-                throw new ArgumentException("Leg Parameters must contain a pay currency !");
-
-            var couponDatas = new List<DslCouponData>();
-            for (int row = 0; row < legParameters.RowLabels.Length; row++)
+            
+            var couponDatas = new DslPayoffExpression[legParameters.RowLabels.Length];
+            for (int row = 0; row < couponDatas.Length; row++)
             {
-                var paramVals = legParameters.Values.Row(row);
+                object[] paramVals = legParameters.Values.Row(row);
                 IDictionary<string, object> couponParameters = paramLabels.ZipToDictionary(paramVals);
-
-                Currency payCurrency = Currency.Parse(couponParameters["paycurrency"].ToString());
-                DateTime payDate = legParameters.RowLabels[row];
-                var couponPayment = new PaymentInfo(payCurrency, payDate);
-
-                var payoff = DslPayoffParser.Parse(dslCouponPayoff, couponParameters);
-                var dslCouponData = new DslCouponData(payoff, couponPayment);
-
-                couponDatas.Add(dslCouponData);
+                var payoff = DslPayoffParser.Parse(dslCouponPayoffs[row], couponParameters);
+                couponDatas[row] = payoff;
             }
 
-            var coupons = DslCouponCompiler.Compile(couponDatas.ToArray());
-            return new Leg<Coupon>(coupons);
+            return DslPayoffCompiler.Compile(couponDatas);
+        }
+
+        public static Coupon[] BuildDslCoupons(string legId, GenericLegParameters legParameters, string[] dslCouponPayoffs)
+        {
+            var payCurencyLabels = legParameters.ColLabels
+                .Where(l => l.Equals(legId + "PayCurrency", StringComparison.InvariantCultureIgnoreCase))
+                .ToArray();
+            
+            if (!payCurencyLabels.Any())
+                throw new Exception(string.Format("Missing {0} parameter for building leg", legId + "PayCurrency"));
+            
+            if (payCurencyLabels.Count()!=1)
+                throw new Exception(string.Format("Multiple {0} parameters !", legId + "PayCurrency"));
+            
+            var payCurrencies = legParameters.GetCol(payCurencyLabels.First()).Map(o => Currency.Parse(o.ToString()));
+            var payDates = legParameters.RowLabels;
+            var couponPayments = payDates.ZipWith(payCurrencies, (d, c) => new PaymentInfo(c, d));
+
+            var couponPayoffs = BuildDslFixingFunctions(legParameters, dslCouponPayoffs);
+            return couponPayments.ZipWith(couponPayoffs, (payInfo, payoff) => new Coupon(payInfo, payoff));
         }
     }
 }

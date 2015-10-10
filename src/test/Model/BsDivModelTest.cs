@@ -28,7 +28,7 @@ namespace test.Model
             {
                 {"ProductName", "FwdLeg", null, null},
                 {"FwdCouponScript", "stock@fixingDate", null, null},
-                {"FwdPayDate", "PayCurrency", "Stock", "FixingDate"}
+                {"FwdPayDate", "FwdPayCurrency", "Stock", "FixingDate"}
             };
             ArrayUtils.SetSubArray(ref legBag, 0, 0, header);
             
