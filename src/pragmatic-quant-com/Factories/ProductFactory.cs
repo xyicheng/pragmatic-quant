@@ -3,30 +3,49 @@ using Irony.Parsing;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Basic.Structure;
+using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Product;
+using pragmatic_quant_model.Product.Fixings;
 
 namespace pragmatic_quant_com.Factories
 {
+    using Parameters = LabelledMatrix<DateTime, string, object>;
+
     public class ProductFactory : Singleton<ProductFactory>, IFactoryFromBag<IProduct>
     {
         #region private methods
-        private IProduct BuilAutoCall(IProduct decomposable, object[,] bag)
+        public static Coupon[] BuildDslCoupons(string legId, Parameters parameters, string[] dslCouponPayoffs)
+        {
+            var payCurrencies = parameters.GetColFromLabel(legId + "PayCurrency")
+                                             .Map(o => Currency.Parse(o.ToString()));
+            var payDates = parameters.RowLabels;
+            var couponPayments = payDates.ZipWith(payCurrencies, (d, c) => new PaymentInfo(c, d));
+
+            var couponPayoffs = DslPayoffFactory.Build(legId +"Date", parameters, dslCouponPayoffs);
+            return couponPayments.ZipWith(couponPayoffs, (payInfo, payoff) => new Coupon(payInfo, payoff));
+        }
+
+        private IProduct BuilAutoCall(ICouponDecomposable underlying, object[,] bag)
         {
             var parameters = bag.ProcessLabelledMatrix("AutocallDate",
-                                    DateAndDurationConverter.ConvertDate,
-                                    o => o.ToString(), o => o);
-            object[] redemptionObs;
-            if (!parameters.TryGetCol("AutoCallRedemption", out redemptionObs))
-                throw new Exception("Missing AutoCallRedemption column");
+                DateAndDurationConverter.ConvertDate,
+                o => o.ToString(), o => o);
 
-            string[] redemptionScripts = redemptionObs.Map(o => o.ToString());
-            var redemptionPayoffs = GenericLegFactory.BuildDslFixingFunctions(parameters, redemptionScripts);
+            var redemptionScripts = parameters.GetColFromLabel("Redemption").Map(o => o.ToString());
+            var currencies = parameters.GetColFromLabel("RedemptionCurrency").Map(o => Currency.Parse(o.ToString()));
+            var payDates = parameters.GetColFromLabel("RedemptionDate").Map(DateAndDurationConverter.ConvertDate);
+            PaymentInfo[] payInfos = payDates.ZipWith(currencies, (d, c) => new PaymentInfo(c, d));
+            IFixingFunction[] redemptionPayoffs = DslPayoffFactory.Build("AutocallDate", parameters, redemptionScripts);
+            var redemptionCoupons = redemptionPayoffs.ZipWith(payInfos, (payoff, payInfo) => new Coupon(payInfo, payoff));
 
-            throw new NotImplementedException();
+            var triggerScripts = parameters.GetColFromLabel("AutocallTrigger").Map(o => o.ToString());
+            var triggers = DslPayoffFactory.Build("AutocallDate", parameters, triggerScripts);
+
+            return new AutoCall(underlying, parameters.RowLabels, redemptionCoupons, triggers);
         }
         private IProduct BuildCancellable(string cancellableType, ParseTreeNode decomposableNode, object[,] bag)
         {
-            IProduct decomposable = BuildProduct(decomposableNode, bag);
+            var decomposable = (ICouponDecomposable) BuildProduct(decomposableNode, bag);
             switch (cancellableType.ToLowerInvariant())
             {
                 case "autocall" :
@@ -50,7 +69,7 @@ namespace pragmatic_quant_com.Factories
 
             string couponScript = bag.ProcessScalarString(legId + "CouponScript");
             var scripts = EnumerableUtils.ConstantArray(couponScript, parameters.RowLabels.Length);
-            Coupon[] coupons = GenericLegFactory.BuildDslCoupons(legId, parameters, scripts);
+            Coupon[] coupons = BuildDslCoupons(legId, parameters, scripts);
             return new Leg<Coupon>(coupons);
         }
         private IProduct BuildWeighted(double weight, ParseTreeNode factorProductNode, object[,] bag)

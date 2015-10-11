@@ -4,7 +4,7 @@ using Irony.Interpreter;
 using Irony.Interpreter.Ast;
 using Irony.Parsing;
 
-namespace pragmatic_quant_model.Product.CouponDsl
+namespace pragmatic_quant_model.Product.DslPayoff
 {
     [Language("Coupon Payoff DSL", "1.0", "Financial coupon description")]
     public class DslPayoffGrammar : InterpretedLanguageGrammar
@@ -73,9 +73,9 @@ namespace pragmatic_quant_model.Product.CouponDsl
             Fixing.Rule = (identifier ) + PreferShiftHere() + "@" + scheduleId;
             #endregion
             
-            Root = Expr;       // Set grammar root
+            Root = Expr; // Set grammar root
 
-            // 4. Operators precedence
+            #region 4. Operators precedence
             RegisterOperators(10, "?");
             RegisterOperators(15, "&", "&&", "|", "||");
             RegisterOperators(20, "==", "<", "<=", ">", ">=", "!=");
@@ -100,7 +100,7 @@ namespace pragmatic_quant_model.Product.CouponDsl
             AddToNoReportGroup(NewLine);
             AddOperatorReportGroup("operator");
             AddTermsReportGroup("assignment operator", "=", "+=", "-=", "*=", "/=");
-            
+            #endregion
             //9. Language flags. 
             // Automatically add NewLine before EOF so that our BNF rules work correctly when there's no final line break in source
             LanguageFlags = LanguageFlags.NewLineBeforeEOF | LanguageFlags.CreateAst | LanguageFlags.SupportsBigInt;

@@ -44,4 +44,23 @@ namespace pragmatic_quant_model.Basic.Structure
             return col;
         }
     }
+
+    public static class LabelledMatrixUtils
+    {
+        public static TVal[] GetColFromLabel<TRow, TVal>(this LabelledMatrix<TRow, string, TVal> matrix, string label)
+        {
+            var labels = matrix.ColLabels
+                .Where(l => l.Equals(label, StringComparison.InvariantCultureIgnoreCase))
+                .ToArray();
+
+            if (!labels.Any())
+                throw new Exception(string.Format("Missing Label : {0}", label));
+
+            if (labels.Count() != 1)
+                throw new Exception(string.Format("Multiple {0} label !", label));
+
+            return matrix.GetCol(labels.First());
+        }
+    }
+
 }

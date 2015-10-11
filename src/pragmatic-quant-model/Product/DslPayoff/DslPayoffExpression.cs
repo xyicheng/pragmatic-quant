@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using pragmatic_quant_model.Product.Fixings;
 
-namespace pragmatic_quant_model.Product.CouponDsl
+namespace pragmatic_quant_model.Product.DslPayoff
 {
     public class DslPayoffExpression
     {

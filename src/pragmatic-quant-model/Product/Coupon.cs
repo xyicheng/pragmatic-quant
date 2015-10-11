@@ -3,7 +3,7 @@ using pragmatic_quant_model.Product.Fixings;
 
 namespace pragmatic_quant_model.Product
 {
-    public class Coupon : IProduct
+    public class Coupon : ICouponDecomposable
     {
         public Coupon(PaymentInfo paymentInfo, IFixingFunction payoff)
         {
@@ -20,6 +20,11 @@ namespace pragmatic_quant_model.Product
         public TResult Accept<TResult>(IProductVisitor<TResult> visitor)
         {
             return visitor.Visit(this);
+        }
+
+        public Coupon[] Decomposition()
+        {
+            return new[] {this};
         }
     }
     
