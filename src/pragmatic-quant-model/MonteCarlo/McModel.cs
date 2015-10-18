@@ -3,7 +3,6 @@ using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Stochastic;
 using pragmatic_quant_model.Model;
-using pragmatic_quant_model.Product;
 
 namespace pragmatic_quant_model.MonteCarlo
 {

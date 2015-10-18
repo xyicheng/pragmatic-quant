@@ -106,7 +106,7 @@ namespace pragmatic_quant_model.Product.DslPayoff
                 var payoff = FastMethodCall<Func<object, double[], double>>
                     (payoffMethods[i], payoffClassType, typeof (double), new[] {typeof (object), typeof (double[])});
 
-                return new DslPayoffFunction(fixings, payoff, payoffObj) as IFixingFunction;
+                return new DslPayoffFunction(fixings, payoff, payoffObj, dslPayoffExpressions[i].CSharpExpression) as IFixingFunction;
             });
         }
     }

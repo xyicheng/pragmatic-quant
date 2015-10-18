@@ -28,10 +28,21 @@ namespace pragmatic_quant_model.Basic
         {
             return Enumerable.Range(startIndex, count).Select(func).ToArray();
         }
-        public static T[] Append<T>(IEnumerable<IEnumerable<T>> lists)
+        public static T[] Append<T>(params IEnumerable<T>[] lists)
         {
             return lists.Aggregate(new T[0], (result, current) => result.Concat(current).ToArray());
         }
+        
+        public static T[] Merge<T>(params IEnumerable<T>[] lists)
+        {
+            return lists.Aggregate(new T[0], (result, current) => result.Union(current).ToArray());
+        }
+        public static T[] MergeWith<T>(this IEnumerable<T> list, params IEnumerable<T>[] otherLists)
+        {
+            var mergedOthers = Merge(otherLists);
+            return Merge(list, mergedOthers);
+        }
+
         public static IDictionary<TIn, TOut> ZipToDictionary<TIn, TOut>(this IList<TIn> keys, IList<TOut> values)
         {
             return Enumerable.Range(0, keys.Count).ToDictionary(i => keys[i], i => values[i]);

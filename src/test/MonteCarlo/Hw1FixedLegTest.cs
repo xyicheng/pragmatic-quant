@@ -59,8 +59,8 @@ namespace test.MonteCarlo
             var fixedLeg = FixedLeg(market.RefDate);
             var mcPriceResult = mcPricer.Price(fixedLeg, hw1, market);
 
-            var mcCoupons = mcPriceResult.Details.Values.Map(p => p.Value);
-            var refCoupons = mcPriceResult.Details.Keys.Map(pi => market.DiscountCurve(pi.Financing).Zc(pi.Date));
+            var mcCoupons = mcPriceResult.Details.Map(p => p.Item2.Value);
+            var refCoupons = mcPriceResult.Details.Map(pi => market.DiscountCurve(pi.Item1.Financing).Zc(pi.Item1.Date));
 
             var errAbs = Math.Abs(mcCoupons.Sum() - refCoupons.Sum());
             Assert.LessOrEqual(errAbs, 7.0e-5);

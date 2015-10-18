@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Product.Fixings;
 
@@ -16,6 +17,7 @@ namespace pragmatic_quant_model.Product
     {
         TResult Visit(Coupon coupon);
         TResult Visit(ICouponDecomposable couponDecomposable);
+        TResult Visit(AutoCall autocall);
     }
 
     public static class ProductUtils
@@ -42,8 +44,18 @@ namespace pragmatic_quant_model.Product
             }
             public IFixing[] Visit(ICouponDecomposable couponDecomposable)
             {
-                return couponDecomposable.Decomposition().Aggregate(new IFixing[0],
-                    (allFixings, cpn) => allFixings.Union(cpn.Accept(this)).ToArray());
+                var fixings = EnumerableUtils.Merge(couponDecomposable.Decomposition().Map(Visit));
+                return fixings.OrderBy(f => f.Date).ToArray();
+            }
+            public IFixing[] Visit(AutoCall autocall)
+            {
+                var underlyingFixings = autocall.Underlying.Accept(this);
+                var redemptionFixings = autocall.CallDates.Map(d => autocall.Redemption(d).Accept(this));
+                var triggerFixings = autocall.CallDates.Map(d=> autocall.CallTrigger(d).Fixings);
+
+                var mergedFixings = underlyingFixings.MergeWith(redemptionFixings)
+                                                     .MergeWith(triggerFixings);
+                return mergedFixings.OrderBy(f => f.Date).ToArray();
             }
         }
 
@@ -59,6 +71,17 @@ namespace pragmatic_quant_model.Product
                 return couponDecomposable.Decomposition().Aggregate(new DateTime[0],
                     (allEventDates, cpn) => allEventDates.Union(cpn.Accept(this)).ToArray());
             }
+            public DateTime[] Visit(AutoCall autocall)
+            {
+                var underlyingDates = autocall.Underlying.Accept(this);
+                var redemptionDates = autocall.CallDates.Map(d => autocall.Redemption(d).Accept(this));
+
+                var result = EnumerableUtils.Merge(redemptionDates);
+                result = EnumerableUtils.Merge(underlyingDates, result);
+                result = EnumerableUtils.Merge(result, autocall.CallDates);
+                result = result.OrderBy(d => d).ToArray();
+                return result;
+            }
         }
 
         private class PaymentProductVisitor : IProductVisitor<PaymentInfo[]>
@@ -71,6 +94,12 @@ namespace pragmatic_quant_model.Product
             {
                 return couponDecomposable.Decomposition().Aggregate(new PaymentInfo[0],
                     (allPayments, cpn) => allPayments.Union(cpn.Accept(this)).ToArray());
+            }
+            public PaymentInfo[] Visit(AutoCall autocall)
+            {
+                var underlyingPayments = autocall.Underlying.Accept(this);
+                var redemptionPayments = autocall.CallDates.Map(d => autocall.Redemption(d).Accept(this));
+                return redemptionPayments.Aggregate(underlyingPayments, (prev, d) => prev.Union(d).ToArray());
             }
         }
         #endregion

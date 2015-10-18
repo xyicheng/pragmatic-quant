@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.MarketDatas;
@@ -9,6 +10,7 @@ namespace pragmatic_quant_model.Product.Fixings
     {
     }
 
+    [DebuggerDisplay("Equity Spot {AssetId} @ {Date}")]
     public class EquitySpot : IFixing
     {
         #region private method
@@ -46,6 +48,7 @@ namespace pragmatic_quant_model.Product.Fixings
         }
     }
 
+    [DebuggerDisplay("Libor {Currency} {Tenor} @ {Date}")]
     public class Libor : IFixing
     {
         #region private fields

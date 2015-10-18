@@ -215,7 +215,9 @@
     <Compile Include="MonteCarlo\McModelFactory.cs" />
     <Compile Include="MonteCarlo\ProcessPathFlowGenerator.cs" />
     <Compile Include="MonteCarlo\ArrayPathCalculator.cs" />
+    <Compile Include="MonteCarlo\Product\AutocallPathFlow.cs" />
     <Compile Include="MonteCarlo\Product\CouponArrayPathFlow.cs" />
+    <Compile Include="MonteCarlo\Product\CouponPathFlow.cs" />
     <Compile Include="MonteCarlo\Product\PriceFlowsAggregator.cs" />
     <Compile Include="Pricing\FormulaePricer.cs" />
     <Compile Include="Pricing\IPricer.cs" />
@@ -238,7 +240,7 @@
     <Compile Include="Product\Coupon.cs" />
     <Compile Include="Product\Fixings\IFixingFunction.cs" />
     <Compile Include="Product\Fixings\IObservation.cs" />
-    <Compile Include="Product\ICallableProduct.cs" />
+    <Compile Include="Product\ICancellableProduct.cs" />
     <Compile Include="Product\IProduct.cs" />
     <Compile Include="Pricing\PriceResult.cs" />
     <Compile Include="Product\ICouponDecomposable.cs" />

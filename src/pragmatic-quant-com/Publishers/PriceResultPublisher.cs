@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Structure;
@@ -11,26 +10,27 @@ namespace pragmatic_quant_com.Publishers
     public class PriceResultPublisher : Singleton<PriceResultPublisher>, IPublisher<PriceResult>
     {
         #region private fields
-        private static void PricingDetails(IDictionary<PaymentInfo, Price> details,
+        private static void PricingDetails(Tuple<PaymentInfo, Price>[] details,
             out DateTime[] payDates, out Currency[] payCurrencies, out double[,] values)
         {
-            payDates = details.Keys.Select(pi => pi.Date)
+            payDates = details.Select(pi => pi.Item1.Date)
                 .Distinct()
                 .OrderBy(d => d)
                 .ToArray();
             var payDateIndexes = payDates.ZipToDictionary(Enumerable.Range(0, payDates.Length).ToArray());
 
-            payCurrencies = details.Keys.Select(pi => pi.Currency)
+            payCurrencies = details.Select(pi => pi.Item1.Currency)
                 .Distinct()
                 .ToArray();
             var payCurrencyIndexes = payCurrencies.ZipToDictionary(Enumerable.Range(0, payCurrencies.Length).ToArray());
 
             values = new double[payDates.Length, payCurrencies.Length];
-            foreach (PaymentInfo pay in details.Keys)
+            foreach (var kv in details)
             {
+                var pay = kv.Item1;
                 int dateIndex = payDateIndexes[pay.Date];
                 int currencyIndex = payCurrencyIndexes[pay.Currency];
-                values[dateIndex, currencyIndex] += details[pay].Value;
+                values[dateIndex, currencyIndex] += kv.Item2.Value;
             }
         }
         #endregion

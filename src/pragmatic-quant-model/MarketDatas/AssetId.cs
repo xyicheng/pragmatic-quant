@@ -28,7 +28,7 @@ namespace pragmatic_quant_model.MarketDatas
         {
             get { return currency; }
         }
-
+        
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;

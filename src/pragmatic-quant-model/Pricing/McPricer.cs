@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.MarketDatas;
@@ -39,16 +40,16 @@ namespace pragmatic_quant_model.Pricing
             PathFlows<double, PaymentInfo> result = mcEngine.Run(nbPaths);
             
             var refCurrency = product.Financing.Currency;
-            var priceDetails = new Dictionary<PaymentInfo, Price>();
+            var priceDetails = new List<Tuple<PaymentInfo, Price>>();
             var totalPrice = 0.0;
             for (int i = 0; i < result.Flows.Length; i++)
             {
                 PaymentInfo paymentInfo = result.Labels[i];
                 var price = new Price(result.Flows[i], paymentInfo.Currency);
-                priceDetails.Add(paymentInfo, price);
+                priceDetails.Add(new Tuple<PaymentInfo, Price>(paymentInfo, price));
                 totalPrice += price.Convert(refCurrency, market).Value;
             }
-            return new PriceResult(new Price(totalPrice, refCurrency), priceDetails);
+            return new PriceResult(new Price(totalPrice, refCurrency), priceDetails.ToArray());
         }
     }
 }
