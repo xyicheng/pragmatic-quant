@@ -310,8 +310,8 @@ namespace test
             };
             
             TimeMatrixDatas timeDatas = bag1.ProcessTimeMatrixDatas("MyParam");
-            var helloDatas = timeDatas.GetCol("hello");
-            var totoDatas = timeDatas.GetCol("toto");
+            var helloDatas = timeDatas.GetColFromLabel("hello");
+            var totoDatas = timeDatas.GetColFromLabel("toto");
             
             UnitTestUtils.EqualDoubleArray(helloDatas, new[] {1.0, 2.0, 3.0}, DoubleUtils.MachineEpsilon);
             UnitTestUtils.EqualDoubleArray(totoDatas, new[] { 5.0, 4.0, 1.0 }, DoubleUtils.MachineEpsilon);

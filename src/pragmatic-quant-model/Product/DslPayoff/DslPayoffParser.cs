@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Irony;
 using Irony.Interpreter.Ast;
 using Irony.Parsing;
 using pragmatic_quant_model.Basic;
@@ -25,8 +26,11 @@ namespace pragmatic_quant_model.Product.DslPayoff
         public static DslPayoffExpression Parse(string dslPayoffScript, IDictionary<string, object> couponParameters)
         {
             var payoffParsedTree = grammarParser.Parse(dslPayoffScript);
-            var payoffAst = payoffParsedTree.Root.AstNode as AstNode;
 
+            if (payoffParsedTree.HasErrors())
+                throw new Exception("Unable to parse script " + dslPayoffScript);
+            
+            var payoffAst = payoffParsedTree.Root.AstNode as AstNode;
             var couponBuilder = new DslExpressionBuilder(couponParameters);
             return couponBuilder.Build(payoffAst);
         }

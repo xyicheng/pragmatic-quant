@@ -124,12 +124,8 @@ namespace pragmatic_quant_model.MarketDatas
 
     public class VolatilitySurface
     {
-        #region private fields
-        
-        
-        
-        #endregion
-        protected VolatilitySurface(ITimeMeasure time, MoneynessProvider moneyness, 
+        #region private methods
+        private VolatilitySurface(ITimeMeasure time, MoneynessProvider moneyness, 
                                     VarianceInterpoler varianceInterpoler, LocalVariance localVariance)
         {
             Time = time;
@@ -137,7 +133,7 @@ namespace pragmatic_quant_model.MarketDatas
             Moneyness = moneyness;
             LocalVariance = localVariance;
         }
-
+        #endregion
         public static VolatilitySurface BuildInterpol(VolatilityMatrix volMatrix, MoneynessProvider moneyness)
         {
             double[] timePillars = volMatrix.Time[volMatrix.Pillars];

@@ -123,6 +123,10 @@ namespace pragmatic_quant_model.Basic
         {
             return array.ToList().FindIndex(e => e.Equals(element));
         }
+        public static int FindIndex<T>(this T[] array, Predicate<T> predicate)
+        {
+            return array.ToList().FindIndex(predicate);
+        }
 
         public static double[] MergeSortedArray(double[] a, double[] b)
         {

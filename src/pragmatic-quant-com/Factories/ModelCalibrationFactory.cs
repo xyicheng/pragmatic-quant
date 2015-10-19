@@ -40,7 +40,7 @@ namespace pragmatic_quant_com.Factories
                 throw new ArgumentException("Invalid BlackScholes calibration parameters");
 
             var calibLabel = calibMatrix.ColLabels.First();
-            var calibDatas = calibMatrix.GetCol(calibLabel);
+            var calibDatas = calibMatrix.GetColFromLabel(calibLabel);
 
             switch (calibLabel.ToLowerInvariant().Trim())
             {

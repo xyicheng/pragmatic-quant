@@ -34,7 +34,7 @@ namespace pragmatic_quant_com.Factories
                 if (!FinancingId.TryParse(curveLabel, out financingId))
                     throw new ArgumentException(String.Format("RateMarketFactory, invalid Discount Curve Id : {0}", curveLabel));
 
-                double[] zcs = curveRawDatas.GetCol(curveLabel);
+                double[] zcs = curveRawDatas.GetColFromLabel(curveLabel);
                 var discountCurve = DiscountCurve.LinearRateInterpol(financingId, datePillars, zcs, rateTimeInterpol);
 
                 curves.Add(discountCurve);
@@ -45,8 +45,8 @@ namespace pragmatic_quant_com.Factories
         {
             var divId = String.Format("Dividend.{0}", assetName);
             var dividendsRawDatas = bag.ProcessTimeMatrixDatas(divId);
-            var cashs = dividendsRawDatas.GetCol("Cash");
-            var yields = dividendsRawDatas.GetCol("Yield");
+            var cashs = dividendsRawDatas.GetColFromLabel("Cash");
+            var yields = dividendsRawDatas.GetColFromLabel("Yield");
             var divQuotes = dividendsRawDatas.RowLabels.Select((d, idx) =>
                 new DividendQuote(d.ToDate(refDate), cashs[idx], yields[idx])).ToArray();
             return divQuotes;
@@ -71,8 +71,8 @@ namespace pragmatic_quant_com.Factories
             for (int i = 0; i < assetRawDatas.RowLabels.Length; i++)
             {
                 var assetName = assetRawDatas.RowLabels[i];
-                var rawCurrency = assetRawDatas.GetCol("Currency")[i].ToString();
-                object rawSpot = assetRawDatas.GetCol("Spot")[i];
+                var rawCurrency = assetRawDatas.GetColFromLabel("Currency")[i].ToString();
+                object rawSpot = assetRawDatas.GetColFromLabel("Spot")[i];
 
                 var currency = Currency.Parse(rawCurrency);
                 var assetId = new AssetId(assetName, currency);
@@ -81,7 +81,7 @@ namespace pragmatic_quant_com.Factories
                 if (!NumberConverter.TryConvertDouble(rawSpot, out spot))
                     throw new ArgumentException(String.Format("AssetMarketFactory, invalid {0} spot : {1}", assetName, rawSpot));
 
-                double[] repoRates = repoRawDatas.GetCol(assetName);
+                double[] repoRates = repoRawDatas.GetColFromLabel(assetName);
                 var repoZcs = repoRates.Select((r, idx) => Math.Exp(-eqtyTime[repoPillars[idx]] * r)).ToArray();
                 var repoCurve = DiscountCurve.LinearRateInterpol(FinancingId.AssetCollat(assetId), repoPillars, repoZcs, eqtyTime);
 
