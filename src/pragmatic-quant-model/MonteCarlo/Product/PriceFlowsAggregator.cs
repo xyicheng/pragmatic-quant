@@ -1,24 +1,21 @@
 using System.Linq;
-using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Maths;
-using pragmatic_quant_model.Product;
 
 namespace pragmatic_quant_model.MonteCarlo.Product
 {
-    public class PriceFlowsAggregator 
-        : IPathResultAgregator<PathFlows<double, PaymentInfo>, PathFlows<double, PaymentInfo>>
+    public class PriceFlowsAggregator<TLabel>
+        : IPathResultAgregator<PathFlows<double, TLabel>, PathFlows<double, TLabel>>
     {
-        public static readonly PriceFlowsAggregator Value = new PriceFlowsAggregator();
-        public PathFlows<double, PaymentInfo> Aggregate(PathFlows<double, PaymentInfo>[] paths)
+        public PathFlows<double, TLabel> Aggregate(PathFlows<double, TLabel>[] paths)
         {
             var prices = new double[paths.First().Flows.Length];
-            foreach (PathFlows<double, PaymentInfo> pathFlows in paths)
+            foreach (PathFlows<double, TLabel> pathFlows in paths)
             {
                 VectorUtils.Add(ref prices, pathFlows.Flows);
             }
             VectorUtils.Mult(ref prices, 1.0 / paths.Length);
 
-            return new PathFlows<double, PaymentInfo>(prices, paths.First().Labels);
+            return new PathFlows<double, TLabel>(prices, paths.First().Labels);
         }
     }
 }

@@ -5,7 +5,7 @@ using pragmatic_quant_model.Product.Fixings;
 
 namespace pragmatic_quant_model.MonteCarlo.Product
 {
-    
+
     internal class AutocallPathFlow : IProductPathFlow
     {
         #region private fields
@@ -13,6 +13,7 @@ namespace pragmatic_quant_model.MonteCarlo.Product
         private readonly CouponPathFlow[] redemptionPathFlows;
         private readonly FixingFuncPathValue[] triggers;
         private readonly int[] underlyingCallIndexes;
+        private readonly CouponFlowLabel[] labels;
         #endregion
         #region private methods
         private int CallIndex(double[][] fixings)
@@ -30,10 +31,10 @@ namespace pragmatic_quant_model.MonteCarlo.Product
         #endregion
         public AutocallPathFlow(CouponPathFlow[] underlyingPathFlows,
                                 CouponPathFlow[] redemptionPathFlows,
-                                FixingFuncPathValue[] triggers, 
+                                FixingFuncPathValue[] triggers,
                                 int[] underlyingCallIndexes)
         {
-            Contract.Requires(redemptionPathFlows.Length==triggers.Length);
+            Contract.Requires(redemptionPathFlows.Length == triggers.Length);
             Contract.Requires(underlyingCallIndexes.Length == triggers.Length);
 
             this.underlyingPathFlows = underlyingPathFlows;
@@ -45,16 +46,21 @@ namespace pragmatic_quant_model.MonteCarlo.Product
             var redemptionFixings = redemptionPathFlows.Map(pf => pf.PayoffPathValues.FixingFunction.Fixings);
             var triggerFixings = triggers.Map(pf => pf.FixingFunction.Fixings);
             Fixings = EnumerableUtils.Merge(underlyingFixings)
-                                     .MergeWith(redemptionFixings)
-                                     .MergeWith(triggerFixings);
+                .MergeWith(redemptionFixings)
+                .MergeWith(triggerFixings);
 
-            var underlyingPayments = underlyingPathFlows.Map(pf => pf.PaymentInfo);
-            var redemptionPayments = redemptionPathFlows.Map(pf => pf.PaymentInfo);
+            var underlyingLabels = underlyingPathFlows.Map(pf => pf.CouponLabel);
+            var redemptionLabels = redemptionPathFlows.Map(pf => pf.CouponLabel);
+            labels = EnumerableUtils.Append(underlyingLabels, redemptionLabels);
+
+            var underlyingPayments = underlyingLabels.Map(l => l.Payment);
+            var redemptionPayments = redemptionLabels.Map(l => l.Payment);
             Payments = EnumerableUtils.Append(underlyingPayments, redemptionPayments);
         }
 
-        public void ComputePathFlows(ref PathFlows<double, PaymentInfo> pathFlows, PathFlows<double[], IFixing[]> fixingsPath,
-            PathFlows<double[], PaymentInfo[]> flowRebasementPath)
+        public void ComputePathFlows(ref PathFlows<double, CouponFlowLabel> pathFlows,
+                                     PathFlows<double[], IFixing[]> fixingsPath,
+                                     PathFlows<double[], PaymentInfo[]> flowRebasementPath)
         {
             double[][] fixings = fixingsPath.Flows;
             double[][] rebasements = flowRebasementPath.Flows;
@@ -70,22 +76,22 @@ namespace pragmatic_quant_model.MonteCarlo.Product
 
             for (int i = 0; i < lastPayCouponIndex; i++)
                 autocallFlows[i] = underlyingPathFlows[i].FlowValue(fixings, rebasements);
-            
+
             if (callIndex < redemptionPathFlows.Length)
             {
                 autocallFlows[underlyingPathFlows.Length + callIndex] = redemptionPathFlows[callIndex].FlowValue(fixings, rebasements);
             }
         }
-        public PathFlows<double, PaymentInfo> NewPathFlow()
+        public PathFlows<double, CouponFlowLabel> NewPathFlow()
         {
-            return new PathFlows<double, PaymentInfo>(new double[Payments.Length], Payments); 
+            return new PathFlows<double, CouponFlowLabel>(new double[Payments.Length], labels);
         }
         public int SizeOfPath
         {
-            get { return Payments.Length * sizeof(double); }
+            get { return Payments.Length * sizeof (double); }
         }
         public IFixing[] Fixings { get; private set; }
         public PaymentInfo[] Payments { get; private set; }
     }
-    
+
 }

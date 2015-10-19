@@ -44,7 +44,16 @@ namespace test
                 throw new Exception(string.Format(@"Missing worksheet {0}", name));
             return sheet;
         }
-        private static void AssertRangeEquality(object[,] rng, object[,] refRng, double tolerance)
+        private static void AssertValueEquality(object val, object refVal, double tolerance)
+        {
+            double value, refValue;
+            if (!(NumberConverter.TryConvertDouble(val, out value)
+                  && NumberConverter.TryConvertDouble(refVal, out refValue)))
+                throw new Exception(string.Format(" tested value is not a double"));
+            var error = Math.Abs(value - refValue);
+            Assert.LessOrEqual(error, tolerance);
+        }
+        private static void AssertArrayRangeEquality(object[,] rng, object[,] refRng, double tolerance)
         {
             Assert.AreEqual(rng.GetLength(0), refRng.GetLength(0));
             Assert.AreEqual(rng.GetLength(1), refRng.GetLength(1));
@@ -53,14 +62,19 @@ namespace test
             {
                 for (int j = rng.GetLowerBound(1); j <= rng.GetUpperBound(1); j++)
                 {
-                    double value, refValue;
-                    if (!(NumberConverter.TryConvertDouble(rng[i, j], out value)
-                          && NumberConverter.TryConvertDouble(refRng[i, j], out refValue)))
-                        throw new Exception(string.Format(" tested value is not a double"));
-                    var error = Math.Abs(value - refValue);
-                    Assert.LessOrEqual(error, tolerance);
+                    AssertValueEquality(rng[i, j], refRng[i, j], tolerance);
                 }
             }
+        }
+        private static void AssertRangeEquality(object rng, object refRng, double tolerance)
+        {
+            if (rng is object[,] && refRng is object[,])
+            {
+                AssertArrayRangeEquality((object[,]) rng, (object[,]) refRng, tolerance);
+                return;
+            }
+
+            AssertValueEquality(rng, refRng, tolerance);
         }
         #endregion
         

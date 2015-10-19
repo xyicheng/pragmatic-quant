@@ -102,7 +102,8 @@ namespace pragmatic_quant_model.MonteCarlo.Product
             {
                 var payoffPathValue = FixingFuncPathValue(simulatedFixings, cpn.Payoff);
                 var paymentCoordinate = FindPaymentIndex(simulatedRebasement, cpn.PaymentInfo);
-                return new CouponPathFlow(payoffPathValue, cpn.PaymentInfo, paymentCoordinate);
+                var couponFlowLabel = new CouponFlowLabel(cpn.PaymentInfo, cpn.ToString()); 
+                return new CouponPathFlow(payoffPathValue, couponFlowLabel, paymentCoordinate);
             });
             return couponFlows;
         }

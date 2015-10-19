@@ -4,8 +4,8 @@ using pragmatic_quant_model.Product.Fixings;
 
 namespace pragmatic_quant_model.MonteCarlo.Product
 {
-    public class ProductPathFlowCalculator 
-        : IPathFlowCalculator<double, PaymentInfo>
+    public class ProductPathFlowCalculator
+        : IPathFlowCalculator<double, CouponFlowLabel>
     {
         #region private fields
         private readonly IPathFlowCalculator<double[], IFixing[]> fixingPathCalculator;
@@ -31,13 +31,13 @@ namespace pragmatic_quant_model.MonteCarlo.Product
             numerairePath = numerairePathCalc.NewPathFlow();
         }
 
-        public void ComputeFlows(ref PathFlows<double, PaymentInfo> pathFlows, IProcessPath processPath)
+        public void ComputeFlows(ref PathFlows<double, CouponFlowLabel> pathFlows, IProcessPath processPath)
         {
             fixingPathCalculator.ComputeFlows(ref fixingsPath, processPath);
             numerairePathCalc.ComputeFlows(ref numerairePath, processPath);
             productPathFlow.ComputePathFlows(ref pathFlows, fixingsPath, numerairePath);
         }
-        public PathFlows<double, PaymentInfo> NewPathFlow()
+        public PathFlows<double, CouponFlowLabel> NewPathFlow()
         {
             return productPathFlow.NewPathFlow();
         }
@@ -45,6 +45,17 @@ namespace pragmatic_quant_model.MonteCarlo.Product
         {
             get { return productPathFlow.SizeOfPath; }
         }
+    }
+
+    public class CouponFlowLabel
+    {
+        public CouponFlowLabel(PaymentInfo payment, string label)
+        {
+            Payment = payment;
+            Label = label;
+        }
+        public PaymentInfo Payment { get; private set; }
+        public string Label { get; private set; }
     }
 
 }

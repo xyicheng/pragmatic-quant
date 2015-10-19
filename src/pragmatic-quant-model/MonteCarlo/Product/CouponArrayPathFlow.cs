@@ -9,17 +9,19 @@ namespace pragmatic_quant_model.MonteCarlo.Product
     {
         #region private fields
         private readonly CouponPathFlow[] couponPathFlows;
+        private readonly CouponFlowLabel[] labels;
         #endregion
         public CouponArrayPathFlow(CouponPathFlow[] couponPathFlows)
         {
             this.couponPathFlows = couponPathFlows;
-            Payments = couponPathFlows.Map(cpnCoord => cpnCoord.PaymentInfo);
+            labels = couponPathFlows.Map(l => l.CouponLabel);
+            Payments = couponPathFlows.Map(cpnCoord => cpnCoord.CouponLabel.Payment);
             Fixings = EnumerableUtils.Merge(couponPathFlows.Map(c => c.PayoffPathValues.FixingFunction.Fixings))
                                      .OrderBy(f => f.Date)
                                      .ToArray();
         }
-        
-        public void ComputePathFlows(ref PathFlows<double, PaymentInfo> pathFlows, 
+
+        public void ComputePathFlows(ref PathFlows<double, CouponFlowLabel> pathFlows, 
                                      PathFlows<double[], IFixing[]> fixingsPath, 
                                      PathFlows<double[], PaymentInfo[]> flowRebasementPath)
         {
@@ -32,10 +34,10 @@ namespace pragmatic_quant_model.MonteCarlo.Product
                 couponsFlows[i] = couponPathFlows[i].FlowValue(fixings, rebasements);
             }
         }
-        
-        public PathFlows<double, PaymentInfo> NewPathFlow()
+
+        public PathFlows<double, CouponFlowLabel> NewPathFlow()
         {
-            return new PathFlows<double, PaymentInfo>(new double[couponPathFlows.Length], Payments);
+            return new PathFlows<double, CouponFlowLabel>(new double[couponPathFlows.Length], labels);
         }
         public int SizeOfPath
         {

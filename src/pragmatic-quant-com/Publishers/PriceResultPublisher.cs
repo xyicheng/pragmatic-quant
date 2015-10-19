@@ -10,16 +10,16 @@ namespace pragmatic_quant_com.Publishers
     public class PriceResultPublisher : Singleton<PriceResultPublisher>, IPublisher<PriceResult>
     {
         #region private fields
-        private static void PricingDetails(Tuple<PaymentInfo, Price>[] details,
+        private static void PricingDetails(Tuple<string, PaymentInfo, Price>[] details,
             out DateTime[] payDates, out Currency[] payCurrencies, out double[,] values)
         {
-            payDates = details.Select(pi => pi.Item1.Date)
+            payDates = details.Select(pi => pi.Item2.Date)
                 .Distinct()
                 .OrderBy(d => d)
                 .ToArray();
             var payDateIndexes = payDates.ZipToDictionary(Enumerable.Range(0, payDates.Length).ToArray());
 
-            payCurrencies = details.Select(pi => pi.Item1.Currency)
+            payCurrencies = details.Select(pi => pi.Item2.Currency)
                 .Distinct()
                 .ToArray();
             var payCurrencyIndexes = payCurrencies.ZipToDictionary(Enumerable.Range(0, payCurrencies.Length).ToArray());
@@ -27,10 +27,10 @@ namespace pragmatic_quant_com.Publishers
             values = new double[payDates.Length, payCurrencies.Length];
             foreach (var kv in details)
             {
-                var pay = kv.Item1;
+                var pay = kv.Item2;
                 int dateIndex = payDateIndexes[pay.Date];
                 int currencyIndex = payCurrencyIndexes[pay.Currency];
-                values[dateIndex, currencyIndex] += kv.Item2.Value;
+                values[dateIndex, currencyIndex] += kv.Item3.Value;
             }
         }
         #endregion
