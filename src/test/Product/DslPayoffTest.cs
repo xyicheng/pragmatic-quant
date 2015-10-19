@@ -29,6 +29,7 @@ namespace test.Product
 
         public static IEnumerable Payoffs()
         {
+            #region Payoff1
             const string payoffScript1 = "Max(0.0,  1.2 * stock@fixingdate - strike)";
             var parameters1 = new Dictionary<string, object>
             {
@@ -38,7 +39,9 @@ namespace test.Product
             };
             Func<double, double> refPayoff1 = x => Math.Max(0.0, 1.2 * x - 0.95);
             yield return new object[] {payoffScript1, parameters1, refPayoff1};
+            #endregion
 
+            #region Payoff2
             const string payoffScript2 = "(stock@fixingdate > strike) ? 1.2 * stock@fixingdate - strike + 0.01 : 0.0";
             var parameters2 = new Dictionary<string, object>
             {
@@ -48,7 +51,21 @@ namespace test.Product
             };
             Func<double, double> refPayoff2 = x => x > 0.95 ? 1.2 * x - 0.95 + 0.01 : 0.0;
             yield return new object[] { payoffScript2, parameters2, refPayoff2 };
+            #endregion
+
+            #region Payoff3
+            const string payoffScript3 = "-1.0 * stock@fixingdate";
+            var parameters3 = new Dictionary<string, object>
+            {
+                {"stock", "asset(eurostoxx,EUR)"},
+                {"fixingdate", new DateTime(2015, 07, 31)},
+                {"strike", 0.95}
+            };
+            Func<double, double> refPayoff3 = x => -x;
+            yield return new object[] { payoffScript3, parameters3, refPayoff3 };
+            #endregion
         }
 
     }
+
 }

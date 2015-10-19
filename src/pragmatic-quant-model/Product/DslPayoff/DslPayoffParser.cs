@@ -58,7 +58,7 @@ namespace pragmatic_quant_model.Product.DslPayoff
             var obj = RetrieveParameter(paramName);
             return DateAndDurationConverter.ConvertDate(obj);
         }
-        
+
         private string FunctionReference(string target, string[] args)
         {
             switch (target.Trim().ToLower())
@@ -76,7 +76,7 @@ namespace pragmatic_quant_model.Product.DslPayoff
         {
             if (args.Length != expectedSize)
                 throw new ArgumentException(string.Format("{0} expect {1} arguments, but was {2}.",
-                                                           func, expectedSize, args.Length));
+                    func, expectedSize, args.Length));
         }
         private string FixingReference(IFixing fixing, IDictionary<IFixing, string> fixingRefs)
         {
@@ -95,10 +95,10 @@ namespace pragmatic_quant_model.Product.DslPayoff
         private string ObjectReference(object o)
         {
             if (o is double)
-                return DoubleReference((double)o);
-            
+                return DoubleReference((double) o);
+
             if (o is int)
-                return DoubleReference((int)o);
+                return DoubleReference((int) o);
 
             return o.ToString();
         }
@@ -129,6 +129,11 @@ namespace pragmatic_quant_model.Product.DslPayoff
             var rightExpression = GetExpressionBase(binOp.Right, fixingRefs);
             return "(" + leftExpression + ")" + binOp.OpSymbol + "(" + rightExpression + ")";
         }
+        private string GetExpression(UnaryOperationNode unaryOp, IDictionary<IFixing, string> fixingRefs)
+        {
+            var argExpression = GetExpressionBase(unaryOp.Argument, fixingRefs);
+            return unaryOp.OpSymbol + "(" + argExpression + ")";
+        }
         private string GetExpression(IfNode ifNode, IDictionary<IFixing, string> fixingRefs)
         {
             var testExpression = GetExpressionBase(ifNode.Test, fixingRefs);
@@ -153,11 +158,15 @@ namespace pragmatic_quant_model.Product.DslPayoff
 
             var identifier = node as IdentifierNode;
             if (identifier != null)
-                return GetExpression(identifier); 
+                return GetExpression(identifier);
 
             var binOp = node as BinaryOperationNode;
             if (binOp != null)
                 return GetExpression(binOp, fixingRefs);
+
+            var unaryOp = node as UnaryOperationNode;
+            if (unaryOp != null)
+                return GetExpression(unaryOp, fixingRefs);
 
             var ifNode = node as IfNode;
             if (ifNode != null)
@@ -166,7 +175,7 @@ namespace pragmatic_quant_model.Product.DslPayoff
             var function = node as FunctionCallNode;
             if (function != null)
                 return GetExpression(function, fixingRefs);
-            
+
             throw new ArgumentException(string.Format("Not handled node {0} ", node));
         }
         #endregion
@@ -182,4 +191,5 @@ namespace pragmatic_quant_model.Product.DslPayoff
             return new DslPayoffExpression(fixingRefs.Keys.ToArray(), expression, FixingArrayId);
         }
     }
+
 }
