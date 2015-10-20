@@ -59,7 +59,7 @@ namespace pragmatic_quant_com.Factories
                     throw new Exception(string.Format("Error while parsing product, unknown cancellable type : {0}", cancellableType));
             }
         }
-        private IProduct BuildLeg(string legName, object[,] bag)
+        private Leg<Coupon> BuildLeg(string legName, object[,] bag)
         {
             var legId = legName.ToLower().Replace("leg", "");
 
@@ -74,20 +74,20 @@ namespace pragmatic_quant_com.Factories
         }
         private IProduct BuildWeighted(double weight, ParseTreeNode factorProductNode, object[,] bag)
         {
-            IProduct factor = BuildProduct(factorProductNode, bag);
-            throw new NotImplementedException("Weighted product not yet implemented !");
+            var factor = BuildProduct(factorProductNode, bag) as ICouponDecomposable;
+            return DecomposableLinearCombination.Create(new[] {weight}, new[] {factor});
         }
         private IProduct BuildCombination(ParseTreeNode leftNode, ParseTreeNode rightNode, string op, object[,] bag)
         {
-            IProduct left = BuildProduct(leftNode, bag);
-            IProduct right = BuildProduct(rightNode, bag);
+            ICouponDecomposable left = BuildProduct(leftNode, bag) as ICouponDecomposable;
+            ICouponDecomposable right = BuildProduct(rightNode, bag) as ICouponDecomposable;
             switch (op)
             {
                 case "+" :
-                    throw new NotImplementedException("Combination product not yet implemented !");
+                    return DecomposableLinearCombination.Create(new[] {1.0, 1.0}, new[] {left, right});
 
                 case "-" :
-                    throw new NotImplementedException("Combination product not yet implemented !");
+                    return DecomposableLinearCombination.Create(new[] {1.0, -1.0}, new[] {left, right});
 
                 default :
                     throw new Exception("BUG should never get there !");
