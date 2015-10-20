@@ -37,6 +37,10 @@ namespace pragmatic_quant_model.Basic.Structure
             
             return matrix.Values.Column(labelIndexes.First());
         }
+        public static TValOut[] GetColFromLabel<TRow, TVal, TValOut>(this LabelledMatrix<TRow, string, TVal> matrix, string label, Func<TVal,TValOut> func)
+        {
+            return matrix.GetColFromLabel(label).Map(func);
+        }
     }
 
 }

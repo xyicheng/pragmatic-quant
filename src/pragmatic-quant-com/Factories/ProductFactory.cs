@@ -14,10 +14,9 @@ namespace pragmatic_quant_com.Factories
     public class ProductFactory : Singleton<ProductFactory>, IFactoryFromBag<IProduct>
     {
         #region private methods
-        public static Coupon[] BuildDslCoupons(string legId, Parameters parameters, string[] dslCouponPayoffs)
+        private static Coupon[] BuildDslCoupons(string legId, Parameters parameters, string[] dslCouponPayoffs)
         {
-            var payCurrencies = parameters.GetColFromLabel(legId + "PayCurrency")
-                                             .Map(o => Currency.Parse(o.ToString()));
+            var payCurrencies = parameters.GetColFromLabel(legId + "PayCurrency", o => Currency.Parse(o.ToString()));
             var payDates = parameters.RowLabels;
             var couponPayments = payDates.ZipWith(payCurrencies, (d, c) => new PaymentInfo(c, d));
 
@@ -31,14 +30,15 @@ namespace pragmatic_quant_com.Factories
                 DateAndDurationConverter.ConvertDate,
                 o => o.ToString(), o => o);
 
-            var redemptionScripts = parameters.GetColFromLabel("Redemption").Map(o => o.ToString());
-            var currencies = parameters.GetColFromLabel("RedemptionCurrency").Map(o => Currency.Parse(o.ToString()));
-            var payDates = parameters.GetColFromLabel("RedemptionDate").Map(DateAndDurationConverter.ConvertDate);
+            var redemptionScripts = parameters.GetColFromLabel("Redemption", o => o.ToString());
+            var currencies = parameters.GetColFromLabel("RedemptionCurrency", o => Currency.Parse(o.ToString()));
+            var payDates = parameters.GetColFromLabel("RedemptionDate", DateAndDurationConverter.ConvertDate);
+            
             PaymentInfo[] payInfos = payDates.ZipWith(currencies, (d, c) => new PaymentInfo(c, d));
             IFixingFunction[] redemptionPayoffs = DslPayoffFactory.Build("AutocallDate", parameters, redemptionScripts);
             var redemptionCoupons = redemptionPayoffs.ZipWith(payInfos, (payoff, payInfo) => new Coupon(payInfo, payoff));
 
-            var triggerScripts = parameters.GetColFromLabel("AutocallTrigger").Map(o => o.ToString());
+            var triggerScripts = parameters.GetColFromLabel("AutocallTrigger", o => o.ToString());
             var triggers = DslPayoffFactory.Build("AutocallDate", parameters, triggerScripts);
 
             return new AutoCall(underlying, parameters.RowLabels, redemptionCoupons, triggers);
