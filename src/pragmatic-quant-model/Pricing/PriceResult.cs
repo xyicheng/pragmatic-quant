@@ -4,7 +4,11 @@ using pragmatic_quant_model.MarketDatas;
 
 namespace pragmatic_quant_model.Pricing
 {
-    public class PriceResult
+    public interface IPricingResult
+    {
+    }
+    
+    public class PriceResult : IPricingResult
     {
         public PriceResult(Price price, Tuple<string, PaymentInfo, Price>[] details)
         {

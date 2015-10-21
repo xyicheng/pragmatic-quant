@@ -11,7 +11,7 @@ namespace pragmatic_quant_com
                        Category = "PragmaticQuant_VanillaOption")]
         public static object BachelierOption(double forward, double strike, double maturity, double vol, string optionType)
         {
-            return XlFunctionRunner.Run("BachelierOption", () =>
+            return FunctionRunnerUtils.Run("BachelierOption", () =>
             {
                 double q;
                 switch (optionType.Trim().ToLower())
@@ -33,7 +33,7 @@ namespace pragmatic_quant_com
                        Category = "PragmaticQuant_VanillaOption")]
         public static object BachelierImpliedVol(double forward, double strike, double maturity, double price, string optionType)
         {
-            return XlFunctionRunner.Run("BachelierImpliedVol", () =>
+            return FunctionRunnerUtils.Run("BachelierImpliedVol", () =>
             {
                 double q;
                 switch (optionType.Trim().ToLower())
@@ -55,7 +55,7 @@ namespace pragmatic_quant_com
                        Category = "PragmaticQuant_VanillaOption")]
         public static object BachelierGreek(double fwd, double strike, double maturity, double vol, string request)
         {
-            return XlFunctionRunner.Run("BachelierGreek", () =>
+            return FunctionRunnerUtils.Run("BachelierGreek", () =>
             {
                 double gamma, theta, vega, vanna, vomma;
                 Bachelier.Greeks(fwd, strike, maturity, vol,
@@ -82,7 +82,7 @@ namespace pragmatic_quant_com
                        Category = "PragmaticQuant_VanillaOption")]
         public static object BlackOption(double forward, double strike, double maturity, double vol, string optionType)
         {
-            return XlFunctionRunner.Run("BlackOption", () =>
+            return FunctionRunnerUtils.Run("BlackOption", () =>
             {
                 double q;
                 switch (optionType.Trim().ToLower())
@@ -105,7 +105,7 @@ namespace pragmatic_quant_com
                        Category = "PragmaticQuant_VanillaOption")]
         public static object BlackImpliedVol(double forward, double strike, double maturity, double price, string optionType)
         {
-            return XlFunctionRunner.Run("BlackImpliedVol", () =>
+            return FunctionRunnerUtils.Run("BlackImpliedVol", () =>
             {
                 double q;
                 switch (optionType.Trim().ToLower())
@@ -127,7 +127,7 @@ namespace pragmatic_quant_com
                        Category = "PragmaticQuant_VanillaOption")]
         public static object BlackGreek(double fwd, double strike, double maturity, double vol, string request)
         {
-            return XlFunctionRunner.Run("BlackGreek", () =>
+            return FunctionRunnerUtils.Run("BlackGreek", () =>
             {
                 double gamma, theta, vega, vanna, vomma;
                 BlackScholesOption.Greeks(fwd, strike, maturity, vol,

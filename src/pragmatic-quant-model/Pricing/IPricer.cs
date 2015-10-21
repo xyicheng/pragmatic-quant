@@ -6,6 +6,6 @@ namespace pragmatic_quant_model.Pricing
 {
     public interface IPricer
     {
-        PriceResult Price(IProduct product, IModel model, Market market);
+        IPricingResult Price(IProduct product, IModel model, Market market);
     }
 }

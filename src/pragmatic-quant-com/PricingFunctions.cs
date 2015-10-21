@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using ExcelDna.Integration;
 using pragmatic_quant_com.Factories;
 using pragmatic_quant_com.Publishers;
@@ -12,6 +13,75 @@ namespace pragmatic_quant_com
 {
     public class PricingFunctions
     {
+        #region private methods
+        private static Task<Market> BuildMarket(TaskFactory taskFactory, object mktObj)
+        {
+            return taskFactory.ComputationTaskWithLog("market preparation",
+                () => MarketManager.Instance.GetMarket(mktObj));
+        }
+        private static Task<ICalibrationDescription> BuildCalibration(TaskFactory taskFactory, object[,] modelBag)
+        {
+            return taskFactory.ComputationTaskWithLog("model preparation",
+                () => ModelCalibrationFactory.Instance.Build(modelBag));
+        }
+        private static Task<IPricer> BuildPricer(TaskFactory taskFactory, object[,] algorithmBag)
+        {
+            return taskFactory.ComputationTaskWithLog("pricer preparation", () =>
+            {
+                INumericalMethodConfig algorithm = AlgorithmFactory.Instance.Build(algorithmBag);
+
+                var mcConfig = algorithm as MonteCarloConfig;
+                if (mcConfig != null)
+                    return (IPricer) new McPricer(mcConfig);
+
+                throw new Exception(string.Format("Unknown numerical method !"));
+            });
+        }
+        private static Task<IProduct> BuildProduct(TaskFactory taskFactory, object[,] productBag)
+        {
+            return taskFactory.ComputationTaskWithLog("Product preparation",
+                () => ProductFactory.Instance.Build(productBag));
+        }
+        private static Task<IModel> CalibrateModel(TaskFactory taskFactory, Task<Market> market, Task<ICalibrationDescription> modelCalibDesc)
+        {
+            return taskFactory.ComputationTaskWithLog("Model calibration", () =>
+            {
+                IModelDescription modelDesc = ModelCalibration.Instance.Calibrate(modelCalibDesc.Result, market.Result);
+                return ModelFactory.Instance.Build(modelDesc, market.Result);
+            }, market, modelCalibDesc);
+        }
+        private static Task<IPricingResult> ComputePrice(TaskFactory taskFactory, Task<IPricer> pricer, Task<IProduct> product, Task<IModel> model, Task<Market> market)
+        {
+            return taskFactory.ComputationTaskWithLog("Monte-Carlo simulation",
+                () => pricer.Result.Price(product.Result, model.Result, market.Result)
+                , product, model, market, pricer);
+        }
+        #endregion
+        
+        [ExcelFunction(Description = "Exotic product pricing function",
+                       Category = "PragmaticQuant_Pricing")]
+        public static object ExoticPrice(object requestObj, object[,] productBag, object mktObj, object[,] modelBag, object[,] algorithmBag)
+        {
+            return FunctionRunnerUtils.Run("Price", () =>
+            {
+                Trace.WriteLine("");
+                
+                TaskFactory taskFactory = Task.Factory;
+                Task<Market> market = BuildMarket(taskFactory, mktObj);
+                Task<ICalibrationDescription> modelCalibDesc = BuildCalibration(taskFactory, modelBag);
+                Task<IProduct> product = BuildProduct(taskFactory, productBag);
+                
+                Task<IModel> model = CalibrateModel(taskFactory, market, modelCalibDesc);
+                Task<IPricer> pricer = BuildPricer(taskFactory, algorithmBag);
+                Task<IPricingResult> priceResult = ComputePrice(taskFactory, pricer, product, model, market);
+                
+                Trace.WriteLine("");
+                return PriceResultPublisher.Instance.Publish(priceResult.Result);
+            });
+        }
+        
+        #region Old Version
+        /*
         [ExcelFunction(Description = "Exotic product pricing function",
                        Category = "PragmaticQuant_Pricing")]
         public static object McPrice(object requestObj, object[,] productBag, object mktObj, object[,] modelBag, object[,] algorithmBag)
@@ -55,44 +125,8 @@ namespace pragmatic_quant_com
                 return PriceResultPublisher.Instance.Publish(priceResult);
             });
         }
-
-        #region work in progress
-        /*
-        [ExcelFunction(Description = "Exotic product pricing function",
-            Category = "PragmaticQuant_PricingFunctions")]
-        public static object Price(object requestObj, object[,] productBag, object mktObj, object[,] modelBag, object[,] algorithmBag)
-        {
-            return XlFunctionRunner.Run("Price", () =>
-            {
-                Trace.WriteLine("");
-                TaskFactory f = Task.Factory;
-                var market = f.ComputationTaskWithLog("market preparation", () => MarketManager.Instance.GetMarket(mktObj));
-                var modelCalibDesc = f.ComputationTaskWithLog("model preparation", () => ModelCalibrationFactory.Instance.Build(modelBag));
-                var pricer = f.ComputationTaskWithLog("pricer preparation", () =>
-                {
-                    var algorithm = AlgorithmFactory.Instance.Build(algorithmBag);
-                    return new McPricer(algorithm as MonteCarloConfig);
-                });
-                
-                var product = f.ComputationTaskWithLog("Product preparation", 
-                    () => ProductFactory.Instance.Build(productBag));
-
-                var model = f.ComputationTaskWithLog("Model calibration", () =>
-                {
-                    IModelDescription modelDesc = ModelCalibration.Instance.Calibrate(modelCalibDesc.Result, market.Result);
-                    return ModelFactory.Instance.Build(modelDesc, market.Result);
-                }, market, modelCalibDesc);
-
-                var priceResult = f.ComputationTaskWithLog("Monte-Carlo simulation",
-                    () => pricer.Result.Price(product.Result, model.Result, market.Result), product, model, market, pricer);
-                
-                Trace.WriteLine("");
-                return PriceResultPublisher.Instance.Publish(priceResult.Result);
-            });
-        }
         */
         #endregion
     }
-    
     
 }

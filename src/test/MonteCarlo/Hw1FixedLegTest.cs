@@ -57,7 +57,7 @@ namespace test.MonteCarlo
             var mcPricer = new McPricer(mcConfig);
 
             var fixedLeg = FixedLeg(market.RefDate);
-            var mcPriceResult = mcPricer.Price(fixedLeg, hw1, market);
+            var mcPriceResult = (PriceResult) mcPricer.Price(fixedLeg, hw1, market);
 
             var mcCoupons = mcPriceResult.Details.Map(p => p.Item3.Value);
             var refCoupons = mcPriceResult.Details.Map(pi => market.DiscountCurve(pi.Item2.Financing).Zc(pi.Item2.Date));

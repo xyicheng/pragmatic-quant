@@ -31,7 +31,7 @@ namespace pragmatic_quant_model.Pricing
             nbPaths = mcConfig.NbPaths;
         }
 
-        public PriceResult Price(IProduct product, IModel model, Market market)
+        public IPricingResult Price(IProduct product, IModel model, Market market)
         {
             var simulatedDates = product.RetrieveEventDates();
             McModel mcModel = mcModelFactory.Build(model, market, simulatedDates);

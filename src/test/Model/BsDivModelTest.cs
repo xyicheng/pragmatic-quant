@@ -55,7 +55,7 @@ namespace test.Model
                                 .Map(d => assetMkt.RefDate + d);
 
             IProduct fwdLeg = ForwardLeg(fwdDates);
-            PriceResult priceResult = new McPricer(mcConfig).Price(fwdLeg, blackScholesModel, market);
+            PriceResult priceResult = (PriceResult) new McPricer(mcConfig).Price(fwdLeg, blackScholesModel, market);
             double[] fwds = priceResult.Details.Map(kv => kv.Item3.Value);
 
             var assetFwdCurve = assetMkt.Forward();

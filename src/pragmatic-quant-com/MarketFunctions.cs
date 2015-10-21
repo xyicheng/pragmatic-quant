@@ -30,7 +30,7 @@ namespace pragmatic_quant_com
                        Category = "PragmaticQuant_Market")]
         public static object MarketRefDate(object mktObj)
         {
-            return XlFunctionRunner.Run("MarketRefDate", () =>
+            return FunctionRunnerUtils.Run("MarketRefDate", () =>
             {
                 var market = MarketManager.Instance.GetMarket(mktObj);
                 return market.RefDate;
@@ -41,7 +41,7 @@ namespace pragmatic_quant_com
                        Category = "PragmaticQuant_Market")]
         public static object Discount(object mktObj, object[,] dates, string curveId)
         {
-            return XlFunctionRunner.Run("Discount", () =>
+            return FunctionRunnerUtils.Run("Discount", () =>
             {
                 var market = MarketManager.Instance.GetMarket(mktObj);
                 var finCurveId = FinancingId.Parse(curveId);
@@ -62,7 +62,7 @@ namespace pragmatic_quant_com
                        Category = "PragmaticQuant_Market")]
         public static object AssetForward(object mktObj, object[,] dates, string assetName)
         {
-            return XlFunctionRunner.Run("AssetForward", () =>
+            return FunctionRunnerUtils.Run("AssetForward", () =>
             {
                 var market = MarketManager.Instance.GetMarket(mktObj);
                 var assetMarket = market.AssetMarketFromName(assetName);
@@ -84,7 +84,7 @@ namespace pragmatic_quant_com
                        Category = "PragmaticQuant_Market")]
         public static object VolSurface(object mktObj, object[] dates, double[] strikes, string assetName)
         {
-            return XlFunctionRunner.Run("VolSurface", () =>
+            return FunctionRunnerUtils.Run("VolSurface", () =>
             {
                 Market market = MarketManager.Instance.GetMarket(mktObj);
                 AssetMarket assetMarket = market.AssetMarketFromName(assetName);
@@ -107,7 +107,7 @@ namespace pragmatic_quant_com
                        Category = "PragmaticQuant_Model")]
         public static object LocalVolSurface(object mktObj, object[] dates, double[] strikes, string assetName)
         {
-            return XlFunctionRunner.Run("LocalVolSurface", () =>
+            return FunctionRunnerUtils.Run("LocalVolSurface", () =>
             {
                 Market market = MarketManager.Instance.GetMarket(mktObj);
                 AssetMarket assetMarket = market.AssetMarketFromName(assetName);
@@ -127,7 +127,7 @@ namespace pragmatic_quant_com
                        Category = "PragmaticQuant_Model")]
         public static object EquityVanillaOption(object mktObj, string assetName, object maturity, double strike, double vol, string optionType)
         {
-            return XlFunctionRunner.Run("EquityVanillaOption", () =>
+            return FunctionRunnerUtils.Run("EquityVanillaOption", () =>
             {
                 Market market = MarketManager.Instance.GetMarket(mktObj);
                 AssetMarket assetMkt = market.AssetMarketFromName(assetName);
@@ -157,7 +157,7 @@ namespace pragmatic_quant_com
                        Category = "PragmaticQuant_Model")]
         public static object EquityImpliedVol(object mktObj, string assetName, object maturity, double strike, double price, string optionType)
         {
-            return XlFunctionRunner.Run("EquityImpliedVol", () =>
+            return FunctionRunnerUtils.Run("EquityImpliedVol", () =>
             {
                 Market market = MarketManager.Instance.GetMarket(mktObj);
                 AssetMarket assetMkt = market.AssetMarketFromName(assetName);

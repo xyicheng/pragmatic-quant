@@ -33,7 +33,7 @@ namespace pragmatic_quant_com
         }
     }
 
-    public static class XlFunctionRunner
+    public static class FunctionRunnerUtils
     {
         public static object Run(string functionName, Func<object> func)
         {
@@ -85,4 +85,5 @@ namespace pragmatic_quant_com
         }
 
     }
+
 }
