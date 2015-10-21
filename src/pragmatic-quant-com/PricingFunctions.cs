@@ -13,8 +13,8 @@ namespace pragmatic_quant_com
     public class PricingFunctions
     {
         [ExcelFunction(Description = "Exotic product pricing function",
-            Category = "PragmaticQuant_PricingFunctions")]
-        public static object Price(object requestObj, object[,] productBag, object mktObj, object[,] modelBag, object[,] algorithmBag)
+                       Category = "PragmaticQuant_Pricing")]
+        public static object McPrice(object requestObj, object[,] productBag, object mktObj, object[,] modelBag, object[,] algorithmBag)
         {
             return XlFunctionRunner.Run("Price", () =>
             {

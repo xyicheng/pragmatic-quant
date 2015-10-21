@@ -11,7 +11,7 @@ namespace pragmatic_quant_com
     public class MarketFunctions
     {
         [ExcelFunction(Description = "Set market from xl range", 
-                       Category = "PragmaticQuant_MarketFunctions")]
+                       Category = "PragmaticQuant_Market")]
         public static bool SetMarket(string mktId, object range)
         {
             try
@@ -27,7 +27,7 @@ namespace pragmatic_quant_com
         }
 
         [ExcelFunction(Description = "Get market reference date",
-                       Category = "PragmaticQuant_MarketFunctions")]
+                       Category = "PragmaticQuant_Market")]
         public static object MarketRefDate(object mktObj)
         {
             return XlFunctionRunner.Run("MarketRefDate", () =>
@@ -38,7 +38,7 @@ namespace pragmatic_quant_com
         }
 
         [ExcelFunction(Description = "Discount zero coupon function", 
-                       Category = "PragmaticQuant_MarketFunctions")]
+                       Category = "PragmaticQuant_Market")]
         public static object Discount(object mktObj, object[,] dates, string curveId)
         {
             return XlFunctionRunner.Run("Discount", () =>
@@ -59,7 +59,7 @@ namespace pragmatic_quant_com
         }
 
         [ExcelFunction(Description = "Equity Asset forward function",
-                       Category = "PragmaticQuant_MarketFunctions")]
+                       Category = "PragmaticQuant_Market")]
         public static object AssetForward(object mktObj, object[,] dates, string assetName)
         {
             return XlFunctionRunner.Run("AssetForward", () =>
@@ -81,7 +81,7 @@ namespace pragmatic_quant_com
         }
 
         [ExcelFunction(Description = "Equity Asset vol function",
-                       Category = "PragmaticQuant_MarketFunctions")]
+                       Category = "PragmaticQuant_Market")]
         public static object VolSurface(object mktObj, object[] dates, double[] strikes, string assetName)
         {
             return XlFunctionRunner.Run("VolSurface", () =>
@@ -104,7 +104,7 @@ namespace pragmatic_quant_com
     public class ModelFunctions
     {
         [ExcelFunction(Description = "Equity local volatility function",
-                       Category = "PragmaticQuant_ModelFunctions")]
+                       Category = "PragmaticQuant_Model")]
         public static object LocalVolSurface(object mktObj, object[] dates, double[] strikes, string assetName)
         {
             return XlFunctionRunner.Run("LocalVolSurface", () =>
@@ -124,7 +124,7 @@ namespace pragmatic_quant_com
         }
 
         [ExcelFunction(Description = "Equity vanilla option",
-                       Category = "PragmaticQuant_ModelFunctions")]
+                       Category = "PragmaticQuant_Model")]
         public static object EquityVanillaOption(object mktObj, string assetName, object maturity, double strike, double vol, string optionType)
         {
             return XlFunctionRunner.Run("EquityVanillaOption", () =>
@@ -154,7 +154,7 @@ namespace pragmatic_quant_com
         }
 
         [ExcelFunction(Description = "Equity vanilla option implied volatility",
-                       Category = "PragmaticQuant_ModelFunctions")]
+                       Category = "PragmaticQuant_Model")]
         public static object EquityImpliedVol(object mktObj, string assetName, object maturity, double strike, double price, string optionType)
         {
             return XlFunctionRunner.Run("EquityImpliedVol", () =>

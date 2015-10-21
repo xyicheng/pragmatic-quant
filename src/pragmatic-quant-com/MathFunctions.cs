@@ -8,7 +8,8 @@ namespace pragmatic_quant_com
 {
     public class MathFunctions
     {
-        [ExcelFunction(Description = "Generate uniform sample with Sobol algorithm", Category = "PragmaticQuant_Math")]
+        [ExcelFunction(Description = "Generate uniform sample with Sobol algorithm", 
+                       Category = "PragmaticQuant_Math")]
         public static object Sobol(string directionType, int dimension, int nbPaths,
             int nbSkippedPaths, object startDimIndexDisplay)
         {
@@ -40,7 +41,8 @@ namespace pragmatic_quant_com
             });
         }
 
-        [ExcelFunction(Description = "Cubic spline interpolation", Category = "PragmaticQuant_Math")]
+        [ExcelFunction(Description = "Cubic spline interpolation", 
+                       Category = "PragmaticQuant_Math")]
         public static object CubicSpline(double[] abscissae, double[] values, double[] points)
         {
             return XlFunctionRunner.Run("CubicSpline", () =>
