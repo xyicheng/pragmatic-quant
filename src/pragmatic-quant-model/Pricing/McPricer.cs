@@ -9,26 +9,35 @@ using pragmatic_quant_model.Product;
 
 namespace pragmatic_quant_model.Pricing
 {
+    using CouponPathFlows = PathFlows<double, CouponFlowLabel>;
+
     public class McPricer : IPricer
     {
         #region private fields
         private readonly McModelFactory mcModelFactory;
+        private readonly IMcPricingResult pricingResult;
         private readonly int nbPaths;
         #endregion
         #region private methods
-        private McEngine<PathFlows<double, CouponFlowLabel>, PathFlows<double, CouponFlowLabel>> McEngine(IProduct product, McModel mcModel)
+        private McEngine<CouponPathFlows, CouponPathFlows> McEngine(IProduct product, McModel mcModel)
         {
             var productPathFlowCalculator = ProductPathFlowFactory.Build(product, mcModel);
             var processPathFlowGen = new ProcessPathFlowGenerator<double, CouponFlowLabel>
                 (mcModel.BrownianBridge, mcModel.ProcessPathGen, productPathFlowCalculator);
-            return new McEngine<PathFlows<double, CouponFlowLabel>, PathFlows<double, CouponFlowLabel>>
+            return new McEngine<CouponPathFlows, CouponPathFlows>
                 (mcModel.RandomGenerator, processPathFlowGen, new PriceFlowsAggregator<CouponFlowLabel>());
         }
         #endregion
-        public McPricer(MonteCarloConfig mcConfig)
+        
+        public McPricer(MonteCarloConfig mcConfig, IMcPricingResult pricingResult)
         {
+            this.pricingResult = pricingResult;
             mcModelFactory = new McModelFactory(mcConfig);
             nbPaths = mcConfig.NbPaths;
+        }
+        public static McPricer WithDetails(MonteCarloConfig mcConfig)
+        {
+            return new McPricer(mcConfig, new McPricingResultWithDetails());
         }
 
         public IPricingResult Price(IProduct product, IModel model, Market market)
@@ -38,7 +47,19 @@ namespace pragmatic_quant_model.Pricing
             var mcEngine = McEngine(product, mcModel);
 
             PathFlows<double, CouponFlowLabel> result = mcEngine.Run(nbPaths);
-            
+            return pricingResult.PricingResult(result, product, market);
+        }
+    }
+
+    public interface IMcPricingResult
+    {
+        IPricingResult PricingResult(CouponPathFlows result, IProduct product, Market market);
+    }
+
+    public class McPricingResultWithDetails : IMcPricingResult
+    {
+        public IPricingResult PricingResult(CouponPathFlows result, IProduct product, Market market)
+        {
             var refCurrency = product.Financing.Currency;
             var priceDetails = new List<Tuple<string, PaymentInfo, Price>>();
             var totalPrice = 0.0;
@@ -52,4 +73,5 @@ namespace pragmatic_quant_model.Pricing
             return new PriceResult(new Price(totalPrice, refCurrency), priceDetails.ToArray());
         }
     }
+
 }

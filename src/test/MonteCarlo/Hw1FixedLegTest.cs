@@ -54,8 +54,8 @@ namespace test.MonteCarlo
             var mcConfig = new MonteCarloConfig(20000,
                 RandomGenerators.GaussianSobol(SobolDirection.JoeKuoD5));
             
-            var mcPricer = new McPricer(mcConfig);
-
+            var mcPricer = McPricer.WithDetails(mcConfig);
+            
             var fixedLeg = FixedLeg(market.RefDate);
             var mcPriceResult = (PriceResult) mcPricer.Price(fixedLeg, hw1, market);
 

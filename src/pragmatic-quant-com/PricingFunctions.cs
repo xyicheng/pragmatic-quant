@@ -24,7 +24,7 @@ namespace pragmatic_quant_com
             return taskFactory.ComputationTaskWithLog("model preparation",
                 () => ModelCalibrationFactory.Instance.Build(modelBag));
         }
-        private static Task<IPricer> BuildPricer(TaskFactory taskFactory, object[,] algorithmBag)
+        private static Task<IPricer> BuildPricer(TaskFactory taskFactory, object requestObj, object[,] algorithmBag)
         {
             return taskFactory.ComputationTaskWithLog("pricer preparation", () =>
             {
@@ -32,7 +32,12 @@ namespace pragmatic_quant_com
 
                 var mcConfig = algorithm as MonteCarloConfig;
                 if (mcConfig != null)
-                    return (IPricer) new McPricer(mcConfig);
+                {
+                    if (!requestObj.ToString().Equals("price", StringComparison.InvariantCultureIgnoreCase))
+                        throw new Exception("Unknow request");
+
+                    return (IPricer) McPricer.WithDetails(mcConfig);
+                }
 
                 throw new Exception(string.Format("Unknown numerical method !"));
             });
@@ -62,7 +67,7 @@ namespace pragmatic_quant_com
                        Category = "PragmaticQuant_Pricing")]
         public static object ExoticPrice(object requestObj, object[,] productBag, object mktObj, object[,] modelBag, object[,] algorithmBag)
         {
-            return FunctionRunnerUtils.Run("Price", () =>
+            return FunctionRunnerUtils.Run("ExoticPrice", () =>
             {
                 Trace.WriteLine("");
                 
@@ -72,7 +77,7 @@ namespace pragmatic_quant_com
                 Task<IProduct> product = BuildProduct(taskFactory, productBag);
                 
                 Task<IModel> model = CalibrateModel(taskFactory, market, modelCalibDesc);
-                Task<IPricer> pricer = BuildPricer(taskFactory, algorithmBag);
+                Task<IPricer> pricer = BuildPricer(taskFactory, requestObj, algorithmBag);
                 Task<IPricingResult> priceResult = ComputePrice(taskFactory, pricer, product, model, market);
                 
                 Trace.WriteLine("");
