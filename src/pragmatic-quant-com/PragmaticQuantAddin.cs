@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -35,6 +36,18 @@ namespace pragmatic_quant_com
 
     public static class FunctionRunnerUtils
     {
+        #region private methods
+        private static Exception[] CollectAggregate(Exception exception)
+        {
+            var aggregateExcept = exception as AggregateException;
+            if (aggregateExcept != null)
+            {
+                var inners = aggregateExcept.InnerExceptions.Map(CollectAggregate);
+                return EnumerableUtils.Append(inners);
+            }
+            return new[] {exception};
+        }
+        #endregion
         public static object Run(string functionName, Func<object> func)
         {
             try
@@ -43,17 +56,9 @@ namespace pragmatic_quant_com
             }
             catch (Exception e)
             {
-                var aggregateException = e as AggregateException;
-                if (aggregateException != null)
-                {
-                    foreach (var exception in aggregateException.InnerExceptions)
-                        Trace.TraceError(exception.Message);
-                }
-                else
-                {
-                    Trace.TraceError(e.Message);
-                }
-                
+                var inners = CollectAggregate(e);
+                foreach (var exception in inners)
+                    Trace.TraceError(exception.Message);
                 return string.Format("ERROR while running {0}", functionName);
             }
         }
