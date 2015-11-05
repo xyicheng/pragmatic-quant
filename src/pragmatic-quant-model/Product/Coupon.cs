@@ -11,7 +11,7 @@ namespace pragmatic_quant_model.Product
             Payoff = payoff;
             Fixings = payoff.Fixings;
         }
-
+        
         public IFixing[] Fixings { get; private set; }
         public IFixingFunction Payoff { get; private set; }
         public PaymentInfo PaymentInfo { get; private set; }
@@ -21,10 +21,15 @@ namespace pragmatic_quant_model.Product
         {
             return visitor.Visit(this);
         }
-
         public Coupon[] Decomposition()
         {
             return new[] {this};
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Coupon : Cur = {0}, Date = {1}, Financing = {2}", 
+                PaymentInfo.Currency, PaymentInfo.Date, PaymentInfo.Financing);
         }
     }
     

@@ -21,6 +21,7 @@ namespace pragmatic_quant_model.Model.Equity.Dividends
         private readonly double[] quadPoints;
         private readonly double[] quadWeights;
         #endregion
+        
         public BlackScholesWithDividendOption(double spot, AffineDivCurveUtils affineDivUtils, int quadratureNbPoints = 10)
         {
             this.affineDivUtils = affineDivUtils;
@@ -29,9 +30,9 @@ namespace pragmatic_quant_model.Model.Equity.Dividends
         }
 
         public static BlackScholesWithDividendOption Build(double spot,
-            DividendQuote[] dividends,
-            DiscountCurve discountCurve,
-            ITimeMeasure time)
+                                                           DividendQuote[] dividends,
+                                                           DiscountCurve discountCurve,
+                                                           ITimeMeasure time)
         {
             var divUtils = new AffineDivCurveUtils(dividends, discountCurve, time);
             return new BlackScholesWithDividendOption(spot, divUtils);
@@ -47,27 +48,7 @@ namespace pragmatic_quant_model.Model.Equity.Dividends
         /// <returns></returns>
         public double Price(double maturity, double strike, double vol, double q)
         {
-            var midT = 0.5 * maturity; //TODO find a best heuristic !
-            var dT = maturity - midT;
-
-            var displacement1 = affineDivUtils.CashBpvAverage(0.0, midT);
-            var displacement2 = affineDivUtils.CashBpvAverage(midT, maturity);
-            var maturityGrowth = affineDivUtils.AssetGrowth(maturity);
-
-            var k = strike + maturityGrowth * (affineDivUtils.CashDivBpv(maturity) - displacement2);
-            double a = maturityGrowth * (spot - displacement1) * Math.Exp(-0.5 * vol * vol * midT);
-            double b = maturityGrowth * (displacement1 - displacement2);
-            double stdDev = Math.Sqrt(midT) * vol;
-            
-            var price = 0.0;
-            for (int i = 0; i < quadPoints.Length; i++)
-            {
-                double x = a * Math.Exp(stdDev * quadPoints[i]) + b;
-                double midTprice = (x > 0.0) ? BlackScholesOption.Price(x, k, vol, dT, q)
-                    : (q > 0.0) ? 0.0 : k - x;
-                price += quadWeights[i] * midTprice;
-            }
-            return price;
+            return new BsDivPrice(maturity, strike, spot, affineDivUtils, quadPoints, quadWeights).Price(vol, q);
         }
 
         /// <summary>
@@ -80,23 +61,22 @@ namespace pragmatic_quant_model.Model.Equity.Dividends
         /// <returns></returns>
         public double ImpliedVol(double maturity, double strike, double price, double q)
         {
-            Func<double, double> volToError = v => Price(maturity, strike, v, q) - price;
-
             //Proxy using Lehman Formula
             double proxyFwd, proxyDk;
             affineDivUtils.LehmanProxy(maturity, spot, out proxyFwd, out proxyDk);
-            double v1 = BlackScholesOption.ImpliedVol(price, proxyFwd, strike + proxyDk, maturity, q);
-
-            //Second Guess
-            double gamma, theta, vega, vanna, vomma;
-            BlackScholesOption.Greeks(proxyFwd, strike + proxyDk, maturity, v1,
-                out gamma, out theta, out vega, out vanna, out vomma);
-            double v2 = v1 - volToError(v1) / vega;
+            double lehmanTargetVol = BlackScholesOption.ImpliedVol(price, proxyFwd, strike + proxyDk, maturity, q);
             
+            var pricer = new BsDivPrice(maturity, strike, spot, affineDivUtils, quadPoints, quadWeights);
+            Func<double, double> volToLehmanVolErr =
+                v => BlackScholesOption.ImpliedVol(pricer.Price(v, q), proxyFwd, strike + proxyDk, maturity, q) - lehmanTargetVol;
+            //TODO mettre un cache pour le solver
+
             //Bracket & Solve
-            if (!RootUtils.Bracket(volToError, v1, v2, out v1, out v2))
+            double v1 = lehmanTargetVol;
+            double v2 = lehmanTargetVol - volToLehmanVolErr(lehmanTargetVol);
+            if (!RootUtils.Bracket(volToLehmanVolErr, v1, v2, out v1, out v2))
                 throw new Exception("Failed to inverse vol");
-            var impliedVol = RootUtils.Brenth(volToError, v1, v2, 1.0e-10, 2.0 * DoubleUtils.MachineEpsilon, 10);
+            var impliedVol = RootUtils.Brenth(volToLehmanVolErr, v1, v2, 1.0e-10, 2.0 * DoubleUtils.MachineEpsilon, 10);
             return impliedVol;
         }
 
@@ -129,6 +109,56 @@ namespace pragmatic_quant_model.Model.Equity.Dividends
             double formulaVol = vol * volAdj;
             return BlackScholesOption.Price(formulaForward, formulaStrike, formulaVol, maturity, q);
         }
+
+        #region private class
+        private sealed class BsDivPrice
+        {
+            #region private fields
+            private readonly double k;
+            private readonly double a;
+            private readonly double b;
+            private readonly double midT;
+            private readonly double dT;
+            private readonly double[] z;
+            private readonly double[] quadWeights;
+            #endregion
+
+            public BsDivPrice(double maturity, double strike, double spot,
+                AffineDivCurveUtils affineDivUtils, double[] quadPoints, double[] quadWeights)
+            {
+                this.quadWeights = quadWeights;
+
+                midT = 0.5 * maturity; //TODO find a best heuristic !
+                dT = maturity - midT;
+
+                double sqrtMidT = Math.Sqrt(midT);
+                z = quadPoints.Map(p => p * sqrtMidT);
+
+                var displacement1 = affineDivUtils.CashBpvAverage(0.0, midT);
+                var displacement2 = affineDivUtils.CashBpvAverage(midT, maturity);
+                var maturityGrowth = affineDivUtils.AssetGrowth(maturity);
+
+                k = strike + maturityGrowth * (affineDivUtils.CashDivBpv(maturity) - displacement2);
+                a = maturityGrowth * (spot - displacement1);
+                b = maturityGrowth * (displacement1 - displacement2);
+            }
+            
+            public double Price(double vol, double q)
+            {
+                double aCvx = a * Math.Exp(-0.5 * vol * vol * midT);
+
+                var price = 0.0;
+                for (int i = 0; i < z.Length; i++)
+                {
+                    double x = aCvx * Math.Exp(vol * z[i]) + b;
+                    double midTprice = (x > 0.0) ? BlackScholesOption.Price(x, k, vol, dT, q)
+                        : (q > 0.0) ? 0.0 : k - x;
+                    price += quadWeights[i] * midTprice;
+                }
+                return price;
+            }
+        }
+        #endregion
     }
 
     public class AffineDivCurveUtils

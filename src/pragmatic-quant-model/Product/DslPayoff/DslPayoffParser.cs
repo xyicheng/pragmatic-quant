@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Irony;
 using Irony.Interpreter.Ast;
 using Irony.Parsing;
 using pragmatic_quant_model.Basic;

@@ -91,16 +91,16 @@ namespace pragmatic_quant_model.MonteCarlo.Product
             var fixingIndex = fixings[dateIndex].FindIndex(searchedFixing);
             return new Tuple<int, int>(dateIndex, fixingIndex);
         }
-        private static FixingFuncPathValue FixingFuncPathValue(IFixing[][] simulatedFixings, IFixingFunction payoff)
+        private FixingFuncPathValue FixingFuncPathValue(IFixingFunction payoff)
         {
             var coords = payoff.Fixings.Map(f => FindFixingIndex(simulatedFixings, f));
             return new FixingFuncPathValue(payoff, coords);
         }
-        private static CouponPathFlow[] BuildCouponPathFlow(IFixing[][] simulatedFixings, PaymentInfo[][] simulatedRebasement, params Coupon[] coupons)
+        private CouponPathFlow[] BuildCouponPathFlow(params Coupon[] coupons)
         {
             CouponPathFlow[] couponFlows = coupons.Map(cpn =>
             {
-                var payoffPathValue = FixingFuncPathValue(simulatedFixings, cpn.Payoff);
+                var payoffPathValue = FixingFuncPathValue(cpn.Payoff);
                 var paymentCoordinate = FindPaymentIndex(simulatedRebasement, cpn.PaymentInfo);
                 var couponFlowLabel = new CouponFlowLabel(cpn.PaymentInfo, cpn.ToString()); 
                 return new CouponPathFlow(payoffPathValue, couponFlowLabel, paymentCoordinate);
@@ -116,12 +116,12 @@ namespace pragmatic_quant_model.MonteCarlo.Product
 
         public IProductPathFlow Visit(Coupon coupon)
         {
-            var couponFlows = BuildCouponPathFlow(simulatedFixings, simulatedRebasement, coupon);
+            var couponFlows = BuildCouponPathFlow(coupon);
             return new CouponArrayPathFlow(couponFlows);
         }
         public IProductPathFlow Visit(ICouponDecomposable couponDecomposable)
         {
-            var couponFlows = BuildCouponPathFlow(simulatedFixings, simulatedRebasement, couponDecomposable.Decomposition());
+            var couponFlows = BuildCouponPathFlow(couponDecomposable.Decomposition());
             return new CouponArrayPathFlow(couponFlows); 
         }
         public IProductPathFlow Visit(AutoCall autocall)
@@ -129,7 +129,7 @@ namespace pragmatic_quant_model.MonteCarlo.Product
             List<Coupon> underlyingsCouponsByPayDate = autocall.Underlying.Decomposition()
                                                             .OrderBy(cpn => cpn.PaymentInfo.Date)
                                                             .ToList();
-            CouponPathFlow[] underlyingPathFlows = BuildCouponPathFlow(simulatedFixings, simulatedRebasement, underlyingsCouponsByPayDate.ToArray());
+            CouponPathFlow[] underlyingPathFlows = BuildCouponPathFlow(underlyingsCouponsByPayDate.ToArray());
 
             int[] underlyingCallIndexes = autocall.CallDates.Map(callDate =>
             {
@@ -142,13 +142,13 @@ namespace pragmatic_quant_model.MonteCarlo.Product
             var triggerPathEvals = autocall.CallDates.Map(callDate =>
             {
                 var trigger = autocall.CallTrigger(callDate);
-                return FixingFuncPathValue(simulatedFixings, trigger);
+                return FixingFuncPathValue(trigger);
             });
 
             var redemptionPathFlows = autocall.CallDates.Map(callDate =>
             {
                 var redemptionCpn = autocall.Redemption(callDate);
-                return BuildCouponPathFlow(simulatedFixings, simulatedRebasement, redemptionCpn).Single();
+                return BuildCouponPathFlow(redemptionCpn).Single();
             });
 
             return new AutocallPathFlow(underlyingPathFlows, redemptionPathFlows, triggerPathEvals, underlyingCallIndexes);
