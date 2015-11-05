@@ -52,6 +52,19 @@ namespace pragmatic_quant_model.Model.Equity.Dividends
         }
 
         /// <summary>
+        /// Price option using a two step quadrature.
+        /// </summary>
+        /// <param name="maturity">option maturity</param>
+        /// <param name="strike">option strike</param>
+        /// <param name="terminalVol"> terminal volatility : quadratic average of BS instant volatility </param>
+        /// <param name="q">option type : 1 for call, -1 for put</param>
+        /// <returns></returns>
+        public double Price(double maturity, double strike, RrFunction terminalVol, double q)
+        {
+            return new BsDivPrice(maturity, strike, spot, affineDivUtils, quadPoints, quadWeights).Price(terminalVol, q);
+        }
+
+        /// <summary>
         /// Implied volatility from option price. (Inversion of the two step quadrature formula.)
         /// </summary>
         /// <param name="maturity">option maturity</param>
@@ -119,6 +132,7 @@ namespace pragmatic_quant_model.Model.Equity.Dividends
             private readonly double b;
             private readonly double midT;
             private readonly double dT;
+            private readonly double maturity;
             private readonly double[] z;
             private readonly double[] quadWeights;
             #endregion
@@ -127,6 +141,7 @@ namespace pragmatic_quant_model.Model.Equity.Dividends
                 AffineDivCurveUtils affineDivUtils, double[] quadPoints, double[] quadWeights)
             {
                 this.quadWeights = quadWeights;
+                this.maturity = maturity;
 
                 midT = 0.5 * maturity; //TODO find a best heuristic !
                 dT = maturity - midT;
@@ -142,20 +157,33 @@ namespace pragmatic_quant_model.Model.Equity.Dividends
                 a = maturityGrowth * (spot - displacement1);
                 b = maturityGrowth * (displacement1 - displacement2);
             }
-            
-            public double Price(double vol, double q)
+            private double Price(double volBeforeMidT, double volAfterMidT, double q)
             {
-                double aCvx = a * Math.Exp(-0.5 * vol * vol * midT);
+                double aCvx = a * Math.Exp(-0.5 * volBeforeMidT * volBeforeMidT * midT);
 
                 var price = 0.0;
                 for (int i = 0; i < z.Length; i++)
                 {
-                    double x = aCvx * Math.Exp(vol * z[i]) + b;
-                    double midTprice = (x > 0.0) ? BlackScholesOption.Price(x, k, vol, dT, q)
+                    double x = aCvx * Math.Exp(volBeforeMidT * z[i]) + b;
+                    double midTprice = (x > 0.0) ? BlackScholesOption.Price(x, k, volAfterMidT, dT, q)
                         : (q > 0.0) ? 0.0 : k - x;
                     price += quadWeights[i] * midTprice;
                 }
                 return price;
+            }
+            public double Price(double vol, double q)
+            {
+                return Price(vol, vol, q);
+            }
+            public double Price(RrFunction terminalVol, double q)
+            {
+                var volBeforeMidT = terminalVol.Eval(midT);
+
+                var termVolAtMaturity = terminalVol.Eval(maturity);
+                var varAfterMidT = (termVolAtMaturity * termVolAtMaturity * maturity - volBeforeMidT * volBeforeMidT - midT) / dT;
+                var volAfterMidT = Math.Sqrt(varAfterMidT);
+
+                return Price(volBeforeMidT, volAfterMidT, q);
             }
         }
         #endregion
