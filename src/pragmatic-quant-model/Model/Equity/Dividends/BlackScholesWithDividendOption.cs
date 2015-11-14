@@ -59,7 +59,7 @@ namespace pragmatic_quant_model.Model.Equity.Dividends
         /// <param name="terminalVol"> terminal volatility : quadratic average of BS instant volatility </param>
         /// <param name="q">option type : 1 for call, -1 for put</param>
         /// <returns></returns>
-        public double Price(double maturity, double strike, RrFunction terminalVol, double q)
+        public double Price(double maturity, double strike, Func<double, double> terminalVol, double q)
         {
             return new BsDivPrice(maturity, strike, spot, affineDivUtils, quadPoints, quadWeights).Price(terminalVol, q);
         }
@@ -82,7 +82,7 @@ namespace pragmatic_quant_model.Model.Equity.Dividends
             var pricer = new BsDivPrice(maturity, strike, spot, affineDivUtils, quadPoints, quadWeights);
             Func<double, double> volToLehmanVolErr =
                 v => BlackScholesOption.ImpliedVol(pricer.Price(v, q), proxyFwd, strike + proxyDk, maturity, q) - lehmanTargetVol;
-            //TODO mettre un cache pour le solver
+            //TODO use a cache
 
             //Bracket & Solve
             double v1 = lehmanTargetVol;
@@ -93,6 +93,78 @@ namespace pragmatic_quant_model.Model.Equity.Dividends
             return impliedVol;
         }
 
+        public double[] CalibrateVol(double[] maturities, double[] targetPrices, double[] strikes, double[] optionTypes)
+        {
+            Contract.Requires(EnumerableUtils.IsSorted(maturities));
+            Contract.Requires(maturities.Length == strikes.Length 
+                              && strikes.Length == targetPrices.Length
+                              && targetPrices.Length== optionTypes.Length);
+            
+            double[] variances = new double[maturities.Length + 1];
+            double[] varPillars = new[] {0.0}.Concat(maturities).ToArray();
+
+            double[] calibVols = new double[maturities.Length];
+            for (int step = 0; step < maturities.Length; step++)
+            {
+                var maturity = maturities[step];
+                var strike = strikes[step];
+                var targetPrice = targetPrices[step];
+                var q = optionTypes[step];
+                
+                //Proxy using Lehman Formula
+                double proxyFwd, proxyDk;
+                affineDivUtils.LehmanProxy(maturity, spot, out proxyFwd, out proxyDk);
+                double lehmanTargetVol = BlackScholesOption.ImpliedVol(targetPrice, proxyFwd, strike + proxyDk, maturity, q);
+
+                var pricer = new BsDivPrice(maturities[step], strikes[step], spot, affineDivUtils, quadPoints, quadWeights);
+                Func<double, double> volToLehmanVolErr = v =>
+                {
+                    variances[1 + step] = v * v * maturity;
+                    var varFunc = RrFunctions.LinearInterpolation(varPillars, variances);
+                    
+                    Func<double, double> volFunc = t => Math.Sqrt(varFunc.Eval(t) / t);
+                    var price = pricer.Price(volFunc, q);
+                    return BlackScholesOption.ImpliedVol(price, proxyFwd, strike + proxyDk, maturity, q) - lehmanTargetVol;
+                };//TODO use a cache
+                
+                
+                //Bracket & Solve
+                double v1 = lehmanTargetVol;
+                double v2;
+                if (step == 0)
+                {
+                    v2 = lehmanTargetVol - volToLehmanVolErr(lehmanTargetVol);
+                }
+                else
+                {
+                    var volIfZeroVolOnStep = Math.Sqrt(calibVols[step - 1] * calibVols[step - 1] * maturities[step - 1] / maturities[step]);
+                    var minError = volToLehmanVolErr(volIfZeroVolOnStep);
+                    if (minError > 0.0) //saturation case
+                    {
+                        calibVols[step] = volIfZeroVolOnStep;
+                        variances[1 + step] = volIfZeroVolOnStep * volIfZeroVolOnStep * maturity;
+                        continue;
+                    }
+                    v2 = volIfZeroVolOnStep;
+                }
+                
+                if (!RootUtils.Bracket(volToLehmanVolErr, v1, v2, out v1, out v2))
+                    throw new Exception("Failed to inverse vol");
+                var impliedVol = RootUtils.Brenth(volToLehmanVolErr, v1, v2, 1.0e-10, 2.0 * DoubleUtils.MachineEpsilon, 10);
+                
+                calibVols[step] = impliedVol;
+                variances[1 + step] = impliedVol * impliedVol * maturity;
+            }
+
+            return calibVols;
+        }
+        public double[] CalibrateVol(double[] maturities, double[] targetPrices, double strike, double optionType)
+        {
+            return CalibrateVol(maturities, targetPrices,
+                ArrayUtils.Constant(maturities.Length, strike),
+                ArrayUtils.Constant(maturities.Length, optionType));
+        }
+        
         /// <summary>
         /// Price option using Lehman Brother proxy.
         /// </summary>
@@ -175,12 +247,12 @@ namespace pragmatic_quant_model.Model.Equity.Dividends
             {
                 return Price(vol, vol, q);
             }
-            public double Price(RrFunction terminalVol, double q)
+            public double Price(Func<double, double> terminalVol, double q)
             {
-                var volBeforeMidT = terminalVol.Eval(midT);
+                var volBeforeMidT = terminalVol(midT);
 
-                var termVolAtMaturity = terminalVol.Eval(maturity);
-                var varAfterMidT = (termVolAtMaturity * termVolAtMaturity * maturity - volBeforeMidT * volBeforeMidT - midT) / dT;
+                var termVolAtMaturity = terminalVol(maturity);
+                var varAfterMidT = (termVolAtMaturity * termVolAtMaturity * maturity - volBeforeMidT * volBeforeMidT * midT) / dT;
                 var volAfterMidT = Math.Sqrt(varAfterMidT);
 
                 return Price(volBeforeMidT, volAfterMidT, q);

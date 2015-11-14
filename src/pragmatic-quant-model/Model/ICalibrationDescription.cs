@@ -33,6 +33,7 @@ namespace pragmatic_quant_model.Model
             AddExplicit<Hw1ModelDescription>(result);
             AddExplicit<BlackScholesModelDescription>(result);
             result.Add(typeof (LocalVolModelCalibDesc), LocalVolModelCalibration.Instance);
+            result.Add(typeof(BlackScholesModelCalibDesc), BlackScholesModelCalibration.Instance);
             return result;
         }
         #endregion

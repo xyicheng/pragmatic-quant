@@ -69,7 +69,7 @@
     <Compile Include="Maths\PolynomialTest.cs" />
     <Compile Include="Maths\SobolTest.cs" />
     <Compile Include="Maths\BrownianBridge_Test.cs" />
-    <Compile Include="Model\BlackDivImpliedVol.cs" />
+    <Compile Include="Model\BlackDivImpliedVolTest.cs" />
     <Compile Include="Model\BsDivModelTest.cs" />
     <Compile Include="Model\Hw1ModelTest.cs" />
     <Compile Include="MonteCarlo\Hw1FixedLegTest.cs" />

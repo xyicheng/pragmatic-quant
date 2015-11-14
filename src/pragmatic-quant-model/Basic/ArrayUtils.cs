@@ -6,6 +6,10 @@ namespace pragmatic_quant_model.Basic
 {
     public static class ArrayUtils
     {
+        public static T[] Constant<T>(int size, T value)
+        {
+            return EnumerableUtils.For(0, size, i => value);
+        }
         public static T[] Column<T>(this T[,] array, int index)
         {
             if (index < 0 || index >= array.GetLength(1))

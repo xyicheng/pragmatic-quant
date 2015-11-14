@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.Model;
@@ -34,23 +33,18 @@ namespace pragmatic_quant_com.Factories
             var assetName = bag.ProcessScalarString("Asset");
             var withDivs = !bag.Has("WithDivs") || bag.ProcessScalarBoolean("WithDivs");
             
-            var calibMatrix = bag.ProcessTimeMatrixDatas("CalibDate");
+            var calibDatas = bag.ProcessTimeMatrixDatas("CalibDate");
 
-            if (calibMatrix.ColLabels.Count() != 1)
-                throw new ArgumentException("Invalid BlackScholes calibration parameters");
-
-            var calibLabel = calibMatrix.ColLabels.First();
-            var calibDatas = calibMatrix.GetColFromLabel(calibLabel);
-
-            switch (calibLabel.ToLowerInvariant().Trim())
+            if (calibDatas.HasCol("Sigma"))
             {
-                case "sigma" :
-                    var sigma = new MapRawDatas<DateOrDuration, double>(calibMatrix.RowLabels, calibDatas);
-                    var bsDescription = new BlackScholesModelDescription(assetName, sigma, withDivs);
-                    return new ExplicitCalibration<BlackScholesModelDescription>(bsDescription);
+                var sigmaValues = calibDatas.GetColFromLabel("Sigma");
+                var sigma = new MapRawDatas<DateOrDuration, double>(calibDatas.RowLabels, sigmaValues);
+                var bsDescription = new BlackScholesModelDescription(assetName, sigma, withDivs);
+                return new ExplicitCalibration<BlackScholesModelDescription>(bsDescription);
             }
-
-            throw new ArgumentException(string.Format("Unknown BlackScholes parameter {0}", calibLabel));
+            
+            var calibStrikes = calibDatas.GetColFromLabel("Strike");
+            return new BlackScholesModelCalibDesc(assetName, withDivs, calibDatas.RowLabels, calibStrikes);
         }
     }
 
