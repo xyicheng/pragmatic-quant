@@ -1,9 +1,7 @@
 using System;
 using pragmatic_quant_model.MarketDatas;
-using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Function;
 using pragmatic_quant_model.Maths.Stochastic;
-using pragmatic_quant_model.Product;
 
 namespace pragmatic_quant_model.Model.HullWhite
 {
@@ -27,10 +25,7 @@ namespace pragmatic_quant_model.Model.HullWhite
             return drift;
         }
         #endregion
-        public Hw1ModelPathGeneratorFactory(MonteCarloConfig mcConfig = null)
-        {
-        }
-
+        
         protected override IProcessPathGenerator Build(Hw1Model model, Market market, PaymentInfo probaMeasure, DateTime[] simulatedDates)
         {
             var dates = model.Time[simulatedDates];

@@ -1,7 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using NUnit.Framework;
 using pragmatic_quant_model.Basic;
-using pragmatic_quant_model.Maths;
 using pragmatic_quant_model.Maths.Function;
 using pragmatic_quant_model.Maths.Interpolation;
 
@@ -56,19 +56,47 @@ namespace test.Maths.Function
         [Test]
         public void TestMult()
         {
-            var pillars = new[] {0.0, 1.0, 2.0};
-            var vals = new[] {0.007, 0.004, 0.0065};
-            const double left = 2.0;
-            var step = new StepFunction(pillars, vals, left);
-            var square = step * step;
-            Assert.IsTrue(square is StepFunction);
-            for (int i = 0; i < pillars.Length - 1; i++)
+            var pillars1 = new[] {0.0, 1.0, 2.0};
+            var vals1 = new[] {0.007, 0.004, 0.0065};
+            const double left1 = 2.0;
+            var step1 = new StepFunction(pillars1, vals1, left1);
+
+            var pillars2 = new[] {-0.8, 0.2, 1.0, 1.5, 2.0, 3.55};
+            var vals2 = new[] {0.005, 0.003, -0.1, 0.0, -0.08, 10.0};
+            const double left2 = -1.89;
+            var step2 = new StepFunction(pillars2, vals2, left2);
+            
+            var prod = step1 * step2;
+            Assert.IsTrue(prod is StepFunction);
+
+            var allPillars = pillars1.Union(pillars2).OrderBy(p => p).ToArray();
+            for (int i = 0; i < allPillars.Length; i++)
             {
-                var integralVal = square.Eval(pillars[i]);
-                Assert.IsTrue(DoubleUtils.MachineEquality(integralVal, vals[i] * vals[i]));
+                double x = allPillars[i];
+                var val1 = step1.Eval(x);
+                var val2 = step2.Eval(x);
+                var prodVal = prod.Eval(x);
+                
+                Assert.IsTrue(DoubleUtils.MachineEquality(prodVal, val1 * val2));
             }
-            Assert.IsTrue(DoubleUtils.MachineEquality(square.Eval(double.NegativeInfinity), left * left));
+            Assert.IsTrue(DoubleUtils.MachineEquality(prod.Eval(double.NegativeInfinity),
+                step1.Eval(double.NegativeInfinity) * step2.Eval(double.NegativeInfinity)));
+
+            var rand = new Random(123);
+            double a = allPillars.Max() - allPillars.Min() ;
+            double b = allPillars.Min();
+            for (int i = 0; i < 1000; i++)
+            {
+                var x = rand.NextDouble() * a * 3.0 + b - 0.1 * a;
+                var val1 = step1.Eval(x);
+                var val2 = step2.Eval(x);
+                var prodVal = prod.Eval(x);
+
+                Assert.IsTrue(DoubleUtils.MachineEquality(prodVal, val1 * val2));
+            }
+
         }
+        
     }
 
     [TestFixture]

@@ -46,10 +46,7 @@ namespace pragmatic_quant_model.Model.Equity.BlackScholes
             return new BsEqtySimulatorStepDatas(step, dates, stepDividends, discounts, stepVols, stepVarDrifts);
         }
         #endregion
-        public BlackScholesEqtyPathGenFactory(MonteCarloConfig mcConfig)
-        {
-            
-        }
+        
         protected override IProcessPathGenerator Build(BlackScholesModel model, Market market, PaymentInfo probaMeasure, DateTime[] simulatedDates)
         {
             var asset = model.Asset;

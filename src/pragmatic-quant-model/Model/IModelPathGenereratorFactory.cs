@@ -24,8 +24,8 @@ namespace pragmatic_quant_model.Model
         {
             var result = new Dictionary<Type, Func<MonteCarloConfig, IModelPathGenereratorFactory>>
             {
-                {typeof (Hw1Model), mcConfig => new Hw1ModelPathGeneratorFactory(mcConfig)},
-                {typeof (BlackScholesModel), mcConfig => new BlackScholesEqtyPathGenFactory(mcConfig)},
+                {typeof (Hw1Model), mcConfig => new Hw1ModelPathGeneratorFactory()},
+                {typeof (BlackScholesModel), mcConfig => new BlackScholesEqtyPathGenFactory()},
                 {typeof (LocalVolatilityModel), mcConfig => new LocalVolPathGenFactory(mcConfig)}
             };
             return result;
