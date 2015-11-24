@@ -23,7 +23,7 @@ namespace pragmatic_quant_model.Maths.Function
         {
             var cst = other as ConstantRrFunction;
             if (cst != null)
-                return RrFunctions.Constant(Value * cst.Value);
+                return RrFunctions.Constant(Value + cst.Value);
 
             var step = other as StepFunction;
             if (step != null)

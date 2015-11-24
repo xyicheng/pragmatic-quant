@@ -37,7 +37,7 @@ namespace test.Maths.Function
             Assert.AreEqual(stepFunc.Eval(rightExtrapolPoint), vals[abs.Length - 1] + rightSlope * (rightExtrapolPoint - abs[abs.Length - 1]));
         }
     }
-
+                                                                                                   
     [TestFixture]
     public class CubicSplineInterpolationTest
     {
