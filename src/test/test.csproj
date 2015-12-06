@@ -67,6 +67,7 @@
     <Compile Include="Maths\BlackOption_Test.cs" />
     <Compile Include="Maths\BachelierOption_Test.cs" />
     <Compile Include="Maths\PolynomialTest.cs" />
+    <Compile Include="Maths\RootTest.cs" />
     <Compile Include="Maths\SobolTest.cs" />
     <Compile Include="Maths\BrownianBridge_Test.cs" />
     <Compile Include="Model\BlackDivImpliedVolTest.cs" />

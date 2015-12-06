@@ -7,7 +7,7 @@ using pragmatic_quant_model.Maths.Interpolation;
 
 namespace pragmatic_quant_model.Maths.Function
 {
-    [DebuggerDisplay("ConstantRrFunction Value={Value}")]
+    [DebuggerDisplay("Constant Value = {Value}")]
     public class ConstantRrFunction : RrFunction
     {
         public ConstantRrFunction(double value)
@@ -180,7 +180,7 @@ namespace pragmatic_quant_model.Maths.Function
         }
         #endregion
 
-        public LinearCombinationRrFunction(double[] weights, RrFunction[] functions)
+        private LinearCombinationRrFunction(double[] weights, RrFunction[] functions)
         {
             if (weights.Length != functions.Length)
                 throw new Exception("LinearCombinationRRFunction : incompatible size input");

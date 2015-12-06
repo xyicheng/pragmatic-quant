@@ -82,17 +82,28 @@ namespace pragmatic_quant_model.Model.Equity.Dividends
             var pricer = new BsDivPrice(maturity, strike, spot, affineDivUtils, quadPoints, quadWeights);
             Func<double, double> volToLehmanVolErr =
                 v => BlackScholesOption.ImpliedVol(pricer.Price(v, q), proxyFwd, strike + proxyDk, maturity, q) - lehmanTargetVol;
-            //TODO use a cache
-
-            //Bracket & Solve
+            
+            //Solve
             double v1 = lehmanTargetVol;
-            double v2 = lehmanTargetVol - volToLehmanVolErr(lehmanTargetVol);
-            if (!RootUtils.Bracket(volToLehmanVolErr, v1, v2, out v1, out v2))
-                throw new Exception("Failed to inverse vol");
-            var impliedVol = RootUtils.Brenth(volToLehmanVolErr, v1, v2, 1.0e-10, 2.0 * DoubleUtils.MachineEpsilon, 10);
-            return impliedVol;
-        }
+            double err1 = volToLehmanVolErr(v1);
 
+            double v2 = lehmanTargetVol - err1;
+            double err2 = volToLehmanVolErr(v2);
+            double v3 = v1 - err1 * (v2 - v1) / (err2 - err1);
+            
+            if (Math.Abs(v3 - v2) < v2 * 1.0e-13)
+                return v3;
+            double err3 = volToLehmanVolErr(v3);
+            double v4 = RootUtils.TrinomRoot(v1, v2, v3, err1, err2, err3);
+            
+            if (Math.Abs(v4 - v3) < v3 * 1.0e-13)
+                return v4;
+            double err4 = volToLehmanVolErr(v4);
+            double v5 = RootUtils.TrinomRoot(v2, v3, v4, err2, err3, err4);
+            
+            return v5;
+        }
+        
         public double[] CalibrateVol(double[] maturities, double[] targetPrices, double[] strikes, double[] optionTypes)
         {
             Contract.Requires(EnumerableUtils.IsSorted(maturities));

@@ -30,7 +30,7 @@ namespace test.Model
                     var impliedVol = pricer.ImpliedVol(t, strike, price, m > 0 ? 1 : -1);
 
                     var errRelative = (impliedVol - vol) / vol;
-                    Assert.IsTrue(Math.Abs(errRelative) < 7.0e-10);
+                    Assert.IsTrue(Math.Abs(errRelative) < 5.0e-13);
                 }
             }
             

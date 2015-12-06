@@ -5,32 +5,77 @@ namespace pragmatic_quant_model.Maths
 {
     public static class RootUtils
     {
+        #region private methods
+        private static bool Bracket(Func<double, double> f, double x1, double x2,                                   
+                                    out double xa, out double fa,
+                                    out double xb, out double fb)
+        {
+            const int NTRY = 50;
+            const double FACTOR = 1.6;
+
+            if (DoubleUtils.MachineEquality(x1, x2))
+                throw new Exception("Bracket : bad initial range");
+            xa = x1;
+            xb = x2;
+            fa = f(xa);
+            fb = f(xb);
+
+            double last = double.NaN;
+            double lastf = double.NaN;
+
+            for (int j = 0; j < NTRY; j++)
+            {
+                if (fa * fb < 0.0)
+                {
+                    if (lastf * fa < 0.0)
+                    {
+                        xb = last;
+                        fb = lastf;
+                    }
+                    if (lastf * fb < 0.0)
+                    {
+                        xa = last;
+                        fa = lastf;
+                    }
+                    return true;
+                }
+                if (Math.Abs(fa) < Math.Abs(fb))
+                {
+                    last = xa;
+                    lastf = fa;
+                    xa += FACTOR * (xa - xb);
+                    fa = f(xa);
+                }
+                else
+                {
+                    last = xb;
+                    lastf = fb;
+                    xb += FACTOR * (xb - xa);
+                    fb = f(xb);
+                }
+            }
+            return false;
+        }
+        #endregion
+
         /// <summary>
         /// Brenth algorithm from scipy
         /// </summary>
-        /// <param name="f"></param>
-        /// <param name="xa"></param>
-        /// <param name="xb"></param>
-        /// <param name="xtol"></param>
-        /// <param name="rtol"></param>
-        /// <param name="maxIter"></param>
-        /// <param name="funcalls"> nb func call</param>
-        /// <param name="iterations">nb algo iterations</param>
-        /// <returns></returns>
-        public static double Brenth(Func<double, double> f, double xa, double xb,
+        public static double Brenth(Func<double, double> f, 
+                                    double xa, double fa, double xb, double fb,
                                     double xtol, double rtol, int maxIter,
                                     out int funcalls, out int iterations)
         {
             double xpre = xa;
             double xcur = xb;
-            double fpre = f(xpre);
-            double fcur = f(xcur);
-            funcalls = 2;
+            double fpre = fa;
+            double fcur = fb;
+            funcalls = 0;
             iterations = 0;
 
             if (fpre * fcur > 0)
                 throw new Exception("Brent : root must be bracketed");
-            
+
             if (DoubleUtils.EqualZero(fpre)) return xpre;
             if (DoubleUtils.EqualZero(fcur)) return xcur;
 
@@ -72,6 +117,7 @@ namespace pragmatic_quant_model.Maths
                         // extrapolate
                         double dpre = (fpre - fcur) / (xpre - xcur);
                         double dblk = (fblk - fcur) / (xblk - xcur);
+                        
                         stry = -fcur * (fblk - fpre) / (fblk * dpre - fpre * dblk);
                     }
 
@@ -107,7 +153,28 @@ namespace pragmatic_quant_model.Maths
             }
             throw new Exception("Brent : max iteration excedeed");
         }
-
+        
+        /// <summary>
+        /// Brenth algorithm from scipy
+        /// </summary>
+        /// <param name="f"></param>
+        /// <param name="xa"></param>
+        /// <param name="xb"></param>
+        /// <param name="xtol"></param>
+        /// <param name="rtol"></param>
+        /// <param name="maxIter"></param>
+        /// <param name="funcalls"> nb func call</param>
+        /// <param name="iterations">nb algo iterations</param>
+        /// <returns></returns>
+        public static double Brenth(Func<double, double> f, double xa, double xb,
+                                    double xtol, double rtol, int maxIter,
+                                    out int funcalls, out int iterations)
+        {
+            var root= Brenth(f, xa, f(xa), xb, f(xb), xtol, rtol, maxIter, out funcalls, out iterations);
+            funcalls += 2;
+            return root;
+        }
+        
         /// <summary>
         /// Brenth algorithm from scipy
         /// </summary>
@@ -124,45 +191,34 @@ namespace pragmatic_quant_model.Maths
             int funcalls, iterations;
             return Brenth(f, xa, xb, xtol, rtol, maxIter, out funcalls, out iterations);
         }
+        
+        public static double BrentWithBracket(Func<double, double> f, double x1, double x2,
+                                              double xtol, double rtol, int maxIter = 100)
+        {
+            double xa, fa, xb, fb;
+            if (!Bracket(f, x1, x2, out xa, out fa, out xb, out fb))
+                throw new Exception("Failed to bracket root !");
+
+            int funcalls, iterations;
+            return Brenth(f, xa, fa, xb, fb, xtol, rtol, maxIter, out funcalls, out iterations);
+        }
 
         /// <summary>
         /// Root bracketing algorithm
         /// </summary>
         /// <param name="f">function to bracket</param>
-        /// <param name="xa"></param>
-        /// <param name="xb"></param>
         /// <param name="x1"></param>
         /// <param name="x2"></param>
+        /// <param name="xa"></param>
+        /// <param name="xb"></param>
         /// <returns></returns>
-        public static bool Bracket(Func<double, double> f, double xa, double xb,
-                                   out double x1, out double x2)
+        public static bool Bracket(Func<double, double> f, double x1, double x2,
+                                   out double xa, out double xb)
         {
-            const int NTRY = 50;
-            const double FACTOR = 1.6;
-
-            if (DoubleUtils.MachineEquality(xa, xb))
-                throw new Exception("Bracket : bad initial range");
-            x1 = xa;
-            x2 = xb;
-            double f1 = f(x1);
-            double f2 = f(x2);
-            for (int j = 0; j < NTRY; j++)
-            {
-                if (f1 * f2 < 0.0) return true;
-                if (Math.Abs(f1) < Math.Abs(f2))
-                {
-                    x1 += FACTOR * (x1 - x2);
-                    f1 = f(x1);
-                }
-                else
-                {
-                    x2 += FACTOR * (x2 - x1);
-                    f2 = f(x2);
-                }
-            }
-            return false;
+            double fa, fb;
+            return Bracket(f, x1, x2, out xa, out fa, out xb, out fb);
         }
-
+        
         public static double TrinomRoot(double a, double b, double c,
                                         double fa, double fb, double fc)
         {

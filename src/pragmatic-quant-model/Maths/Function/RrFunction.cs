@@ -81,11 +81,11 @@ namespace pragmatic_quant_model.Maths.Function
         }
         public static RrFunction Sum(params RrFunction[] functions)
         {
-            return new LinearCombinationRrFunction(functions.Select(f => 1.0).ToArray(), functions);
+            return LinearCombinationRrFunction.Create(functions.Select(f => 1.0).ToArray(), functions);
         }
         public static RrFunction LinearCombination(double[] weights, RrFunction[] funcs)
         {
-            return new LinearCombinationRrFunction(weights, funcs);
+            return LinearCombinationRrFunction.Create(weights, funcs);
         }
         public static RrFunction Product(RrFunction f, RrFunction g)
         {

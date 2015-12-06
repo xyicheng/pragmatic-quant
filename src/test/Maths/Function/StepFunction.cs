@@ -97,6 +97,50 @@ namespace test.Maths.Function
 
         }
         
+        [Test]
+        public void TestAdd()
+        {
+            var pillars1 = new[] { 0.0, 1.0, 2.0 };
+            var vals1 = new[] { 0.007, 0.004, 0.0065 };
+            const double left1 = 2.0;
+            var step1 = new StepFunction(pillars1, vals1, left1);
+
+            var pillars2 = new[] { -0.8, 0.2, 1.0, 1.5, 2.0, 3.55 };
+            var vals2 = new[] { 0.005, 0.003, -0.1, 0.0, -0.08, 10.0 };
+            const double left2 = -1.89;
+            var step2 = new StepFunction(pillars2, vals2, left2);
+
+            var sum = step1 + step2;
+            Assert.IsTrue(sum is StepFunction);
+
+            var allPillars = pillars1.Union(pillars2).OrderBy(p => p).ToArray();
+            for (int i = 0; i < allPillars.Length; i++)
+            {
+                double x = allPillars[i];
+                var val1 = step1.Eval(x);
+                var val2 = step2.Eval(x);
+                var sumVal = sum.Eval(x);
+
+                Assert.IsTrue(DoubleUtils.MachineEquality(sumVal, val1 + val2));
+            }
+            Assert.IsTrue(DoubleUtils.MachineEquality(sum.Eval(double.NegativeInfinity),
+                step1.Eval(double.NegativeInfinity) + step2.Eval(double.NegativeInfinity)));
+
+            var rand = new Random(123);
+            double a = allPillars.Max() - allPillars.Min();
+            double b = allPillars.Min();
+            for (int i = 0; i < 1000; i++)
+            {
+                var x = rand.NextDouble() * a * 3.0 + b - 0.1 * a;
+                var val1 = step1.Eval(x);
+                var val2 = step2.Eval(x);
+                var sumVal = sum.Eval(x);
+
+                Assert.IsTrue(DoubleUtils.MachineEquality(sumVal, val1 + val2));
+            }
+
+        }
+        
     }
 
     [TestFixture]
