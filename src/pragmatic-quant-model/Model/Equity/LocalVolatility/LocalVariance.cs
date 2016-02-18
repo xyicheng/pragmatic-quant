@@ -20,6 +20,58 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
         private readonly RrFunction[] pillarStepIntegrals;
         #endregion
         #region private methods
+        private RrFunction Denominator(double t, int stepIndex)
+        {
+
+            RrFunction v, dVdY, d2Vd2Y;
+            if (stepIndex < 0)
+            {
+                double w = t / maturities[0];
+
+                if (Math.Abs(w) < 1.0e-10)
+                    return shortLocalVar;
+
+                v = w * vs[0];
+                dVdY = w * dVdYs[0];
+                d2Vd2Y = w * d2Vd2Ys[0];
+            }
+            else if (stepIndex == maturities.Length - 1)
+            {
+                double w = t / maturities[maturities.Length - 1];
+                v = vs[stepIndex] * w;
+                dVdY = dVdYs[stepIndex] * w;
+                d2Vd2Y = d2Vd2Ys[stepIndex] * w;
+            }
+            else
+            {
+                double w = (t - maturities[stepIndex]) / (maturities[stepIndex + 1] - maturities[stepIndex]);
+                v = (1.0 - w) * vs[stepIndex] + w * vs[stepIndex + 1];
+                dVdY = (1.0 - w) * dVdYs[stepIndex] + w * dVdYs[stepIndex + 1];
+                d2Vd2Y = (1.0 - w) * d2Vd2Ys[stepIndex] + w * d2Vd2Ys[stepIndex + 1];
+            }
+
+            var denominator = 0.5 * m * dVdY / v - 1.0;
+            denominator = denominator * denominator + 0.5 * d2Vd2Y - 0.25 * (0.25 + 1.0 / v) * dVdY * dVdY;
+            return denominator;
+        }
+        private RrFunction Numerator(double t, int stepIndex)
+        {
+            RrFunction dVdT;
+            if (stepIndex < 0)
+            {
+                double w = t / maturities[0];
+
+                if (Math.Abs(w) < 1.0e-10)
+                    return shortLocalVar;
+
+                dVdT = vs[0] / maturities[0];
+            }
+            else
+            {
+                dVdT = dVdTs[stepIndex];
+            }
+            return dVdT;
+        }
         private RrFunction StepQuadrature(double start, double end)
         {
             var dt = (end - start);
@@ -27,7 +79,6 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
             {
                 //2 points Gauss-Legendre
                 return (0.5 * dt) * (TimeSlice(start + dt * 0.211324865405187) + TimeSlice(start + dt * 0.788675134594813));
-                //return (0.5 * dt) * (TimeSlice(start * (1.0 + 1e-12)) + TimeSlice(end * (1.0 - 1e-12)));
             }
             return RrFunctions.Zero;
         }
@@ -122,48 +173,25 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
             localVar = dVdT / localVar;
             return localVar;
         }
+
+        /// <summary>
+        /// Return local variance at date t given by formula :
+        ///                                                   dv/dt 
+        /// local variance = ------------------------------------------------------------------------------------
+        ///                   (y * (dv/dy) / (2 * v) - 1)^2 + 1/2 * (d^2 v/dy^2) - 1/4 * (1/4 + 1/v) * (dv/dy)^2
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public RrFunction TimeSlice(double t)
         {
             var stepIndex = maturityStepSearcher.LocateLeftIndex(t);
-            RrFunction v, dVdY, d2Vd2Y, dVdT;
-            if (stepIndex < 0)
-            {
-                double w = t / maturities[0];
-
-                if (Math.Abs(w) < 1.0e-10)
-                    return shortLocalVar;
-
-                v = w * vs[0];
-                dVdY = w * dVdYs[0];
-                d2Vd2Y = w * d2Vd2Ys[0];
-                dVdT = vs[0] / maturities[0];
-            }
-            else if (stepIndex == maturities.Length - 1)
-            {
-                double w = t / maturities[maturities.Length - 1];
-                v = vs[stepIndex] * w;
-                dVdY = dVdYs[stepIndex] * w;
-                d2Vd2Y = d2Vd2Ys[stepIndex] * w;
-                dVdT = dVdTs[stepIndex];
-            }
-            else
-            {
-                double w = (t - maturities[stepIndex]) / (maturities[stepIndex + 1] - maturities[stepIndex]);
-                v = (1.0 - w) * vs[stepIndex] + w * vs[stepIndex + 1];
-                dVdY = (1.0 - w) * dVdYs[stepIndex] + w * dVdYs[stepIndex + 1];
-                d2Vd2Y = (1.0 - w) * d2Vd2Ys[stepIndex] + w * d2Vd2Ys[stepIndex + 1];
-                dVdT = dVdTs[stepIndex];
-            }
-
-            //                                                  dv/dt 
-            // local variance = ------------------------------------------------------------------------------------
-            //                   (y * (dv/dy) / (2 * v) - 1)^2 + 1/2 * (d^2 v/dy^2) - 1/4 * (1/4 + 1/v) * (dv/dy)^2
-            var localVar = 0.5 * m * dVdY / v - 1.0;
-            localVar = localVar * localVar + 0.5 * d2Vd2Y - 0.25 * (0.25 + 1.0 / v) * dVdY * dVdY;
-            localVar = dVdT / localVar;
+            RrFunction dVdT = Numerator(t, stepIndex);
+            var denominator = Denominator(t, stepIndex);
+            var localVar = dVdT / denominator;
             return localVar;
         }
-        public RrFunction TimeAverage(double start, double end)
+
+        public RrFunction TimeAveragedSlice(double start, double end)
         {
             if (start > end)
                 throw new Exception("LocalVariance.TimeAverage : start must be lower than end");
@@ -181,5 +209,26 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
             average /= (end - start);
             return average;
         }
+
+        /// <summary>
+        /// return denominator of local variance : (y * (dv/dy) / (2 * v) - 1)^2 + 1/2 * (d^2 v/dy^2) - 1/4 * (1/4 + 1/v) * (dv/dy)^2
+        /// </summary>
+        public RrFunction Denominator(double t)
+        {
+            var stepIndex = maturityStepSearcher.LocateLeftIndex(t);
+            return Denominator(t, stepIndex);
+        }
+
+        /// <summary>
+        /// return numerator of local variance : dv/dt 
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public RrFunction Numerator(double t)
+        {
+            var stepIndex = maturityStepSearcher.LocateLeftIndex(t);
+            return Numerator(t, stepIndex);
+        }
+        
     }
 }

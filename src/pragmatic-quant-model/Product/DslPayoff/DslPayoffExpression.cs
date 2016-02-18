@@ -5,10 +5,10 @@ namespace pragmatic_quant_model.Product.DslPayoff
 {
     public class DslPayoffExpression
     {
-        public DslPayoffExpression(IFixing[] fixings, string expression, string fixingArrayId)
+        public DslPayoffExpression(IFixing[] fixings, string cSharpExpression, string fixingArrayId)
         {
             Fixings = fixings;
-            CSharpExpression = expression;
+            CSharpExpression = cSharpExpression;
             FixingArrayId = fixingArrayId;
         }
         

@@ -3,7 +3,6 @@ using System.Linq;
 
 namespace pragmatic_quant_model.Product.Fixings
 {
-    //TODO use a contract to enforce fixings array size in Value method
     public interface IFixingFunction : IObservation
     {
         IFixing[] Fixings { get; }

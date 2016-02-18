@@ -65,7 +65,7 @@ namespace pragmatic_quant_model.Pricing
             var totalPrice = 0.0;
             for (int i = 0; i < result.Flows.Length; i++)
             {
-                var couponFlow = result.Labels[i];
+                CouponFlowLabel couponFlow = result.Labels[i];
                 var price = new Price(result.Flows[i], couponFlow.Payment.Currency);
                 priceDetails.Add(new Tuple<string, PaymentInfo, Price>(couponFlow.Label, couponFlow.Payment, price));
                 totalPrice += price.Convert(refCurrency, market).Value;

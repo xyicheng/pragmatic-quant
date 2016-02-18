@@ -41,7 +41,7 @@ namespace pragmatic_quant_model.Model.Equity.LocalVolatility
             double end = time[endDate];
 
             VolatilitySurface volSurface = model.VolSurface;
-            RrFunction stepLocalVariance = volSurface.LocalVariance.TimeAverage(start, end);
+            RrFunction stepLocalVariance = volSurface.LocalVariance.TimeAveragedSlice(start, end);
             var moneyness = model.Moneyness.Moneyness(start);
             Func<double, double> localVol = logSpot => Math.Sqrt(stepLocalVariance.Eval(moneyness(Math.Exp(logSpot))));
             

@@ -123,6 +123,38 @@ namespace pragmatic_quant_com
             });
         }
 
+        [ExcelFunction(Description = "Equity local volatility function",
+                       Category = "PragmaticQuant_Model")]
+        public static object LocalVolDenominator(object mktObj, object[] dates, double[] strikes, string assetName)
+        {
+            return FunctionRunnerUtils.Run("LocalVolSurface", () =>
+            {
+                Market market = MarketManager.Instance.GetMarket(mktObj);
+                AssetMarket assetMarket = market.AssetMarketFromName(assetName);
+                VolatilitySurface volSurface = assetMarket.VolSurface();
+                
+                var localVariance = volSurface.LocalVariance;
+                var moneyness = volSurface.Moneyness;
+                var time = volSurface.Time;
+
+                var result = new double[dates.Length, strikes.Length];
+                for (int i = 0; i<dates.Length; i++)
+                {
+                    var dateOrDuration = DateAndDurationConverter.ConvertDateOrDuration(dates[i]);
+                    var date  = dateOrDuration.ToDate(assetMarket.RefDate);
+                    double t = time[date];
+                    var denomFunc = localVariance.Denominator(t);
+                    var denoms = strikes.Map(k =>
+                    {
+                        var y = moneyness.Moneyness(t, k);
+                        return denomFunc.Eval(y);
+                    });
+                    ArrayUtils.SetRow(ref result, i, denoms);
+                }
+                return result;
+            });
+        }
+
         [ExcelFunction(Description = "Equity vanilla option",
                        Category = "PragmaticQuant_Model")]
         public static object EquityVanillaOption(object mktObj, string assetName, object maturity, double strike, double vol, string optionType)

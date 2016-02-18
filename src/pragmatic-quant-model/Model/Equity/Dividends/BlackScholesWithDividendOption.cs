@@ -278,7 +278,8 @@ namespace pragmatic_quant_model.Model.Equity.Dividends
         private readonly Func<double, double> assetGrowth;
         private readonly StepFunction cashDivBpv;
         private readonly RrFunction cashBpvIntegral;
-        //private readonly StepFunction squareTimeWeightedCash;
+        
+        private readonly StepFunction squareTimeWeightedCash;
         #endregion
         public AffineDivCurveUtils(DividendQuote[] dividends,
                                    DiscountCurve discountCurve,
@@ -298,15 +299,16 @@ namespace pragmatic_quant_model.Model.Equity.Dividends
                 cashDivBpv = new StepFunction(divDates, cashBpvs, 0.0);
                 cashBpvIntegral = cashDivBpv.Integral(0.0);
 
-                //double[] squareTimeWeightedCashs = discountedCashs.ZipWith(divDates, (c, t) => c * t * t);
-                //squareTimeWeightedCash = new StepFunction(divDates, squareTimeWeightedCashs, 0.0);
+                double[] squareTimeWeightedCashs = discountedCashs.ZipWith(divDates, (c, t) => c * t * t);
+                squareTimeWeightedCash = new StepFunction(divDates, squareTimeWeightedCashs, 0.0);
             }
             else
             {
                 assetGrowth = t => 1.0 / discountCurve.Zc(t);
                 cashDivBpv = new StepFunction(new[] { 0.0 }, new[] { 0.0 }, double.NaN);
                 cashBpvIntegral = RrFunctions.Zero;
-                //squareTimeWeightedCash = new StepFunction(new[] { 0.0 }, new[] { 0.0 }, double.NaN);
+                
+                squareTimeWeightedCash = new StepFunction(new[] { 0.0 }, new[] { 0.0 }, double.NaN);
             }
         }
 
@@ -326,8 +328,8 @@ namespace pragmatic_quant_model.Model.Equity.Dividends
         }
         public double CashBpvTimeWeightedAverage(double t)
         {
-            throw new NotImplementedException("todo");
-            //return cashDivBpv.Eval(t) - squareTimeWeightedCash.Eval(t) / (t * t );
+            //throw new NotImplementedException("todo");
+            return cashDivBpv.Eval(t) - squareTimeWeightedCash.Eval(t) / (t * t );
         }
 
         public void LehmanProxy(double maturity, double spot,
