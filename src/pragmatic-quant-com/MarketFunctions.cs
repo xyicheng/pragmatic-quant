@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using ExcelDna.Integration;
+using pragmatic_quant_com.Factories;
 using pragmatic_quant_model.Basic;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.MarketDatas;
-using pragmatic_quant_model.Model.Equity.Dividends;
 
 namespace pragmatic_quant_com
 {
@@ -89,131 +89,10 @@ namespace pragmatic_quant_com
                 Market market = MarketManager.Instance.GetMarket(mktObj);
                 AssetMarket assetMarket = market.AssetMarketFromName(assetName);
                 VolatilitySurface volSurface = assetMarket.VolSurface();
-
-                var maturities = dates.Map(o =>
-                {
-                    var dateOrDuration = DateAndDurationConverter.ConvertDateOrDuration(o);
-                    return dateOrDuration.ToDate(assetMarket.RefDate);
-                });
+                var maturities = ObjectConverters.ConvertDateArray(dates, assetMarket.RefDate);
 
                 return ArrayUtils.CartesianProd(maturities, strikes, volSurface.Volatility);
             });
         }
-    }
-
-    public class ModelFunctions
-    {
-        [ExcelFunction(Description = "Equity local volatility function",
-                       Category = "PragmaticQuant_Model")]
-        public static object LocalVolSurface(object mktObj, object[] dates, double[] strikes, string assetName)
-        {
-            return FunctionRunnerUtils.Run("LocalVolSurface", () =>
-            {
-                Market market = MarketManager.Instance.GetMarket(mktObj);
-                AssetMarket assetMarket = market.AssetMarketFromName(assetName);
-                VolatilitySurface volSurface = assetMarket.VolSurface();
-
-                var maturities = dates.Map(o =>
-                {
-                    var dateOrDuration = DateAndDurationConverter.ConvertDateOrDuration(o);
-                    return dateOrDuration.ToDate(assetMarket.RefDate);
-                });
-
-                return ArrayUtils.CartesianProd(maturities, strikes, volSurface.LocalVol);
-            });
-        }
-
-        [ExcelFunction(Description = "Equity local volatility function",
-                       Category = "PragmaticQuant_Model")]
-        public static object LocalVolDenominator(object mktObj, object[] dates, double[] strikes, string assetName)
-        {
-            return FunctionRunnerUtils.Run("LocalVolSurface", () =>
-            {
-                Market market = MarketManager.Instance.GetMarket(mktObj);
-                AssetMarket assetMarket = market.AssetMarketFromName(assetName);
-                VolatilitySurface volSurface = assetMarket.VolSurface();
-                
-                var localVariance = volSurface.LocalVariance;
-                var moneyness = volSurface.Moneyness;
-                var time = volSurface.Time;
-
-                var result = new double[dates.Length, strikes.Length];
-                for (int i = 0; i<dates.Length; i++)
-                {
-                    var dateOrDuration = DateAndDurationConverter.ConvertDateOrDuration(dates[i]);
-                    var date  = dateOrDuration.ToDate(assetMarket.RefDate);
-                    double t = time[date];
-                    var denomFunc = localVariance.Denominator(t);
-                    var denoms = strikes.Map(k =>
-                    {
-                        var y = moneyness.Moneyness(t, k);
-                        return denomFunc.Eval(y);
-                    });
-                    ArrayUtils.SetRow(ref result, i, denoms);
-                }
-                return result;
-            });
-        }
-
-        [ExcelFunction(Description = "Equity vanilla option",
-                       Category = "PragmaticQuant_Model")]
-        public static object EquityVanillaOption(object mktObj, string assetName, object maturity, double strike, double vol, string optionType)
-        {
-            return FunctionRunnerUtils.Run("EquityVanillaOption", () =>
-            {
-                Market market = MarketManager.Instance.GetMarket(mktObj);
-                AssetMarket assetMkt = market.AssetMarketFromName(assetName);
-                var pricer = BlackScholesWithDividendOption.Build(assetMkt.Spot,
-                    assetMkt.Dividends,
-                    assetMkt.RiskFreeDiscount,
-                    assetMkt.Time);
-                double q;
-                switch (optionType.Trim().ToLower())
-                {
-                    case "call":
-                        q = 1.0;
-                        break;
-                    case "put":
-                        q = -1.0;
-                        break;
-                    default:
-                        throw new Exception(string.Format("Unknow option type : {0}", optionType));
-                }
-
-                var matAsDate = DateAndDurationConverter.ConvertDateOrDuration(maturity).ToDate(assetMkt.RefDate);
-                return pricer.Price(assetMkt.Time[matAsDate], strike, vol, q);
-            });
-        }
-
-        [ExcelFunction(Description = "Equity vanilla option implied volatility",
-                       Category = "PragmaticQuant_Model")]
-        public static object EquityImpliedVol(object mktObj, string assetName, object maturity, double strike, double price, string optionType)
-        {
-            return FunctionRunnerUtils.Run("EquityImpliedVol", () =>
-            {
-                Market market = MarketManager.Instance.GetMarket(mktObj);
-                AssetMarket assetMkt = market.AssetMarketFromName(assetName);
-                var pricer = BlackScholesWithDividendOption.Build(assetMkt.Spot,
-                    assetMkt.Dividends,
-                    assetMkt.RiskFreeDiscount,
-                    assetMkt.Time);
-                double q;
-                switch (optionType.Trim().ToLower())
-                {
-                    case "call":
-                        q = 1.0;
-                        break;
-                    case "put":
-                        q = -1.0;
-                        break;
-                    default:
-                        throw new Exception(string.Format("Unknow option type : {0}", optionType));
-                }
-
-                var matAsDate = DateAndDurationConverter.ConvertDateOrDuration(maturity).ToDate(assetMkt.RefDate);
-                return pricer.ImpliedVol(assetMkt.Time[matAsDate], strike, price, q);
-            });
-        }
-
     }
 }

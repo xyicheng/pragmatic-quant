@@ -32,7 +32,7 @@ namespace pragmatic_quant_model.Model.Equity.BlackScholes
                 ? assetMkt.Dividends.Map(div => div.DivModel())
                 : new DiscreteLocalDividend[0];
 
-            return new BlackScholesModel(time, assetMkt.Asset, bs.Sigma.ToFunction(time), localDividends);
+            return new BlackScholesModel(time, assetMkt.Asset, bs.Sigma.ToStepFunction(time), localDividends);
         }
     }
     

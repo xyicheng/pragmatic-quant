@@ -24,7 +24,7 @@ namespace pragmatic_quant_model.Model.HullWhite
         public override IModel Build(Hw1ModelDescription model, Market market)
         {
             var time = ModelFactoryUtils.DefaultTime(market.RefDate);
-            return new Hw1Model(time, model.Currency, model.MeanReversion, model.Sigma.ToFunction(time));
+            return new Hw1Model(time, model.Currency, model.MeanReversion, model.Sigma.ToStepFunction(time));
         }
     }
 

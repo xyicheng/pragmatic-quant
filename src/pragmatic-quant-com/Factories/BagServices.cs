@@ -248,5 +248,4 @@ namespace pragmatic_quant_com.Factories
             return ProcessLabelledMatrix(bag, name, DateOrDurationValueConverter(name), DoubleValueConverter(name), DoubleValueConverter(name));
         }
     }
-
 }

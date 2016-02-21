@@ -96,6 +96,7 @@
     <Compile Include="Factories\AlgorithmFactory.cs" />
     <Compile Include="Factories\BagServices.cs" />
     <Compile Include="Factories\ModelCalibrationFactory.cs" />
+    <Compile Include="Factories\ObjectConverters.cs" />
     <Compile Include="Factories\ProductFactory.cs" />
     <Compile Include="Factories\IFactoryFromBag.cs" />
     <Compile Include="Factories\MarketFactory.cs" />
@@ -106,6 +107,7 @@
       <DependentUpon>LoggerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="MarketManager.cs" />
+    <Compile Include="ModelFunctions.cs" />
     <Compile Include="Publishers\IPublisher.cs" />
     <Compile Include="Publishers\PriceResultPublisher.cs" />
     <Compile Include="Publishers\PublisherServices.cs" />

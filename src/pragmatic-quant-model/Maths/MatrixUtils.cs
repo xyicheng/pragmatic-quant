@@ -76,7 +76,23 @@ namespace pragmatic_quant_model.Maths
                 for (int j = 0; j < a.GetLength(1); j++)
                     result[j, i] = a[i, j];
         }
-        
+
+        public static void CorrelFromCovariance(ref double[,] covariance)
+        {
+            if (covariance.GetLength(0)!=covariance.GetLength(1))
+                throw new Exception("Square matrix expected");
+            int size = covariance.GetLength(0);
+            for (int i = 0; i < size; i++)
+            {
+                var stdDev = Math.Sqrt(covariance[i, i]);
+                for (int j = 0; j < size; j++)
+                {
+                    covariance[i, j] /= stdDev;
+                    covariance[j, i] /= stdDev;
+                }
+            }
+        }
+             
         public static double[,] Copy(this double[,] m)
         {
             var c = new double[m.GetLength(0), m.GetLength(1)];
@@ -102,6 +118,12 @@ namespace pragmatic_quant_model.Maths
             var result = new double[m.GetLength(1), m.GetLength(0)];
             Tranpose(ref result, m);
             return result;
+        }
+        public static double[,] Correlation(this double[,] covariance)
+        {
+            var correl = covariance.Copy();
+            CorrelFromCovariance(ref correl);
+            return correl;
         }
 
         public static double[,] Id(int size)

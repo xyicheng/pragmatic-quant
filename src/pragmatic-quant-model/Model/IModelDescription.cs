@@ -6,6 +6,7 @@ using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.MarketDatas;
 using pragmatic_quant_model.Maths.Function;
+using pragmatic_quant_model.Model.Equity.Bergomi;
 using pragmatic_quant_model.Model.Equity.BlackScholes;
 using pragmatic_quant_model.Model.Equity.Dividends;
 using pragmatic_quant_model.Model.Equity.LocalVolatility;
@@ -32,7 +33,8 @@ namespace pragmatic_quant_model.Model
             {
                 {typeof (Hw1ModelDescription), Hw1ModelFactory.Instance},
                 {typeof (BlackScholesModelDescription), BlackScholesModelFactory.Instance},
-                {typeof (LocalVolModelDescription), LocalVolModelFactory.Instance}
+                {typeof (LocalVolModelDescription), LocalVolModelFactory.Instance},
+                {typeof (Bergomi2FModelDescription), Bergomi2FModelFactory.Instance}
             };
             return result;
         }
@@ -67,7 +69,7 @@ namespace pragmatic_quant_model.Model
         {
             return TimeMeasure.Act365(refDate);
         }
-        public static RrFunction ToFunction(this MapRawDatas<DateOrDuration, double> rawDatasFunc, ITimeMeasure time)
+        public static RrFunction ToStepFunction(this MapRawDatas<DateOrDuration, double> rawDatasFunc, ITimeMeasure time)
         {
             var abscissae = rawDatasFunc.Pillars.Map(d => time[d.ToDate(time.RefDate)]);
             return new StepFunction(abscissae, rawDatasFunc.Values, rawDatasFunc.Values.First());

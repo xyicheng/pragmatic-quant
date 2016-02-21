@@ -159,6 +159,7 @@
     <Compile Include="Maths\BlackScholesOption.cs" />
     <Compile Include="Maths\RootUtils.cs" />
     <Compile Include="Maths\FiniteDifferenceUtils.cs" />
+    <Compile Include="Model\Equity\Bergomi\Bergomi2F.cs" />
     <Compile Include="Model\Equity\Dividends\BlackScholesWithDividendOption.cs" />
     <Compile Include="Model\Equity\EquityModel.cs" />
     <Compile Include="Model\Equity\LocalVolatility\LocalVariance.cs" />

@@ -22,7 +22,15 @@ namespace pragmatic_quant_model.Basic
         {
             get { return stepSearcher.Pillars; }
         }
-             
+        public T[] Values
+        {
+            get { return values; }
+        }
+        public T LeftValue
+        {
+            get { return leftValue;}
+        }
+
         public T Eval(double x)
         {
             int stepIndex;

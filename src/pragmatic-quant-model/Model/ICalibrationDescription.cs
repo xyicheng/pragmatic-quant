@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.MarketDatas;
+using pragmatic_quant_model.Model.Equity.Bergomi;
 using pragmatic_quant_model.Model.Equity.BlackScholes;
 using pragmatic_quant_model.Model.Equity.LocalVolatility;
 using pragmatic_quant_model.Model.HullWhite;
@@ -32,6 +33,7 @@ namespace pragmatic_quant_model.Model
             var result = new Dictionary<Type, IModelCalibration>();
             AddExplicit<Hw1ModelDescription>(result);
             AddExplicit<BlackScholesModelDescription>(result);
+            AddExplicit<Bergomi2FModelDescription>(result);
             result.Add(typeof (LocalVolModelCalibDesc), LocalVolModelCalibration.Instance);
             result.Add(typeof(BlackScholesModelCalibDesc), BlackScholesModelCalibration.Instance);
             return result;

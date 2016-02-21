@@ -2,6 +2,7 @@ using System;
 using pragmatic_quant_model.Basic.Dates;
 using pragmatic_quant_model.Basic.Structure;
 using pragmatic_quant_model.Model;
+using pragmatic_quant_model.Model.Equity.Bergomi;
 using pragmatic_quant_model.Model.Equity.BlackScholes;
 using pragmatic_quant_model.Model.Equity.LocalVolatility;
 
@@ -19,6 +20,8 @@ namespace pragmatic_quant_com.Factories
                     return BlackScholesModelFactory.Instance.Build(bag);
                 case "localvol":
                     return LocalVolModelFactoryFromBag.Instance.Build(bag);
+                case "bergomi2f":
+                    return Bergomi2FModelFactoryFromBag.Instance.Build(bag);
             }
 
             throw new NotImplementedException(modelName);
@@ -56,6 +59,33 @@ namespace pragmatic_quant_com.Factories
             var assetName = bag.ProcessScalarString("Asset");
             var withDivs = !bag.Has("WithDivs") || bag.ProcessScalarBoolean("WithDivs");
             return new LocalVolModelCalibDesc(assetName, withDivs);
+        }
+    }
+
+    public class Bergomi2FModelFactoryFromBag :
+        Singleton<Bergomi2FModelFactoryFromBag>, IFactoryFromBag<ICalibrationDescription>
+    {
+        public ICalibrationDescription Build(object[,] bag)
+        {
+            string assetName = bag.ProcessScalarString("Asset");
+            bool withDivs = !bag.Has("WithDivs") || bag.ProcessScalarBoolean("WithDivs");
+
+            var calibDatas = bag.ProcessTimeMatrixDatas("Date");
+            var sigmaValues = calibDatas.GetColFromLabel("Sigma");
+            var sigma = new MapRawDatas<DateOrDuration, double>(calibDatas.RowLabels, sigmaValues);
+            
+            double k1 = bag.ProcessScalarDouble("K1");
+            double k2 = bag.ProcessScalarDouble("K2");
+            double theta = bag.ProcessScalarDouble("Theta");
+            double nu = bag.ProcessScalarDouble("Nu");
+            double rhoXY = bag.ProcessScalarDouble("RhoXY");
+            double rhoSX = bag.ProcessScalarDouble("RhoSX");
+            double rhoSY = bag.ProcessScalarDouble("RhoSY");
+
+            Bergomi2FModelDescription b2FDescription = new Bergomi2FModelDescription(assetName, withDivs, sigma,
+                k1, k2, theta, nu, rhoXY, rhoSX, rhoSY);
+
+            return new ExplicitCalibration<Bergomi2FModelDescription>(b2FDescription);
         }
     }
 

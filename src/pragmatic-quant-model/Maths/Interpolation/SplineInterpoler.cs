@@ -45,7 +45,16 @@ namespace pragmatic_quant_model.Maths.Interpolation
         }
         public override RrFunction Derivative()
         {
-            return new SplineInterpoler(stepSplines.Map(f => f.Derivative()));
+            var splineDerivatives = stepSplines.Map(f => f.Derivative());
+
+            var isStepFunc = splineDerivatives.Values.Union(new[] {splineDerivatives.LeftValue})
+                                              .All((f => f.Denom.Degree == 0 && f.Num.Degree == 0));
+            if (isStepFunc)
+            {
+                return new StepFunction(splineDerivatives.Map(f => f.Eval(0.0)));
+            }
+
+            return new SplineInterpoler(splineDerivatives);
         }
         public override RrFunction Inverse()
         {
@@ -226,7 +235,22 @@ namespace pragmatic_quant_model.Maths.Interpolation
         {
             var linearInterpol = EnumerableUtils.For(0, abscissae.Length - 1,
                 i => StepLinearInterpoler(abscissae[i + 1] - abscissae[i], values[i], values[i + 1]));
+
+            if (Double.IsNaN(rightExtrapolationSlope))
+            {
+                if (values.Length <= 1)
+                    throw new Exception("Linear interpolation : natural extrapolation need at least two values");
+                rightExtrapolationSlope = (values[values.Length - 1] - values[values.Length - 2])
+                                          / (abscissae[abscissae.Length - 1] - abscissae[abscissae.Length - 2]);
+            }
             var rightElem = new Polynomial(values[values.Length - 1], rightExtrapolationSlope);
+            
+            if (Double.IsNaN(leftExtrapolationSlope))
+            {
+                if (values.Length <= 1)
+                    throw new Exception("Linear interpolation : natural extrapolation need at least two values");
+                leftExtrapolationSlope = (values[1] - values[0]) / (abscissae[1] - abscissae[0]);
+            }
             var leftElem = new Polynomial(values[0], leftExtrapolationSlope);
 
             return new StepFunction<Polynomial>(abscissae, linearInterpol.Concat(new[] {rightElem}).ToArray(), leftElem);

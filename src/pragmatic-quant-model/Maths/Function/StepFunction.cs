@@ -22,6 +22,13 @@ namespace pragmatic_quant_model.Maths.Function
             return new StepFunction(mergedAbscissae, multValues, multLeftValue);
         }
         #endregion
+        public StepFunction(StepFunction<double> steps)
+        {
+            evaluator = steps;
+            abscissae = steps.Pillars;
+            values = steps.Values;
+            leftValue = steps.LeftValue;
+        }
         public StepFunction(double[] abscissae, double[] values, double leftValue)
         {
             evaluator = new StepFunction<double>(abscissae, values, leftValue);
